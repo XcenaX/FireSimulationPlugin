@@ -1,0 +1,12 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UE4Editor-FireSimulation-0001.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"G:\UE_Projects\TestProject\Intermediate\Build\Win64\TestProjectEditor\Development\Engine\SharedPCH.Engine.ShadowErrors.h.obj"
+"G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Development\FireSimulation\FireSimulation.cpp.obj"
+"G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Development\FireSimulation\Default.rc2.res"
+/OUT:"G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Development\FireSimulation\UE4Editor-FireSimulation-0001.lib"
