@@ -6,7 +6,7 @@
 #include "FireStarter.generated.h"
 
 UCLASS()
-class YOURPROJECTNAME_API FireStarter : public AActor
+class FIRESIMULATION_API FireStarter : public AActor
 {
     GENERATED_BODY()
 

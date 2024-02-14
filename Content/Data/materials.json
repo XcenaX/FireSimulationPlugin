@@ -1,0 +1,873 @@
+[
+    {
+      "Name": "Здания Ι-II степени огнестойкости; мебель + бытовые изделия",
+      "LowestHeatOfCombustion_kJ_per_kg": 13800.0,
+      "LinearFlameSpeed": 0.0108,
+      "BurningRate": 0.0145,
+      "SmokeGeneration": 270.0,
+      "OxygenConsumption_kg_per_kg": -1.03,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.203,
+        "CarbonMonoxide_kg_per_kg": 0.0022,
+        "HydrogenChloride_kg_per_kg": 0.014
+      }
+    },
+    {
+      "Name": "Здания Ι-II степени огнестойкости; мебель + ткани",
+      "LowestHeatOfCombustion_kJ_per_kg": 14700.0,
+      "LinearFlameSpeed": 0.0108,
+      "BurningRate": 0.0145,
+      "SmokeGeneration": 82.0,
+      "OxygenConsumption_kg_per_kg": -1.437,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 1.285,
+        "CarbonMonoxide_kg_per_kg": 0.0022,
+        "HydrogenChloride_kg_per_kg": 0.006
+      }
+    },
+    {
+      "Name": "Здания ΙII-IV степени огнестойкости; мебель + бытовые изделия",
+      "LowestHeatOfCombustion_kJ_per_kg": 13800.0,
+      "LinearFlameSpeed": 0.0465,
+      "BurningRate": 0.0344,
+      "SmokeGeneration": 270.0,
+      "OxygenConsumption_kg_per_kg": -1.03,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.203,
+        "CarbonMonoxide_kg_per_kg": 0.0022,
+        "HydrogenChloride_kg_per_kg": 0.014
+      }
+    },
+    {
+      "Name": "Здания ΙII-IV степени огнестойкости; мебель + ткани",
+      "LowestHeatOfCombustion_kJ_per_kg": 14700.0,
+      "LinearFlameSpeed": 0.0465,
+      "BurningRate": 0.0344,
+      "SmokeGeneration": 82.0,
+      "OxygenConsumption_kg_per_kg": -1.437,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 1.285,
+        "CarbonMonoxide_kg_per_kg": 0.0022,
+        "HydrogenChloride_kg_per_kg": 0.006
+      }
+    },
+    {
+      "Name": "Здания Ι степени огнестойкости; мебель + ткани (0.75+0.25)",
+      "LowestHeatOfCombustion_kJ_per_kg": 14900.0,
+      "LinearFlameSpeed": 0.0125,
+      "BurningRate": 0.0162,
+      "SmokeGeneration": 58.5,
+      "OxygenConsumption_kg_per_kg": -1.437,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 1.32,
+        "CarbonMonoxide_kg_per_kg": 0.0193,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Здания ΙII степени огнестойкости; мебель + ткани (0.75+0.25)",
+      "LowestHeatOfCombustion_kJ_per_kg": 14900.0,
+      "LinearFlameSpeed": 0.04,
+      "BurningRate": 0.0162,
+      "SmokeGeneration": 58.5,
+      "OxygenConsumption_kg_per_kg": -1.437,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 1.32,
+        "CarbonMonoxide_kg_per_kg": 0.0193,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Кабинет; мебель + бумага (0.75+0.25)",
+      "LowestHeatOfCombustion_kJ_per_kg": 14002.0,
+      "LinearFlameSpeed": 0.042,
+      "BurningRate": 0.0129,
+      "SmokeGeneration": 53.0,
+      "OxygenConsumption_kg_per_kg": -1.161,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.642,
+        "CarbonMonoxide_kg_per_kg": 0.0317,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Помещение. облицованное панелями ДВП; панели ДВП",
+      "LowestHeatOfCombustion_kJ_per_kg": 18100.0,
+      "LinearFlameSpeed": 0.0405,
+      "BurningRate": 0.0143,
+      "SmokeGeneration": 130.0,
+      "OxygenConsumption_kg_per_kg": -1.15,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.686,
+        "CarbonMonoxide_kg_per_kg": 0.0215,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Административное помещение; мебель + бумага (0.75+0.25)",
+      "LowestHeatOfCombustion_kJ_per_kg": 14002.0,
+      "LinearFlameSpeed": 0.022,
+      "BurningRate": 0.021,
+      "SmokeGeneration": 53.0,
+      "OxygenConsumption_kg_per_kg": -1.161,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 1.434,
+        "CarbonMonoxide_kg_per_kg": 0.043,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Лекарственные препараты; этиловый спирт + глицерин (0.95+0.05)",
+      "LowestHeatOfCombustion_kJ_per_kg": 26600.0,
+      "LinearFlameSpeed": 812.8,
+      "BurningRate": 0.033,
+      "SmokeGeneration": 88.1,
+      "OxygenConsumption_kg_per_kg": -2.304,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 1.912,
+        "CarbonMonoxide_kg_per_kg": 0.262,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Общественные здания; мебель + линолеум ПВХ (0.9+0.1)",
+      "LowestHeatOfCombustion_kJ_per_kg": 14000.0,
+      "LinearFlameSpeed": 0.015,
+      "BurningRate": 0.0137,
+      "SmokeGeneration": 47.7,
+      "OxygenConsumption_kg_per_kg": -1.369,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 1.478,
+        "CarbonMonoxide_kg_per_kg": 0.03,
+        "HydrogenChloride_kg_per_kg": 0.0058
+      }
+    },
+    {
+      "Name": "Библиотеки. архивы; книги. журналы на стеллажах ",
+      "LowestHeatOfCombustion_kJ_per_kg": 14500.0,
+      "LinearFlameSpeed": 0.0103,
+      "BurningRate": 0.011,
+      "SmokeGeneration": 49.5,
+      "OxygenConsumption_kg_per_kg": -1.154,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 1.1087,
+        "CarbonMonoxide_kg_per_kg": 0.0974,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Сценическая часть зрительного зала; древесина",
+      "LowestHeatOfCombustion_kJ_per_kg": 13800.0,
+      "LinearFlameSpeed": 0.0368,
+      "BurningRate": 0.0145,
+      "SmokeGeneration": 57.0,
+      "OxygenConsumption_kg_per_kg": -1.15,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 1.57,
+        "CarbonMonoxide_kg_per_kg": 0.024,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Верхняя одежда; ворс ткани (шерсть + нейлон)",
+      "LowestHeatOfCombustion_kJ_per_kg": 23300.0,
+      "LinearFlameSpeed": 0.0835,
+      "BurningRate": 0.013,
+      "SmokeGeneration": 129.0,
+      "OxygenConsumption_kg_per_kg": -3.698,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.467,
+        "CarbonMonoxide_kg_per_kg": 0.0145,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Резинотехнические изделия; резина. изделия из неё",
+      "LowestHeatOfCombustion_kJ_per_kg": 36000.0,
+      "LinearFlameSpeed": 0.0184,
+      "BurningRate": 0.0112,
+      "SmokeGeneration": 850.0,
+      "OxygenConsumption_kg_per_kg": -2.99,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.416,
+        "CarbonMonoxide_kg_per_kg": 0.015,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Окрашенные полы. стены; дерево + окраска РХО (0.9+0.1)",
+      "LowestHeatOfCombustion_kJ_per_kg": 14100.0,
+      "LinearFlameSpeed": 0.0151,
+      "BurningRate": 0.0145,
+      "SmokeGeneration": 71.3,
+      "OxygenConsumption_kg_per_kg": -1.218,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 1.47,
+        "CarbonMonoxide_kg_per_kg": 0.0349,
+        "HydrogenChloride_kg_per_kg": 0.001
+      }
+    },
+    {
+      "Name": "Выставочный зал. мастерская; дерево + ткани + окраски (0.9+0.09+0.01)",
+      "LowestHeatOfCombustion_kJ_per_kg": 14000.0,
+      "LinearFlameSpeed": 0.0163,
+      "BurningRate": 0.0152,
+      "SmokeGeneration": 53.0,
+      "OxygenConsumption_kg_per_kg": -1.218,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 1.423,
+        "CarbonMonoxide_kg_per_kg": 0.023,
+        "HydrogenChloride_kg_per_kg": 0.0001
+      }
+    },
+    {
+      "Name": "Издательства. типографии",
+      "LowestHeatOfCombustion_kJ_per_kg": 13800.0,
+      "LinearFlameSpeed": 0.0108,
+      "BurningRate": 0.0145,
+      "SmokeGeneration": 270.0,
+      "OxygenConsumption_kg_per_kg": -1.03,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.203,
+        "CarbonMonoxide_kg_per_kg": 0.0022,
+        "HydrogenChloride_kg_per_kg": 0.014
+      }
+    },
+    {
+      "Name": "Каюта с синтетической отделкой; дерево + ткани + отделка",
+      "LowestHeatOfCombustion_kJ_per_kg": 15800.0,
+      "LinearFlameSpeed": 0.0177,
+      "BurningRate": 0.015,
+      "SmokeGeneration": 133.5,
+      "OxygenConsumption_kg_per_kg": -1.249,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.845,
+        "CarbonMonoxide_kg_per_kg": 0.0425,
+        "HydrogenChloride_kg_per_kg": 0.023
+      }
+    },
+    {
+      "Name": "Мебель; дерево + облицовка (0.9+0.1)",
+      "LowestHeatOfCombustion_kJ_per_kg": 14400.0,
+      "LinearFlameSpeed": 0.0154,
+      "BurningRate": 0.0135,
+      "SmokeGeneration": 84.1,
+      "OxygenConsumption_kg_per_kg": -1.288,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 1.55,
+        "CarbonMonoxide_kg_per_kg": 0.0367,
+        "HydrogenChloride_kg_per_kg": 0.0036
+      }
+    },
+    {
+      "Name": "Промтовары; текстильные изделия",
+      "LowestHeatOfCombustion_kJ_per_kg": 16700.0,
+      "LinearFlameSpeed": 0.0071,
+      "BurningRate": 0.0244,
+      "SmokeGeneration": 60.6,
+      "OxygenConsumption_kg_per_kg": -2.56,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.879,
+        "CarbonMonoxide_kg_per_kg": 0.0626,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Кабельный подвал/поток; кабели АВВГ+АПВГ",
+      "LowestHeatOfCombustion_kJ_per_kg": 30700.0,
+      "LinearFlameSpeed": 0.0071,
+      "BurningRate": 0.0244,
+      "SmokeGeneration": 521.0,
+      "OxygenConsumption_kg_per_kg": -2.19,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.65,
+        "CarbonMonoxide_kg_per_kg": 0.1295,
+        "HydrogenChloride_kg_per_kg": 0.0202
+      }
+    },
+    {
+      "Name": "Химическое вещество; толуол",
+      "LowestHeatOfCombustion_kJ_per_kg": 40900.0,
+      "LinearFlameSpeed": 860.0,
+      "BurningRate": 0.043,
+      "SmokeGeneration": 562.0,
+      "OxygenConsumption_kg_per_kg": -3.098,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 3.667,
+        "CarbonMonoxide_kg_per_kg": 0.148,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Химическое вещество; ксилол",
+      "LowestHeatOfCombustion_kJ_per_kg": 41200.0,
+      "LinearFlameSpeed": 860.0,
+      "BurningRate": 0.09,
+      "SmokeGeneration": 402.0,
+      "OxygenConsumption_kg_per_kg": -3.623,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 3.657,
+        "CarbonMonoxide_kg_per_kg": 0.148,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Бензин А-76",
+      "LowestHeatOfCombustion_kJ_per_kg": 43200.0,
+      "LinearFlameSpeed": 745.0,
+      "BurningRate": 0.0585,
+      "SmokeGeneration": 256.0,
+      "OxygenConsumption_kg_per_kg": -3.405,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 2.92,
+        "CarbonMonoxide_kg_per_kg": 0.175,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Керосин",
+      "LowestHeatOfCombustion_kJ_per_kg": 43300.0,
+      "LinearFlameSpeed": 794.0,
+      "BurningRate": 0.0415,
+      "SmokeGeneration": 438.1,
+      "OxygenConsumption_kg_per_kg": -3.341,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 2.92,
+        "CarbonMonoxide_kg_per_kg": 0.148,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Дизельное топливо; соляр",
+      "LowestHeatOfCombustion_kJ_per_kg": 45400.0,
+      "LinearFlameSpeed": 853.0,
+      "BurningRate": 0.0425,
+      "SmokeGeneration": 620.1,
+      "OxygenConsumption_kg_per_kg": -3.368,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 3.163,
+        "CarbonMonoxide_kg_per_kg": 0.122,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Радиоматериалы; полиэтилен. полистирол. полипропил. гетинакс",
+      "LowestHeatOfCombustion_kJ_per_kg": 34800.0,
+      "LinearFlameSpeed": 0.0137,
+      "BurningRate": 0.0177,
+      "SmokeGeneration": 381.0,
+      "OxygenConsumption_kg_per_kg": -3.312,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.764,
+        "CarbonMonoxide_kg_per_kg": 0.1,
+        "HydrogenChloride_kg_per_kg": 0.0073
+      }
+    },
+    {
+      "Name": "Электротехнические материалы; текстолит. карболит",
+      "LowestHeatOfCombustion_kJ_per_kg": 20900.0,
+      "LinearFlameSpeed": 0.0125,
+      "BurningRate": 0.0076,
+      "SmokeGeneration": 327.0,
+      "OxygenConsumption_kg_per_kg": -1.95,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.375,
+        "CarbonMonoxide_kg_per_kg": 0.0556,
+        "HydrogenChloride_kg_per_kg": 0.0054
+      }
+    },
+    {
+      "Name": "Теплоноситель; турбинное масло ТП-22",
+      "LowestHeatOfCombustion_kJ_per_kg": 41900.0,
+      "LinearFlameSpeed": 883.0,
+      "BurningRate": 0.03,
+      "SmokeGeneration": 243.0,
+      "OxygenConsumption_kg_per_kg": -0.282,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.7,
+        "CarbonMonoxide_kg_per_kg": 0.122,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Электрокабель АВВГ; ПВХ оболочка + изоляция",
+      "LowestHeatOfCombustion_kJ_per_kg": 25000.0,
+      "LinearFlameSpeed": 0.0071,
+      "BurningRate": 0.0244,
+      "SmokeGeneration": 635.0,
+      "OxygenConsumption_kg_per_kg": -2.19,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.398,
+        "CarbonMonoxide_kg_per_kg": 0.109,
+        "HydrogenChloride_kg_per_kg": 0.0245
+      }
+    },
+    {
+      "Name": "Электрокабель АПВГ; ПВХ-оболочка + полиэтилен",
+      "LowestHeatOfCombustion_kJ_per_kg": 36400.0,
+      "LinearFlameSpeed": 0.0071,
+      "BurningRate": 0.0244,
+      "SmokeGeneration": 407.0,
+      "OxygenConsumption_kg_per_kg": -2.19,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.903,
+        "CarbonMonoxide_kg_per_kg": 0.15,
+        "HydrogenChloride_kg_per_kg": 0.016
+      }
+    },
+    {
+      "Name": "Телефонный кабель ТПВ; ПВХ + полиэтилен",
+      "LowestHeatOfCombustion_kJ_per_kg": 34600.0,
+      "LinearFlameSpeed": 0.0022,
+      "BurningRate": 0.0085,
+      "SmokeGeneration": 556.0,
+      "OxygenConsumption_kg_per_kg": -2.19,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.903,
+        "CarbonMonoxide_kg_per_kg": 0.124,
+        "HydrogenChloride_kg_per_kg": 0.0156
+      }
+    },
+    {
+      "Name": "Сырьё для нефтехимии; нефть",
+      "LowestHeatOfCombustion_kJ_per_kg": 44200.0,
+      "LinearFlameSpeed": 885.0,
+      "BurningRate": 0.0241,
+      "SmokeGeneration": 438.0,
+      "OxygenConsumption_kg_per_kg": -3.24,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 3.104,
+        "CarbonMonoxide_kg_per_kg": 0.161,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Химическое вещество: ацетон",
+      "LowestHeatOfCombustion_kJ_per_kg": 29000.0,
+      "LinearFlameSpeed": 790.0,
+      "BurningRate": 0.044,
+      "SmokeGeneration": 80.0,
+      "OxygenConsumption_kg_per_kg": -2.22,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 2.293,
+        "CarbonMonoxide_kg_per_kg": 0.269,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Химическое вещество: этиловый спирт",
+      "LowestHeatOfCombustion_kJ_per_kg": 27500.0,
+      "LinearFlameSpeed": 789.3,
+      "BurningRate": 0.031,
+      "SmokeGeneration": 80.0,
+      "OxygenConsumption_kg_per_kg": -2.362,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 1.937,
+        "CarbonMonoxide_kg_per_kg": 0.269,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Лесопильный цех I-III степени огнестойкости; древесина",
+      "LowestHeatOfCombustion_kJ_per_kg": 13800.0,
+      "LinearFlameSpeed": 0.0396,
+      "BurningRate": 0.0145,
+      "SmokeGeneration": 57.0,
+      "OxygenConsumption_kg_per_kg": -1.15,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 1.57,
+        "CarbonMonoxide_kg_per_kg": 0.024,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Лесопильный цех IV-V степени огнестойкости; древесина",
+      "LowestHeatOfCombustion_kJ_per_kg": 13800.0,
+      "LinearFlameSpeed": 0.0583,
+      "BurningRate": 0.0145,
+      "SmokeGeneration": 57.0,
+      "OxygenConsumption_kg_per_kg": -1.15,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 1.57,
+        "CarbonMonoxide_kg_per_kg": 0.024,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Цех деревообработки; древесина",
+      "LowestHeatOfCombustion_kJ_per_kg": 13800.0,
+      "LinearFlameSpeed": 0.022,
+      "BurningRate": 0.0145,
+      "SmokeGeneration": 57.0,
+      "OxygenConsumption_kg_per_kg": -1.15,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 1.57,
+        "CarbonMonoxide_kg_per_kg": 0.024,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Цех сушки древесины; древесина",
+      "LowestHeatOfCombustion_kJ_per_kg": 13800.0,
+      "LinearFlameSpeed": 0.0375,
+      "BurningRate": 0.0145,
+      "SmokeGeneration": 57.0,
+      "OxygenConsumption_kg_per_kg": -1.15,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 1.57,
+        "CarbonMonoxide_kg_per_kg": 0.024,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Производство фанеры; древесина + фанера (0.5+0.5)",
+      "LowestHeatOfCombustion_kJ_per_kg": 16100.0,
+      "LinearFlameSpeed": 0.0191,
+      "BurningRate": 0.0117,
+      "SmokeGeneration": 80.5,
+      "OxygenConsumption_kg_per_kg": -1.177,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 1.055,
+        "CarbonMonoxide_kg_per_kg": 0.072,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Штабель древесины; хвойный + лиственный лес",
+      "LowestHeatOfCombustion_kJ_per_kg": 13800.0,
+      "LinearFlameSpeed": 0.0585,
+      "BurningRate": 0.0145,
+      "SmokeGeneration": 57.0,
+      "OxygenConsumption_kg_per_kg": -1.15,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 1.57,
+        "CarbonMonoxide_kg_per_kg": 0.024,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Хвойные древесные стройматериалы; штабель",
+      "LowestHeatOfCombustion_kJ_per_kg": 13800.0,
+      "LinearFlameSpeed": 0.0585,
+      "BurningRate": 0.0063,
+      "SmokeGeneration": 61.0,
+      "OxygenConsumption_kg_per_kg": -1.15,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 1.57,
+        "CarbonMonoxide_kg_per_kg": 0.024,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Лиственные древесные стройматериалы; штабель",
+      "LowestHeatOfCombustion_kJ_per_kg": 13800.0,
+      "LinearFlameSpeed": 0.0585,
+      "BurningRate": 0.014,
+      "SmokeGeneration": 53.0,
+      "OxygenConsumption_kg_per_kg": -1.15,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 1.57,
+        "CarbonMonoxide_kg_per_kg": 0.024,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Клееные стройматериалы; фанера",
+      "LowestHeatOfCombustion_kJ_per_kg": 18400.0,
+      "LinearFlameSpeed": 0.0167,
+      "BurningRate": 0.0089,
+      "SmokeGeneration": 104.0,
+      "OxygenConsumption_kg_per_kg": -1.205,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.54,
+        "CarbonMonoxide_kg_per_kg": 0.121,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Сырьё для лёгкой промышленности; хлопок разрыхлённый",
+      "LowestHeatOfCombustion_kJ_per_kg": 16400.0,
+      "LinearFlameSpeed": 0.0445,
+      "BurningRate": 0.0213,
+      "SmokeGeneration": 0.6,
+      "OxygenConsumption_kg_per_kg": -2.3,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.57,
+        "CarbonMonoxide_kg_per_kg": 0.0052,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Сырьё для лёгкой промышленности; лён разрыхлённый",
+      "LowestHeatOfCombustion_kJ_per_kg": 15700.0,
+      "LinearFlameSpeed": 0.05,
+      "BurningRate": 0.0213,
+      "SmokeGeneration": 3.37,
+      "OxygenConsumption_kg_per_kg": -1.83,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.36,
+        "CarbonMonoxide_kg_per_kg": 0.0039,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Сырьё для лёгкой промышленности; хлопок + капрон (0.75+0.25)",
+      "LowestHeatOfCombustion_kJ_per_kg": 15700.0,
+      "LinearFlameSpeed": 0.028,
+      "BurningRate": 0.0125,
+      "SmokeGeneration": 4.3,
+      "OxygenConsumption_kg_per_kg": -3.55,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 1.045,
+        "CarbonMonoxide_kg_per_kg": 0.012,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Сырьё для лёгкой промышленности; шерсть",
+      "LowestHeatOfCombustion_kJ_per_kg": 21800.0,
+      "LinearFlameSpeed": 0.028,
+      "BurningRate": 0.02,
+      "SmokeGeneration": 164.0,
+      "OxygenConsumption_kg_per_kg": -1.759,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.715,
+        "CarbonMonoxide_kg_per_kg": 0.0153,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Пищевая промышленность; пшеница. рис. гречиха и мука из них",
+      "LowestHeatOfCombustion_kJ_per_kg": 17000.0,
+      "LinearFlameSpeed": 0.005,
+      "BurningRate": 0.008,
+      "SmokeGeneration": 1096.0,
+      "OxygenConsumption_kg_per_kg": -0.968,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.812,
+        "CarbonMonoxide_kg_per_kg": 0.163,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Сырьё и изделия из синтетического каучука",
+      "LowestHeatOfCombustion_kJ_per_kg": 43000.0,
+      "LinearFlameSpeed": 0.0143,
+      "BurningRate": 0.011,
+      "SmokeGeneration": 212.0,
+      "OxygenConsumption_kg_per_kg": -2.985,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 1.408,
+        "CarbonMonoxide_kg_per_kg": 0.15,
+        "HydrogenChloride_kg_per_kg": 0.005
+      }
+    },
+    {
+      "Name": "Склад льноволокна",
+      "LowestHeatOfCombustion_kJ_per_kg": 15700.0,
+      "LinearFlameSpeed": 0.071,
+      "BurningRate": 0.0213,
+      "SmokeGeneration": 3.4,
+      "OxygenConsumption_kg_per_kg": -1.83,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.36,
+        "CarbonMonoxide_kg_per_kg": 0.0039,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Склад хлопка в тюках",
+      "LowestHeatOfCombustion_kJ_per_kg": 16700.0,
+      "LinearFlameSpeed": 0.0042,
+      "BurningRate": 0.0167,
+      "SmokeGeneration": 0.6,
+      "OxygenConsumption_kg_per_kg": -1.15,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.578,
+        "CarbonMonoxide_kg_per_kg": 0.0052,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Склад бумаги в рулонах",
+      "LowestHeatOfCombustion_kJ_per_kg": 15100.0,
+      "LinearFlameSpeed": 0.005,
+      "BurningRate": 0.008,
+      "SmokeGeneration": 41.0,
+      "OxygenConsumption_kg_per_kg": -1.158,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.6635,
+        "CarbonMonoxide_kg_per_kg": 0.1077,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Провода в резиновой изоляции типа КПРТ. ПТ. ВПРС",
+      "LowestHeatOfCombustion_kJ_per_kg": 37800.0,
+      "LinearFlameSpeed": 0.005,
+      "BurningRate": 0.1917,
+      "SmokeGeneration": 850.0,
+      "OxygenConsumption_kg_per_kg": -2.99,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.416,
+        "CarbonMonoxide_kg_per_kg": 0.015,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Склад оргстекла (ПММА)",
+      "LowestHeatOfCombustion_kJ_per_kg": 26400.0,
+      "LinearFlameSpeed": 0.008,
+      "BurningRate": 0.0041,
+      "SmokeGeneration": 78.0,
+      "OxygenConsumption_kg_per_kg": -2.09,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 1.795,
+        "CarbonMonoxide_kg_per_kg": 0.1266,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Кабели + провода; 0.75 *(АВВГ. АПВГ. ТПВ)+0.25*(КПРТ. ПР. ШРПС)",
+      "LowestHeatOfCombustion_kJ_per_kg": 33500.0,
+      "LinearFlameSpeed": 0.0054,
+      "BurningRate": 0.0622,
+      "SmokeGeneration": 612.0,
+      "OxygenConsumption_kg_per_kg": -2.389,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.655,
+        "CarbonMonoxide_kg_per_kg": 0.0995,
+        "HydrogenChloride_kg_per_kg": 0.014
+      }
+    },
+    {
+      "Name": "Дерево + лаковое покрытие; 0.95* древесина+0.05*(ФЛ+РХО)",
+      "LowestHeatOfCombustion_kJ_per_kg": 13900.0,
+      "LinearFlameSpeed": 0.0151,
+      "BurningRate": 0.0225,
+      "SmokeGeneration": 64.1,
+      "OxygenConsumption_kg_per_kg": -1.191,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.724,
+        "CarbonMonoxide_kg_per_kg": 0.0205,
+        "HydrogenChloride_kg_per_kg": 0.0005
+      }
+    },
+    {
+      "Name": "Автомобиль; 0.3*(резина. бензин)+0.15*(ППУ. искожа ПВХ)+0.1*эмаль",
+      "LowestHeatOfCombustion_kJ_per_kg": 31700.0,
+      "LinearFlameSpeed": 0.0068,
+      "BurningRate": 0.0233,
+      "SmokeGeneration": 487.0,
+      "OxygenConsumption_kg_per_kg": -2.64,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 1.295,
+        "CarbonMonoxide_kg_per_kg": 0.097,
+        "HydrogenChloride_kg_per_kg": 0.0109
+      }
+    },
+    {
+      "Name": "Зал; 0.5*ДВП + 0.1*(ткань. искожа ПВХ. ППУ) + 0.2*дерево с покрытием",
+      "LowestHeatOfCombustion_kJ_per_kg": 16200.0,
+      "LinearFlameSpeed": 0.0293,
+      "BurningRate": 0.0123,
+      "SmokeGeneration": 75.6,
+      "OxygenConsumption_kg_per_kg": -1.574,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.817,
+        "CarbonMonoxide_kg_per_kg": 0.041,
+        "HydrogenChloride_kg_per_kg": 0.0143
+      }
+    },
+    {
+      "Name": "Тара: древесина + картон + полистирол (0.5+0.25+0.25)",
+      "LowestHeatOfCombustion_kJ_per_kg": 20710.0,
+      "LinearFlameSpeed": 0.001,
+      "BurningRate": 0.018,
+      "SmokeGeneration": 155.0,
+      "OxygenConsumption_kg_per_kg": -1.52,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.97,
+        "CarbonMonoxide_kg_per_kg": 0.094,
+        "HydrogenChloride_kg_per_kg": 0.0046
+      }
+    },
+    {
+      "Name": "Упаковка: бумага + картон + полиэтилен + полистирол (0.4+0.3+0.15+0.15)",
+      "LowestHeatOfCombustion_kJ_per_kg": 23540.0,
+      "LinearFlameSpeed": 0.004,
+      "BurningRate": 0.0132,
+      "SmokeGeneration": 172.0,
+      "OxygenConsumption_kg_per_kg": -1.7,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.679,
+        "CarbonMonoxide_kg_per_kg": 0.112,
+        "HydrogenChloride_kg_per_kg": 0.0037
+      }
+    },
+    {
+      "Name": "Индустриальное масло",
+      "LowestHeatOfCombustion_kJ_per_kg": 42700.0,
+      "LinearFlameSpeed": 920.0,
+      "BurningRate": 0.043,
+      "SmokeGeneration": 480.0,
+      "OxygenConsumption_kg_per_kg": -1.589,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 1.07,
+        "CarbonMonoxide_kg_per_kg": 0.112,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Вешала текстильных изделий",
+      "LowestHeatOfCombustion_kJ_per_kg": 16720.0,
+      "LinearFlameSpeed": 0.0078,
+      "BurningRate": 0.0254,
+      "SmokeGeneration": 61.0,
+      "OxygenConsumption_kg_per_kg": -2.56,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.879,
+        "CarbonMonoxide_kg_per_kg": 0.063,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    },
+    {
+      "Name": "Отделка: ковролин",
+      "LowestHeatOfCombustion_kJ_per_kg": 15397.0,
+      "LinearFlameSpeed": 0.021,
+      "BurningRate": 0.013,
+      "SmokeGeneration": 150.0,
+      "OxygenConsumption_kg_per_kg": -2.55,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 1.225,
+        "CarbonMonoxide_kg_per_kg": 0.207,
+        "HydrogenChloride_kg_per_kg": 0.0039
+      }
+    },
+    {
+      "Name": "Мебель + бумага (0.8) + ковровое покрытие (0.2)",
+      "LowestHeatOfCombustion_kJ_per_kg": 14280.0,
+      "LinearFlameSpeed": 0.034,
+      "BurningRate": 0.0129,
+      "SmokeGeneration": 74.4,
+      "OxygenConsumption_kg_per_kg": -1.439,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.759,
+        "CarbonMonoxide_kg_per_kg": 0.068,
+        "HydrogenChloride_kg_per_kg": 0.0008
+      }
+    },
+    {
+      "Name": "Занавес зрительного зола кинотеатра",
+      "LowestHeatOfCombustion_kJ_per_kg": 13800.0,
+      "LinearFlameSpeed": 0.05,
+      "BurningRate": 0.0115,
+      "SmokeGeneration": 50.0,
+      "OxygenConsumption_kg_per_kg": -1.03,
+      "GasEmission": {
+        "CarbonDioxide_kg_per_kg": 0.203,
+        "CarbonMonoxide_kg_per_kg": 0.0022,
+        "HydrogenChloride_kg_per_kg": 0.0
+      }
+    }
+  ]
