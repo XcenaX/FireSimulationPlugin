@@ -1,5 +1,19 @@
 {
 	"RemapUnityFiles": 
 	{
+		"Module.FireSimulation.cpp.obj": [
+			"FireSimulation.cpp.obj",
+			"FireSimulationComponent.cpp.obj",
+			"FireStarter.cpp.obj",
+			"FMaterialSelectionCustomization.cpp.obj",
+			"MyActor.cpp.obj"
+		],
+		"Module.FireSimulation.gen.cpp.obj": [
+			"FireSimulation.init.gen.cpp.obj",
+			"FireSimulationComponent.gen.cpp.obj",
+			"FireStarter.gen.cpp.obj",
+			"MaterialData.gen.cpp.obj",
+			"MyActor.gen.cpp.obj"
+		]
 	}
 }

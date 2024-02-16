@@ -1,8 +1,7 @@
-// CellularAutomatonStarter.cpp
 #include "FireStarter.h"
 
 // Sets default values
-FireStarter::FireStarter()
+AFireStarter::AFireStarter()
 {
     // Set this actor to call Tick() every frame.
     PrimaryActorTick.bCanEverTick = true;
@@ -15,7 +14,7 @@ FireStarter::FireStarter()
 }
 
 // Called when the game starts or when spawned
-void FireStarter::BeginPlay()
+void AFireStarter::BeginPlay()
 {
     Super::BeginPlay();
     
@@ -23,7 +22,7 @@ void FireStarter::BeginPlay()
 }
 
 // Called every frame
-void FireStarter::Tick(float DeltaTime)
+void AFireStarter::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 

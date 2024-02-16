@@ -26,6 +26,9 @@ public class FireSimulation : ModuleRules
 			new string[]
 			{
 				"Core",
+                "PropertyEditor",
+                "InputCore",
+				"Json"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

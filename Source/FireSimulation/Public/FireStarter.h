@@ -1,4 +1,3 @@
-// FireStarter.h
 #pragma once
 
 #include "CoreMinimal.h"
@@ -6,13 +5,13 @@
 #include "FireStarter.generated.h"
 
 UCLASS()
-class FIRESIMULATION_API FireStarter : public AActor
+class FIRESIMULATION_API AFireStarter : public AActor
 {
     GENERATED_BODY()
 
 public:    
     // Sets default values for this actor's properties
-    FireStarter();
+    AFireStarter();
 
 protected:
     // Called when the game starts or when spawned

@@ -38,7 +38,7 @@ void UFireSimulationComponent::LoadMaterialFromJson()
     FString JsonString;
     FString FilePath = FPaths::ProjectContentDir() + TEXT("Data/materials.json");
 
-    if (FFileHelper::LoadFileToString(JsonString, *FullPath))
+    if (FFileHelper::LoadFileToString(JsonString, *FilePath))
     {
         TArray<TSharedPtr<FJsonValue>> JsonArray;
         TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
@@ -62,17 +62,18 @@ void UFireSimulationComponent::LoadMaterialFromJson()
                     MaterialData.HydrogenChloride_kg_per_kg = JsonObject->GetObjectField("GasEmission")->GetNumberField("HydrogenChloride_kg_per_kg");
 
                     // Добавление данных о материале в массив
+                    //MaterialOptions.Add(MaterialData);
                     MaterialOptions.Add(MakeShareable(new FMaterialData(MaterialData)));
                 }
             }
         }
         else
         {
-            UE_LOG(LogTemp, Error, TEXT("Failed to parse JSON file: %s"), *FullPath);
+            UE_LOG(LogTemp, Error, TEXT("Failed to parse JSON file: %s"), *FilePath);
         }
     }
     else
     {
-        UE_LOG(LogTemp, Error, TEXT("Failed to load JSON file: %s"), *FullPath);
+        UE_LOG(LogTemp, Error, TEXT("Failed to load JSON file: %s"), *FilePath);
     }
 }

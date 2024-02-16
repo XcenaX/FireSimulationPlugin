@@ -1,12 +1,14 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "FireSimulation.h"
+#include "FMaterialSelectionCustomization.h"
 
 #define LOCTEXT_NAMESPACE "FFireSimulationModule"
 
 void FFireSimulationModule::StartupModule()
 {
-	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
+	FPropertyEditorModule& PropertyEditorModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
+    PropertyEditorModule.RegisterCustomClassLayout("FireSimulationActor", FOnGetDetailCustomizationInstance::CreateStatic(&FMaterialSelectionCustomization::MakeInstance));
 }
 
 void FFireSimulationModule::ShutdownModule()

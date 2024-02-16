@@ -1,6 +1,8 @@
+#pragma once
+
 #include "IDetailCustomization.h"
 
-class FMaterialSelectionCustomization : public IDetailCustomization
+class FIRESIMULATION_API FMaterialSelectionCustomization : public IDetailCustomization
 {
 public:
     static TSharedRef<IDetailCustomization> MakeInstance();

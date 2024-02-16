@@ -1,3 +1,15 @@
+#include "FMaterialSelectionCustomization.h"
+#include "FireSimulationComponent.h"
+#include "IDetailCustomization.h"
+#include "PropertyEditorModule.h"
+#include "DetailLayoutBuilder.h"
+#include "DetailCategoryBuilder.h"
+#include "DetailWidgetRow.h"
+#include "Widgets/Text/STextBlock.h"
+#include "Widgets/Input/SComboBox.h"
+#include "Modules/ModuleManager.h"
+
+
 TSharedRef<IDetailCustomization> FMaterialSelectionCustomization::MakeInstance()
 {
     return MakeShareable(new FMaterialSelectionCustomization);

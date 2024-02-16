@@ -1,12 +1,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/ActorComponent.h"
+#include "Components/SceneComponent.h"
 #include "MaterialData.h"
 #include "FireSimulationComponent.generated.h"
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class FIRESIMULATIONPLUGIN_API UFireSimulationComponent : public UActorComponent
+class FIRESIMULATION_API UFireSimulationComponent : public USceneComponent
 {
     GENERATED_BODY()
 
@@ -29,9 +29,12 @@ public:
     void LoadMaterialFromJson();
 
     // Путь к JSON файлу с данными о материалах
-    UPROPERTY(EditAnywhere, Category = "Fire Simulation")
     FString MaterialDataJsonPath;
+    
+    // Горючий материал объекта (нужен при расчетете распространения огня и дыма)
+    UPROPERTY(EditAnywhere, Category = "Fire Simulation")
+    FString SelectedMaterialName;
 
     // Массив для хранения загруженных данных о материалах
-    TArray<FMaterialData> MaterialOptions;
+    TArray<TSharedPtr<FMaterialData>> MaterialOptions;
 };
