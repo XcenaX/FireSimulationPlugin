@@ -35,13 +35,13 @@ public:
     /*UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Fire Simulation")
     TArray<UMaterialInterface*> AvailableMaterials;*/
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Fire Simulation")
+    //UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Fire Simulation")
     FString SelectedMaterial;
 
-    TArray<FString> MaterialNames;
+    TArray<TSharedPtr<FString>> MaterialNames;
 
     // Массив для хранения загруженных данных о материалах
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Fire Simulation")
+    //UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fire Simulation")
     TArray<FMaterialData> MaterialOptions;
 
     void InitializeMaterialNames();

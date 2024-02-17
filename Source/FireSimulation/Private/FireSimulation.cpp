@@ -1,14 +1,15 @@
 #include "FireSimulation.h"
 #include "FMaterialSelectionCustomization.h"
 #include <PropertyEditorModule.h>
+#include "FireSimulationComponent.h"
 
 #define LOCTEXT_NAMESPACE "FFireSimulationModule"
 
 void FFireSimulationModule::StartupModule()
 {
-    FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
-    PropertyModule.RegisterCustomClassLayout(
-        "UFireSimulationComponent", // Имя класса компонента, который вы хотите кастомизировать
+    FPropertyEditorModule& PropertyEditorModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
+    PropertyEditorModule.RegisterCustomClassLayout(
+        UFireSimulationComponent::StaticClass()->GetFName(),
         FOnGetDetailCustomizationInstance::CreateStatic(&FMaterialSelectionCustomization::MakeInstance)
     );
 

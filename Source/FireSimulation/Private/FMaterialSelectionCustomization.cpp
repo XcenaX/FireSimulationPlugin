@@ -20,11 +20,10 @@ TSharedRef<IDetailCustomization> FMaterialSelectionCustomization::MakeInstance()
 
 void FMaterialSelectionCustomization::CustomizeDetails(IDetailLayoutBuilder& DetailBuilder)
 {
+    UE_LOG(LogTemp, Warning, TEXT("CustomizeDetails is being called!"));
     TArray<TWeakObjectPtr<UObject>> ObjectsBeingCustomized;
     DetailBuilder.GetObjectsBeingCustomized(ObjectsBeingCustomized);
     UFireSimulationComponent* FireSimulationComponent = nullptr;
-
-    FireSimulationComponent->InitializeMaterialNames();
 
     if (ObjectsBeingCustomized.Num() > 0)
     {
@@ -33,14 +32,19 @@ void FMaterialSelectionCustomization::CustomizeDetails(IDetailLayoutBuilder& Det
 
     if (!FireSimulationComponent) return;
 
+    FireSimulationComponent->InitializeMaterialNames();
+
     // Создание временного массива TSharedPtr<FString> для источника данных SComboBox
-    TArray<TSharedPtr<FString>> MaterialNameOptions;
+    /*TArray<TSharedPtr<FString>> MaterialNameOptions;
     for (const FString& MaterialName : FireSimulationComponent->MaterialNames)
     {
         MaterialNameOptions.Add(MakeShared<FString>(MaterialName));
-    }
-
+    }*/
+    
     TSharedPtr<FString> SelectedMaterial = MakeShared<FString>(FireSimulationComponent->GetCurrentMaterialName());
+
+    //UE_LOG(LogTemp, Warning, TEXT("Materials len: %d"), MaterialNameOptions.Num());
+
 
     // Получение IDetailCategoryBuilder для добавления пользовательского UI
     IDetailCategoryBuilder& Category = DetailBuilder.EditCategory("FireSimulation");
@@ -54,7 +58,7 @@ void FMaterialSelectionCustomization::CustomizeDetails(IDetailLayoutBuilder& Det
         .MaxDesiredWidth(250.f)
         [
             SNew(SComboBox<TSharedPtr<FString>>)
-                .OptionsSource(&MaterialNameOptions)
+                .OptionsSource(&FireSimulationComponent->MaterialNames)
                 .InitiallySelectedItem(SelectedMaterial)
                 .OnGenerateWidget_Lambda([](TSharedPtr<FString> InItem)
                     {

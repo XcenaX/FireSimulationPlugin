@@ -87,7 +87,8 @@ void UFireSimulationComponent::InitializeMaterialNames()
     MaterialNames.Empty();
     for (const FMaterialData& Material : MaterialOptions)
     {
-        MaterialNames.Add(Material.Name);
+        //MaterialNames.Add(Material.Name);
+        MaterialNames.Add(MakeShared<FString>(Material.Name));
     }
 }
 
