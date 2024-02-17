@@ -28,7 +28,8 @@ public class FireSimulation : ModuleRules
 				"Core",
                 "PropertyEditor",
                 "InputCore",
-				"Json"
+				"Json",
+                "Projects"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -41,6 +42,8 @@ public class FireSimulation : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
+                "Projects",
+                "EditorStyle"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

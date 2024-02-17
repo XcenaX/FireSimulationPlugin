@@ -1,22 +1,29 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 #include "FireSimulation.h"
 #include "FMaterialSelectionCustomization.h"
+#include <PropertyEditorModule.h>
 
 #define LOCTEXT_NAMESPACE "FFireSimulationModule"
 
 void FFireSimulationModule::StartupModule()
 {
-	FPropertyEditorModule& PropertyEditorModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
-    PropertyEditorModule.RegisterCustomClassLayout("FireSimulationActor", FOnGetDetailCustomizationInstance::CreateStatic(&FMaterialSelectionCustomization::MakeInstance));
+    FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
+    PropertyModule.RegisterCustomClassLayout(
+        "UFireSimulationComponent", // Имя класса компонента, который вы хотите кастомизировать
+        FOnGetDetailCustomizationInstance::CreateStatic(&FMaterialSelectionCustomization::MakeInstance)
+    );
+
+    // Уберите отмену регистрации отсюда
 }
 
 void FFireSimulationModule::ShutdownModule()
 {
-	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
-	// we call this function before unloading the module.
+    if (FModuleManager::Get().IsModuleLoaded("PropertyEditor"))
+    {
+        FPropertyEditorModule& PropertyModule = FModuleManager::GetModuleChecked<FPropertyEditorModule>("PropertyEditor");
+        PropertyModule.UnregisterCustomClassLayout("UFireSimulationComponent");
+    }
 }
 
 #undef LOCTEXT_NAMESPACE
-	
+
 IMPLEMENT_MODULE(FFireSimulationModule, FireSimulation)

@@ -8,6 +8,12 @@ G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\F
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\MaterialData.h
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\MaterialData.generated.h
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\FireSimulationComponent.generated.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Projects\Public\Interfaces/IPluginManager.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Projects\Public\PluginDescriptor.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Projects\Public\ModuleDescriptor.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Projects\Public\CustomBuildSteps.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Projects\Public\LocalizationDescriptor.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Projects\Public\PluginReferenceDescriptor.h
 G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/FireStarter.cpp
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\FireStarter.h
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\FireStarter.generated.h
@@ -21,6 +27,10 @@ C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\PropertyEditor\Public\I
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\PropertyEditor\Public\DetailBuilderTypes.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\PropertyEditor\Public\DetailWidgetRow.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Slate\Public\Widgets/Layout/SSpacer.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\PropertyEditor\Public\PropertyCustomizationHelpers.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\PropertyEditor\Public\SResetToDefaultMenu.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\ActorPickerMode\Public\ActorPickerMode.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\SceneDepthPickerMode\Public\SceneDepthPickerMode.h
 G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/MyActor.cpp
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\MyActor.h
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\MyActor.generated.h

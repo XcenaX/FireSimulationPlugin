@@ -3,17 +3,18 @@
 #include "Serialization/JsonSerializer.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
+#include "Interfaces/IPluginManager.h"
 
 UFireSimulationComponent::UFireSimulationComponent()
 {
     // Set this component to be initialized when the game starts, and to be ticked every frame.
     PrimaryComponentTick.bCanEverTick = true;
+    LoadMaterialFromJson();
 }
 
 void UFireSimulationComponent::BeginPlay()
 {
     Super::BeginPlay();
-    LoadMaterialFromJson();
 }
 
 void UFireSimulationComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -36,7 +37,10 @@ void UFireSimulationComponent::SetFireTexture(UTexture2D* Texture)
 void UFireSimulationComponent::LoadMaterialFromJson()
 {
     FString JsonString;
-    FString FilePath = FPaths::ProjectContentDir() + TEXT("Data/materials.json");
+    FString PluginName = TEXT("FireSimulation");
+    FString PluginPath = IPluginManager::Get().FindPlugin(PluginName)->GetBaseDir();
+    FString FilePath = PluginPath + TEXT("/Content/Data/materials.json");
+
 
     if (FFileHelper::LoadFileToString(JsonString, *FilePath))
     {
@@ -63,7 +67,7 @@ void UFireSimulationComponent::LoadMaterialFromJson()
 
                     // Добавление данных о материале в массив
                     //MaterialOptions.Add(MaterialData);
-                    MaterialOptions.Add(MakeShareable(new FMaterialData(MaterialData)));
+                    MaterialOptions.Add(MaterialData);
                 }
             }
         }
@@ -76,4 +80,33 @@ void UFireSimulationComponent::LoadMaterialFromJson()
     {
         UE_LOG(LogTemp, Error, TEXT("Failed to load JSON file: %s"), *FilePath);
     }
+}
+
+void UFireSimulationComponent::InitializeMaterialNames()
+{
+    MaterialNames.Empty();
+    for (const FMaterialData& Material : MaterialOptions)
+    {
+        MaterialNames.Add(Material.Name);
+    }
+}
+
+void UFireSimulationComponent::UpdateSelectedMaterial(const FString& NewMaterialName)
+{
+    // Здесь мы просто обновляем имя выбранного материала.
+    // Возможно, вам понадобится дополнительная логика для загрузки материала и его применения.
+    SelectedMaterial = NewMaterialName;
+
+    // Пример дополнительной логики (псевдокод):
+    // UMaterialInterface* Material = LoadMaterialByName(SelectedMaterialName);
+    // if (Material)
+    // {
+    //     ApplyMaterialToMesh(Material); // Функция, которая применяет материал к мешу
+    // }
+}
+
+FString UFireSimulationComponent::GetCurrentMaterialName()
+{
+    // Возвращаем имя выбранного материала
+    return SelectedMaterial;
 }

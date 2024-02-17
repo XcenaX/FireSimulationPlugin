@@ -8,4 +8,6 @@ public:
     static TSharedRef<IDetailCustomization> MakeInstance();
 
     virtual void CustomizeDetails(IDetailLayoutBuilder& DetailBuilder) override;
+
+    TArray<TSharedPtr<int32>> MaterialIndices;
 };

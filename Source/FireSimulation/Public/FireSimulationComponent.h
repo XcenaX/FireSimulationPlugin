@@ -32,9 +32,21 @@ public:
     FString MaterialDataJsonPath;
     
     // Горючий материал объекта (нужен при расчетете распространения огня и дыма)
-    UPROPERTY(EditAnywhere, Category = "Fire Simulation")
-    FString SelectedMaterialName;
+    /*UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Fire Simulation")
+    TArray<UMaterialInterface*> AvailableMaterials;*/
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Fire Simulation")
+    FString SelectedMaterial;
+
+    TArray<FString> MaterialNames;
 
     // Массив для хранения загруженных данных о материалах
-    TArray<TSharedPtr<FMaterialData>> MaterialOptions;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Fire Simulation")
+    TArray<FMaterialData> MaterialOptions;
+
+    void InitializeMaterialNames();
+
+    void UpdateSelectedMaterial(const FString& NewMaterialName);
+    FString GetCurrentMaterialName();
+
 };

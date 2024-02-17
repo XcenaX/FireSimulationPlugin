@@ -21,7 +21,7 @@ void EmptyLinkFunctionForGeneratedCodeFireSimulation_init() {}
 				nullptr,
 				0,
 				PKG_CompiledIn | 0x00000000,
-				0x31BA0010,
+				0xDA439C37,
 				0x4644CC97,
 				METADATA_PARAMS(nullptr, 0)
 			};
