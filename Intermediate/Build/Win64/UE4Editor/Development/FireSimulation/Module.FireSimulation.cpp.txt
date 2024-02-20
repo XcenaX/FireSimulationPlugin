@@ -1,36 +1,43 @@
-G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Development\FireSimulation\Definitions.FireSimulation.h
-G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/FireSimulation.cpp
-G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\FireSimulation.h
-G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\FMaterialSelectionCustomization.h
-C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\PropertyEditor\Public\IDetailCustomization.h
-G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\FireSimulationComponent.h
-G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\MaterialData.h
-G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\MaterialData.generated.h
-G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\FireSimulationComponent.generated.h
-G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/FireSimulationComponent.cpp
-C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Projects\Public\Interfaces/IPluginManager.h
-C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Projects\Public\PluginDescriptor.h
-C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Projects\Public\ModuleDescriptor.h
-C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Projects\Public\CustomBuildSteps.h
-C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Projects\Public\LocalizationDescriptor.h
-C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Projects\Public\PluginReferenceDescriptor.h
-G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/FireStarter.cpp
-G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\FireStarter.h
-G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\FireStarter.generated.h
-G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/FMaterialSelectionCustomization.cpp
-C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\PropertyEditor\Public\DetailLayoutBuilder.h
-C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\UnrealEd\Public\AssetThumbnail.h
-C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\UnrealEd\Public\TickableEditorObject.h
-C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\PropertyEditor\Public\IDetailPropertyRow.h
-C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\PropertyEditor\Public\DetailCategoryBuilder.h
-C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\PropertyEditor\Public\IDetailCustomNodeBuilder.h
-C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\PropertyEditor\Public\DetailBuilderTypes.h
-C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\PropertyEditor\Public\DetailWidgetRow.h
-C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Slate\Public\Widgets/Layout/SSpacer.h
-C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\PropertyEditor\Public\PropertyCustomizationHelpers.h
-C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\PropertyEditor\Public\SResetToDefaultMenu.h
-C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\ActorPickerMode\Public\ActorPickerMode.h
-C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\SceneDepthPickerMode\Public\SceneDepthPickerMode.h
-G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/MyActor.cpp
-G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\MyActor.h
-G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\MyActor.generated.h
+D:\Unreal Projects\FireSimulationTest\Plugins\FireSimulationPlugin\Intermediate\Build\Win64\UE4Editor\Development\FireSimulation\Definitions.FireSimulation.h
+D:/Unreal Projects/FireSimulationTest/Plugins/FireSimulationPlugin/Source/FireSimulation/Private/FireSimulation.cpp
+D:\Unreal Projects\FireSimulationTest\Plugins\FireSimulationPlugin\Source\FireSimulation\Public\FireSimulation.h
+D:\Unreal Projects\FireSimulationTest\Plugins\FireSimulationPlugin\Source\FireSimulation\Public\FMaterialSelectionCustomization.h
+D:\EpicGames\UE_4.27\Engine\Source\Editor\PropertyEditor\Public\IDetailCustomization.h
+D:\Unreal Projects\FireSimulationTest\Plugins\FireSimulationPlugin\Source\FireSimulation\Public\FireSimulationComponent.h
+D:\Unreal Projects\FireSimulationTest\Plugins\FireSimulationPlugin\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\FireSimulationComponent.generated.h
+D:\Unreal Projects\FireSimulationTest\Plugins\FireSimulationPlugin\Source\FireSimulation\Public\MaterialDataManager.h
+D:\Unreal Projects\FireSimulationTest\Plugins\FireSimulationPlugin\Source\FireSimulation\Public\MaterialData.h
+D:\Unreal Projects\FireSimulationTest\Plugins\FireSimulationPlugin\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\MaterialData.generated.h
+D:/Unreal Projects/FireSimulationTest/Plugins/FireSimulationPlugin/Source/FireSimulation/Private/FireSimulationComponent.cpp
+D:\EpicGames\UE_4.27\Engine\Source\Runtime\Json\Public\Dom/JsonObject.h
+D:\EpicGames\UE_4.27\Engine\Source\Runtime\Json\Public\JsonGlobals.h
+D:\EpicGames\UE_4.27\Engine\Source\Runtime\Json\Public\Serialization/JsonTypes.h
+D:\EpicGames\UE_4.27\Engine\Source\Runtime\Json\Public\Dom/JsonValue.h
+D:\EpicGames\UE_4.27\Engine\Source\Runtime\Json\Public\Serialization/JsonSerializer.h
+D:\EpicGames\UE_4.27\Engine\Source\Runtime\Json\Public\Serialization/JsonReader.h
+D:\EpicGames\UE_4.27\Engine\Source\Runtime\Json\Public\Serialization/JsonWriter.h
+D:\EpicGames\UE_4.27\Engine\Source\Runtime\Core\Public\Misc/FileHelper.h
+D:\EpicGames\UE_4.27\Engine\Source\Runtime\Projects\Public\Interfaces/IPluginManager.h
+D:\EpicGames\UE_4.27\Engine\Source\Runtime\Projects\Public\PluginDescriptor.h
+D:\EpicGames\UE_4.27\Engine\Source\Runtime\Projects\Public\ModuleDescriptor.h
+D:\EpicGames\UE_4.27\Engine\Source\Runtime\Projects\Public\CustomBuildSteps.h
+D:\EpicGames\UE_4.27\Engine\Source\Runtime\Projects\Public\LocalizationDescriptor.h
+D:\EpicGames\UE_4.27\Engine\Source\Runtime\Projects\Public\PluginReferenceDescriptor.h
+D:/Unreal Projects/FireSimulationTest/Plugins/FireSimulationPlugin/Source/FireSimulation/Private/FireStarter.cpp
+D:\Unreal Projects\FireSimulationTest\Plugins\FireSimulationPlugin\Source\FireSimulation\Public\FireStarter.h
+D:\Unreal Projects\FireSimulationTest\Plugins\FireSimulationPlugin\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\FireStarter.generated.h
+D:/Unreal Projects/FireSimulationTest/Plugins/FireSimulationPlugin/Source/FireSimulation/Private/FMaterialSelectionCustomization.cpp
+D:\EpicGames\UE_4.27\Engine\Source\Editor\PropertyEditor\Public\DetailLayoutBuilder.h
+D:\EpicGames\UE_4.27\Engine\Source\Editor\PropertyEditor\Public\IDetailPropertyRow.h
+D:\EpicGames\UE_4.27\Engine\Source\Editor\PropertyEditor\Public\DetailCategoryBuilder.h
+D:\EpicGames\UE_4.27\Engine\Source\Editor\PropertyEditor\Public\IDetailCustomNodeBuilder.h
+D:\EpicGames\UE_4.27\Engine\Source\Editor\PropertyEditor\Public\DetailBuilderTypes.h
+D:\EpicGames\UE_4.27\Engine\Source\Editor\PropertyEditor\Public\DetailWidgetRow.h
+D:\EpicGames\UE_4.27\Engine\Source\Editor\PropertyEditor\Public\PropertyCustomizationHelpers.h
+D:\EpicGames\UE_4.27\Engine\Source\Editor\PropertyEditor\Public\SResetToDefaultMenu.h
+D:\EpicGames\UE_4.27\Engine\Source\Editor\ActorPickerMode\Public\ActorPickerMode.h
+D:\EpicGames\UE_4.27\Engine\Source\Editor\SceneDepthPickerMode\Public\SceneDepthPickerMode.h
+D:/Unreal Projects/FireSimulationTest/Plugins/FireSimulationPlugin/Source/FireSimulation/Private/MaterialDataManager.cpp
+D:/Unreal Projects/FireSimulationTest/Plugins/FireSimulationPlugin/Source/FireSimulation/Private/MyActor.cpp
+D:\Unreal Projects\FireSimulationTest\Plugins\FireSimulationPlugin\Source\FireSimulation\Public\MyActor.h
+D:\Unreal Projects\FireSimulationTest\Plugins\FireSimulationPlugin\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\MyActor.generated.h

@@ -49,8 +49,8 @@
 #define NDEBUG 1
 #define UE_BUILD_DEVELOPMENT 1
 #define UE_IS_ENGINE_MODULE 0
-#define UE_PROJECT_NAME TestProject
-#define UE_TARGET_NAME TestProjectEditor
+#define UE_PROJECT_NAME FireSimulationTest
+#define UE_TARGET_NAME FireSimulationTestEditor
 #define UE_MODULE_NAME "FireSimulation"
 #define UE_PLUGIN_NAME "FireSimulation"
 #define IMPLEMENT_ENCRYPTION_KEY_REGISTRATION() 

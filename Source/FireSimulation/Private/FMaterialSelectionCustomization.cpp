@@ -10,6 +10,7 @@
 #include "Modules/ModuleManager.h"
 #include <FireSimulationComponent.h>
 #include "PropertyCustomizationHelpers.h"
+#include "MaterialDataManager.h"
 
 
 TSharedRef<IDetailCustomization> FMaterialSelectionCustomization::MakeInstance()
@@ -31,35 +32,40 @@ void FMaterialSelectionCustomization::CustomizeDetails(IDetailLayoutBuilder& Det
     }
 
     if (!FireSimulationComponent) return;
-
-    FireSimulationComponent->InitializeMaterialNames();
-
-    // Создание временного массива TSharedPtr<FString> для источника данных SComboBox
-    /*TArray<TSharedPtr<FString>> MaterialNameOptions;
-    for (const FString& MaterialName : FireSimulationComponent->MaterialNames)
-    {
-        MaterialNameOptions.Add(MakeShared<FString>(MaterialName));
-    }*/
     
-    TSharedPtr<FString> SelectedMaterial = MakeShared<FString>(FireSimulationComponent->GetCurrentMaterialName());
+    FString SelectedMaterial = FireSimulationComponent->GetSelectedMaterial();
 
-    //UE_LOG(LogTemp, Warning, TEXT("Materials len: %d"), MaterialNameOptions.Num());
+    UE_LOG(LogTemp, Log, TEXT("Initializing OptionsSource."));
+    const TArray<TSharedPtr<FString>>& MaterialNames = FMaterialDataManager::Get().GetMaterialNames();
+    UE_LOG(LogTemp, Log, TEXT("OptionsSource now contains %d items."), MaterialNames.Num());
 
+    // Найдите индекс выбранного материала
+    TSharedPtr<FString> InitialSelectedItem;
+    for (const auto& Option : MaterialNames)
+    {
+        if (*Option == SelectedMaterial)
+        {
+            InitialSelectedItem = Option;
+            break;
+        }
+    }
 
-    // Получение IDetailCategoryBuilder для добавления пользовательского UI
     IDetailCategoryBuilder& Category = DetailBuilder.EditCategory("FireSimulation");
     Category.AddCustomRow(FText::FromString("Material Selection"))
         .NameContent()
         [
-            SNew(STextBlock)
-                .Text(FText::FromString("Selected Material"))
+            SNew(STextBlock).Text(FText::FromString("Selected Material"))
         ]
         .ValueContent()
         .MaxDesiredWidth(250.f)
         [
             SNew(SComboBox<TSharedPtr<FString>>)
-                .OptionsSource(&FireSimulationComponent->MaterialNames)
-                .InitiallySelectedItem(SelectedMaterial)
+                .OptionsSource(&MaterialNames)
+                .InitiallySelectedItem(InitialSelectedItem)
+                .OnComboBoxOpening_Lambda([]()
+                    {
+                        UE_LOG(LogTemp, Log, TEXT("ComboBox opening"));
+                    })
                 .OnGenerateWidget_Lambda([](TSharedPtr<FString> InItem)
                     {
                         return SNew(STextBlock).Text(FText::FromString(*InItem));
@@ -73,13 +79,12 @@ void FMaterialSelectionCustomization::CustomizeDetails(IDetailLayoutBuilder& Det
                     })
                         .Content()
                         [
-                            SNew(STextBlock).Text_Lambda([SelectedMaterial]() -> FText
-                                {
-                                    return FText::FromString(SelectedMaterial.IsValid() ? *SelectedMaterial : TEXT("Select a Material"));
-                                })
+                            SNew(STextBlock)
+                                .Text_Lambda([FireSimulationComponent]() -> FText
+                                    {
+                                        FString CurrentSelectedMaterial = FireSimulationComponent->GetSelectedMaterial();
+                                        return FText::FromString(!CurrentSelectedMaterial.IsEmpty() ? CurrentSelectedMaterial : TEXT("Select a Material"));
+                                    })
                         ]
         ];
-
-    // Следует помнить, что MaterialNameOptions должен существовать до конца скоупа функции CustomizeDetails,
-    // поэтому он определен вне лямбда-выражений.
 }

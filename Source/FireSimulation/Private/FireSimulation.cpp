@@ -2,18 +2,18 @@
 #include "FMaterialSelectionCustomization.h"
 #include <PropertyEditorModule.h>
 #include "FireSimulationComponent.h"
+#include <MaterialDataManager.h>
 
 #define LOCTEXT_NAMESPACE "FFireSimulationModule"
 
 void FFireSimulationModule::StartupModule()
 {
+    FMaterialDataManager::Get().LoadMaterialData();
     FPropertyEditorModule& PropertyEditorModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
     PropertyEditorModule.RegisterCustomClassLayout(
         UFireSimulationComponent::StaticClass()->GetFName(),
         FOnGetDetailCustomizationInstance::CreateStatic(&FMaterialSelectionCustomization::MakeInstance)
     );
-
-    // Уберите отмену регистрации отсюда
 }
 
 void FFireSimulationModule::ShutdownModule()

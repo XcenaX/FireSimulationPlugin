@@ -6,6 +6,7 @@
 			"FireSimulationComponent.cpp.obj",
 			"FireStarter.cpp.obj",
 			"FMaterialSelectionCustomization.cpp.obj",
+			"MaterialDataManager.cpp.obj",
 			"MyActor.cpp.obj"
 		],
 		"Module.FireSimulation.gen.cpp.obj": [
