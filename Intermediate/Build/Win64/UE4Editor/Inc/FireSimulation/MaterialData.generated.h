@@ -13,7 +13,7 @@ PRAGMA_DISABLE_DEPRECATION_WARNINGS
 #endif
 #define FIRESIMULATION_MaterialData_generated_h
 
-#define FireSimulationTest_Plugins_FireSimulationPlugin_Source_FireSimulation_Public_MaterialData_h_9_GENERATED_BODY \
+#define TestProject_Plugins_FireSimulation_Source_FireSimulation_Public_MaterialData_h_9_GENERATED_BODY \
 	friend struct Z_Construct_UScriptStruct_FMaterialData_Statics; \
 	FIRESIMULATION_API static class UScriptStruct* StaticStruct();
 
@@ -21,7 +21,7 @@ PRAGMA_DISABLE_DEPRECATION_WARNINGS
 template<> FIRESIMULATION_API UScriptStruct* StaticStruct<struct FMaterialData>();
 
 #undef CURRENT_FILE_ID
-#define CURRENT_FILE_ID FireSimulationTest_Plugins_FireSimulationPlugin_Source_FireSimulation_Public_MaterialData_h
+#define CURRENT_FILE_ID TestProject_Plugins_FireSimulation_Source_FireSimulation_Public_MaterialData_h
 
 
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

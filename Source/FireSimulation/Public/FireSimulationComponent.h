@@ -22,8 +22,13 @@ public:
     void StartFireAtLocation(const FVector& Location);
     void SetFireTexture(UTexture2D* Texture);
 
+    // Материал объекта, нужен для расчетов распространения огня и дыма
     UPROPERTY(config, meta = (Hidden))
     FString SelectedMaterial;
+
+    // Свойство означает является ли этот обьект точкой возгорания
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fire Simulation")
+    bool IsBurning;
 
     void UpdateSelectedMaterial(const FString& NewMaterialName);
     FString GetSelectedMaterial();

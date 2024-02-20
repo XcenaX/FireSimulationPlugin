@@ -32,7 +32,7 @@
 /wd4244
 /wd4838
 /I .
-/I "D:\Unreal Projects\FireSimulationTest\Plugins\FireSimulationPlugin\Source\FireSimulation\Private"
+/I G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Private
 /I ..\Intermediate\Build\Win64\UE4Editor\Inc\CoreUObject
 /I Runtime
 /I Runtime\CoreUObject\Public
@@ -232,9 +232,9 @@
 /I Editor\Kismet\Public
 /I ..\Intermediate\Build\Win64\UE4Editor\Inc\ClothingSystemRuntimeInterface
 /I Runtime\ClothingSystemRuntimeInterface\Public
-/I "D:\Unreal Projects\FireSimulationTest\Plugins\FireSimulationPlugin\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation"
-/I "D:\Unreal Projects\FireSimulationTest\Plugins\FireSimulationPlugin\Source"
-/I "D:\Unreal Projects\FireSimulationTest\Plugins\FireSimulationPlugin\Source\FireSimulation\Public"
+/I G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation
+/I G:\UE_Projects\TestProject\Plugins\FireSimulation\Source
+/I G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public
 /I ThirdParty\PhysX3\PxShared\include
 /I ThirdParty\PhysX3\PxShared\include\cudamanager
 /I ThirdParty\PhysX3\PxShared\include\filebuf
@@ -258,18 +258,18 @@
 /I ThirdParty\PhysX3\APEX_1.4\shared\general\RenderDebug\public
 /I ThirdParty\PhysX3\APEX_1.4\shared\general\PairFilter\include
 /I ThirdParty\PhysX3\APEX_1.4\shared\internal\include
-/I "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.39.33519\INCLUDE"
-/I "C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8.1\include\um"
+/I "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\Tools\MSVC\14.29.30133\INCLUDE"
+/I "C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um"
 /I "C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\ucrt"
 /I "C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\shared"
 /I "C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\um"
 /I "C:\Program Files (x86)\Windows Kits\10\include\10.0.22621.0\winrt"
-/FI"D:\Unreal Projects\FireSimulationTest\Intermediate\Build\Win64\FireSimulationTestEditor\Development\UnrealEd\SharedPCH.UnrealEd.ShadowErrors.h"
-/Yu"D:\Unreal Projects\FireSimulationTest\Intermediate\Build\Win64\FireSimulationTestEditor\Development\UnrealEd\SharedPCH.UnrealEd.ShadowErrors.h"
-/Fp"D:\Unreal Projects\FireSimulationTest\Intermediate\Build\Win64\FireSimulationTestEditor\Development\UnrealEd\SharedPCH.UnrealEd.ShadowErrors.h.pch"
-"D:\Unreal Projects\FireSimulationTest\Plugins\FireSimulationPlugin\Intermediate\Build\Win64\UE4Editor\Development\FireSimulation\Module.FireSimulation.cpp"
-/FI"D:\Unreal Projects\FireSimulationTest\Plugins\FireSimulationPlugin\Intermediate\Build\Win64\UE4Editor\Development\FireSimulation\Definitions.FireSimulation.h"
-/Fo"D:\Unreal Projects\FireSimulationTest\Plugins\FireSimulationPlugin\Intermediate\Build\Win64\UE4Editor\Development\FireSimulation\Module.FireSimulation.cpp.obj"
+/FI"G:\UE_Projects\TestProject\Intermediate\Build\Win64\TestProjectEditor\Development\UnrealEd\SharedPCH.UnrealEd.ShadowErrors.h"
+/Yu"G:\UE_Projects\TestProject\Intermediate\Build\Win64\TestProjectEditor\Development\UnrealEd\SharedPCH.UnrealEd.ShadowErrors.h"
+/Fp"G:\UE_Projects\TestProject\Intermediate\Build\Win64\TestProjectEditor\Development\UnrealEd\SharedPCH.UnrealEd.ShadowErrors.h.pch"
+"G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Development\FireSimulation\Module.FireSimulation.cpp"
+/FI"G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Development\FireSimulation\Definitions.FireSimulation.h"
+/Fo"G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Development\FireSimulation\Module.FireSimulation.cpp.obj"
 /TP
 /GR-
 /W4
