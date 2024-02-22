@@ -1,7 +1,16 @@
 #include "FireGridManager.h"
 #include "Engine/World.h"
+#include "EngineUtils.h"
+#include "DrawDebugHelpers.h"
+#include "UnrealEd.h"
+#include "FireSimulationComponent.h"
 
 UFireGridManager* UFireGridManager::Instance = nullptr;
+
+UFireGridManager::UFireGridManager()
+{
+    // Инициализация переменных и состояний по умолчанию
+}
 
 UFireGridManager* UFireGridManager::GetInstance()
 {
@@ -13,38 +22,52 @@ UFireGridManager* UFireGridManager::GetInstance()
     return Instance;
 }
 
-void UFireGridManager::InitializeGrid(float CellSize)
+void UFireGridManager::InitializeGrid(int32 CubesPerDimension, float GridLength, const FVector& NewGridOrigin)
 {
-    if (CellSize <= 0)
+    GridCellSize = GridLength / CubesPerDimension;
+
+    Grid.SetNum(CubesPerDimension);
+    for (int32 i = 0; i < CubesPerDimension; ++i)
     {
-        // Вывод лога ошибки
-        UE_LOG(LogFireSimulation, Warning, TEXT("Cell Size must be greater than 0."));
+        Grid[i].SetNum(CubesPerDimension);
+        for (int32 j = 0; j < CubesPerDimension; ++j)
+        {
+            Grid[i][j].SetNum(CubesPerDimension);
+        }
+    }
+
+    // Установка начала координат сетки
+    this->GridOrigin = NewGridOrigin;
+}
+
+void UFireGridManager::DrawGrid(bool bVisible)
+{
+    UWorld* World = GEditor->GetEditorWorldContext().World();
+    FlushPersistentDebugLines(World);
+
+    if (!bVisible)
+    {        
         return;
     }
 
-    GridCellSize = CellSize;
-
-    // Здесь логика инициализации размера сетки и самой сетки
-    // Например, если мы имеем дело с ограниченным миром
-    FVector WorldSize = FVector(10000.0f); // Пример размера мира
-
-    int32 GridSizeX = FMath::CeilToInt(WorldSize.X / CellSize);
-    int32 GridSizeY = FMath::CeilToInt(WorldSize.Y / CellSize);
-    int32 GridSizeZ = FMath::CeilToInt(WorldSize.Z / CellSize);
-
-    Grid.SetNum(GridSizeX);
-    for (int32 i = 0; i < GridSizeX; ++i)
+    for (int32 i = 0; i < Grid.Num(); ++i)
     {
-        Grid[i].SetNum(GridSizeY);
-        for (int32 j = 0; j < GridSizeY; ++j)
+        for (int32 j = 0; j < Grid[i].Num(); ++j)
         {
-            Grid[i][j].SetNum(GridSizeZ);
+            for (int32 k = 0; k < Grid[i][j].Num(); ++k)
+            {
+                FVector Center = GridOrigin + FVector(i * GridCellSize, j * GridCellSize, k * GridCellSize) + FVector(GridCellSize / 2);
+                DrawDebugBox(World, Center, FVector(GridCellSize / 2), FColor::Red, true, -1.0f, 0, 2);
+            }
         }
     }
 }
 
-void UFireGridManager::PopulateGridWithActors()
+
+void UFireGridManager::PopulateGridWithActors(UWorld* World)
 {
+    if (!World) return;
+
     // Очистка сетки перед заполнением
     for (auto& Column : Grid)
     {
@@ -57,8 +80,7 @@ void UFireGridManager::PopulateGridWithActors()
         }
     }
 
-    // Получение всех акторов с компонентом FireSimulationComponent в мире
-    for (TActorIterator<AActor> It(GetWorld()); It; ++It)
+    for (TActorIterator<AActor> It(World); It; ++It)
     {
         AActor* Actor = *It;
         UFireSimulationComponent* FireComp = Actor->FindComponentByClass<UFireSimulationComponent>();
@@ -68,6 +90,7 @@ void UFireGridManager::PopulateGridWithActors()
             int32 x, y, z;
             if (GetCellIndex(ActorLocation, x, y, z))
             {
+                // Убедитесь, что массив Grid инициализирован и имеет достаточный размер перед обращением к Grid[x][y][z]
                 Grid[x][y][z].OccupyingActor = Actor;
             }
         }

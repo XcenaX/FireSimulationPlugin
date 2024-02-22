@@ -20,6 +20,7 @@ void EmptyLinkFunctionForGeneratedCodeFireGridManager() {}
 	FIRESIMULATION_API UClass* Z_Construct_UClass_UFireGridManager();
 	COREUOBJECT_API UClass* Z_Construct_UClass_UObject();
 	COREUOBJECT_API UScriptStruct* Z_Construct_UScriptStruct_FVector();
+	ENGINE_API UClass* Z_Construct_UClass_UWorld_NoRegister();
 // End Cross Module References
 class UScriptStruct* FGridCell::StaticStruct()
 {
@@ -109,57 +110,111 @@ static struct FScriptStruct_FireSimulation_StaticRegisterNativesFGridCell
 	uint32 Get_Z_Construct_UScriptStruct_FGridCell_Hash() { return 2429330267U; }
 	DEFINE_FUNCTION(UFireGridManager::execPopulateGridWithActors)
 	{
+		P_GET_OBJECT(UWorld,Z_Param_World);
 		P_FINISH;
 		P_NATIVE_BEGIN;
-		P_THIS->PopulateGridWithActors();
+		P_THIS->PopulateGridWithActors(Z_Param_World);
+		P_NATIVE_END;
+	}
+	DEFINE_FUNCTION(UFireGridManager::execDrawGrid)
+	{
+		P_GET_UBOOL(Z_Param_bVisible);
+		P_FINISH;
+		P_NATIVE_BEGIN;
+		P_THIS->DrawGrid(Z_Param_bVisible);
 		P_NATIVE_END;
 	}
 	DEFINE_FUNCTION(UFireGridManager::execInitializeGrid)
 	{
-		P_GET_STRUCT_REF(FVector,Z_Param_Out_WorldSize);
-		P_GET_PROPERTY(FFloatProperty,Z_Param_CellSize);
+		P_GET_PROPERTY(FIntProperty,Z_Param_CubesPerDimension);
+		P_GET_PROPERTY(FFloatProperty,Z_Param_GridLength);
+		P_GET_STRUCT_REF(FVector,Z_Param_Out_GridOrigin);
 		P_FINISH;
 		P_NATIVE_BEGIN;
-		P_THIS->InitializeGrid(Z_Param_Out_WorldSize,Z_Param_CellSize);
+		P_THIS->InitializeGrid(Z_Param_CubesPerDimension,Z_Param_GridLength,Z_Param_Out_GridOrigin);
 		P_NATIVE_END;
 	}
 	void UFireGridManager::StaticRegisterNativesUFireGridManager()
 	{
 		UClass* Class = UFireGridManager::StaticClass();
 		static const FNameNativePtrPair Funcs[] = {
+			{ "DrawGrid", &UFireGridManager::execDrawGrid },
 			{ "InitializeGrid", &UFireGridManager::execInitializeGrid },
 			{ "PopulateGridWithActors", &UFireGridManager::execPopulateGridWithActors },
 		};
 		FNativeFunctionRegistrar::RegisterFunctions(Class, Funcs, UE_ARRAY_COUNT(Funcs));
 	}
-	struct Z_Construct_UFunction_UFireGridManager_InitializeGrid_Statics
+	struct Z_Construct_UFunction_UFireGridManager_DrawGrid_Statics
 	{
-		struct FireGridManager_eventInitializeGrid_Parms
+		struct FireGridManager_eventDrawGrid_Parms
 		{
-			FVector WorldSize;
-			float CellSize;
+			bool bVisible;
 		};
-#if WITH_METADATA
-		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_WorldSize_MetaData[];
-#endif
-		static const UE4CodeGen_Private::FStructPropertyParams NewProp_WorldSize;
-		static const UE4CodeGen_Private::FFloatPropertyParams NewProp_CellSize;
+		static void NewProp_bVisible_SetBit(void* Obj);
+		static const UE4CodeGen_Private::FBoolPropertyParams NewProp_bVisible;
 		static const UE4CodeGen_Private::FPropertyParamsBase* const PropPointers[];
 #if WITH_METADATA
 		static const UE4CodeGen_Private::FMetaDataPairParam Function_MetaDataParams[];
 #endif
 		static const UE4CodeGen_Private::FFunctionParams FuncParams;
 	};
+	void Z_Construct_UFunction_UFireGridManager_DrawGrid_Statics::NewProp_bVisible_SetBit(void* Obj)
+	{
+		((FireGridManager_eventDrawGrid_Parms*)Obj)->bVisible = 1;
+	}
+	const UE4CodeGen_Private::FBoolPropertyParams Z_Construct_UFunction_UFireGridManager_DrawGrid_Statics::NewProp_bVisible = { "bVisible", nullptr, (EPropertyFlags)0x0010000000000080, UE4CodeGen_Private::EPropertyGenFlags::Bool | UE4CodeGen_Private::EPropertyGenFlags::NativeBool, RF_Public|RF_Transient|RF_MarkAsNative, 1, sizeof(bool), sizeof(FireGridManager_eventDrawGrid_Parms), &Z_Construct_UFunction_UFireGridManager_DrawGrid_Statics::NewProp_bVisible_SetBit, METADATA_PARAMS(nullptr, 0) };
+	const UE4CodeGen_Private::FPropertyParamsBase* const Z_Construct_UFunction_UFireGridManager_DrawGrid_Statics::PropPointers[] = {
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_UFireGridManager_DrawGrid_Statics::NewProp_bVisible,
+	};
 #if WITH_METADATA
-	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UFunction_UFireGridManager_InitializeGrid_Statics::NewProp_WorldSize_MetaData[] = {
+	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UFunction_UFireGridManager_DrawGrid_Statics::Function_MetaDataParams[] = {
+		{ "Comment", "// \xd0\x92\xd0\xb8\xd0\xb7\xd1\x83\xd0\xb0\xd0\xbb\xd0\xb8\xd0\xb7\xd0\xb0\xd1\x86\xd0\xb8\xd1\x8f \xd1\x81\xd0\xb5\xd1\x82\xd0\xba\xd0\xb8.\n" },
+		{ "ModuleRelativePath", "Public/FireGridManager.h" },
+		{ "ToolTip", "\xd0\x92\xd0\xb8\xd0\xb7\xd1\x83\xd0\xb0\xd0\xbb\xd0\xb8\xd0\xb7\xd0\xb0\xd1\x86\xd0\xb8\xd1\x8f \xd1\x81\xd0\xb5\xd1\x82\xd0\xba\xd0\xb8." },
+	};
+#endif
+	const UE4CodeGen_Private::FFunctionParams Z_Construct_UFunction_UFireGridManager_DrawGrid_Statics::FuncParams = { (UObject*(*)())Z_Construct_UClass_UFireGridManager, nullptr, "DrawGrid", nullptr, nullptr, sizeof(FireGridManager_eventDrawGrid_Parms), Z_Construct_UFunction_UFireGridManager_DrawGrid_Statics::PropPointers, UE_ARRAY_COUNT(Z_Construct_UFunction_UFireGridManager_DrawGrid_Statics::PropPointers), RF_Public|RF_Transient|RF_MarkAsNative, (EFunctionFlags)0x04020401, 0, 0, METADATA_PARAMS(Z_Construct_UFunction_UFireGridManager_DrawGrid_Statics::Function_MetaDataParams, UE_ARRAY_COUNT(Z_Construct_UFunction_UFireGridManager_DrawGrid_Statics::Function_MetaDataParams)) };
+	UFunction* Z_Construct_UFunction_UFireGridManager_DrawGrid()
+	{
+		static UFunction* ReturnFunction = nullptr;
+		if (!ReturnFunction)
+		{
+			UE4CodeGen_Private::ConstructUFunction(ReturnFunction, Z_Construct_UFunction_UFireGridManager_DrawGrid_Statics::FuncParams);
+		}
+		return ReturnFunction;
+	}
+	struct Z_Construct_UFunction_UFireGridManager_InitializeGrid_Statics
+	{
+		struct FireGridManager_eventInitializeGrid_Parms
+		{
+			int32 CubesPerDimension;
+			float GridLength;
+			FVector GridOrigin;
+		};
+		static const UE4CodeGen_Private::FIntPropertyParams NewProp_CubesPerDimension;
+		static const UE4CodeGen_Private::FFloatPropertyParams NewProp_GridLength;
+#if WITH_METADATA
+		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_GridOrigin_MetaData[];
+#endif
+		static const UE4CodeGen_Private::FStructPropertyParams NewProp_GridOrigin;
+		static const UE4CodeGen_Private::FPropertyParamsBase* const PropPointers[];
+#if WITH_METADATA
+		static const UE4CodeGen_Private::FMetaDataPairParam Function_MetaDataParams[];
+#endif
+		static const UE4CodeGen_Private::FFunctionParams FuncParams;
+	};
+	const UE4CodeGen_Private::FIntPropertyParams Z_Construct_UFunction_UFireGridManager_InitializeGrid_Statics::NewProp_CubesPerDimension = { "CubesPerDimension", nullptr, (EPropertyFlags)0x0010000000000080, UE4CodeGen_Private::EPropertyGenFlags::Int, RF_Public|RF_Transient|RF_MarkAsNative, 1, STRUCT_OFFSET(FireGridManager_eventInitializeGrid_Parms, CubesPerDimension), METADATA_PARAMS(nullptr, 0) };
+	const UE4CodeGen_Private::FFloatPropertyParams Z_Construct_UFunction_UFireGridManager_InitializeGrid_Statics::NewProp_GridLength = { "GridLength", nullptr, (EPropertyFlags)0x0010000000000080, UE4CodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, 1, STRUCT_OFFSET(FireGridManager_eventInitializeGrid_Parms, GridLength), METADATA_PARAMS(nullptr, 0) };
+#if WITH_METADATA
+	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UFunction_UFireGridManager_InitializeGrid_Statics::NewProp_GridOrigin_MetaData[] = {
 		{ "NativeConst", "" },
 	};
 #endif
-	const UE4CodeGen_Private::FStructPropertyParams Z_Construct_UFunction_UFireGridManager_InitializeGrid_Statics::NewProp_WorldSize = { "WorldSize", nullptr, (EPropertyFlags)0x0010000008000182, UE4CodeGen_Private::EPropertyGenFlags::Struct, RF_Public|RF_Transient|RF_MarkAsNative, 1, STRUCT_OFFSET(FireGridManager_eventInitializeGrid_Parms, WorldSize), Z_Construct_UScriptStruct_FVector, METADATA_PARAMS(Z_Construct_UFunction_UFireGridManager_InitializeGrid_Statics::NewProp_WorldSize_MetaData, UE_ARRAY_COUNT(Z_Construct_UFunction_UFireGridManager_InitializeGrid_Statics::NewProp_WorldSize_MetaData)) };
-	const UE4CodeGen_Private::FFloatPropertyParams Z_Construct_UFunction_UFireGridManager_InitializeGrid_Statics::NewProp_CellSize = { "CellSize", nullptr, (EPropertyFlags)0x0010000000000080, UE4CodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, 1, STRUCT_OFFSET(FireGridManager_eventInitializeGrid_Parms, CellSize), METADATA_PARAMS(nullptr, 0) };
+	const UE4CodeGen_Private::FStructPropertyParams Z_Construct_UFunction_UFireGridManager_InitializeGrid_Statics::NewProp_GridOrigin = { "GridOrigin", nullptr, (EPropertyFlags)0x0010000008000182, UE4CodeGen_Private::EPropertyGenFlags::Struct, RF_Public|RF_Transient|RF_MarkAsNative, 1, STRUCT_OFFSET(FireGridManager_eventInitializeGrid_Parms, GridOrigin), Z_Construct_UScriptStruct_FVector, METADATA_PARAMS(Z_Construct_UFunction_UFireGridManager_InitializeGrid_Statics::NewProp_GridOrigin_MetaData, UE_ARRAY_COUNT(Z_Construct_UFunction_UFireGridManager_InitializeGrid_Statics::NewProp_GridOrigin_MetaData)) };
 	const UE4CodeGen_Private::FPropertyParamsBase* const Z_Construct_UFunction_UFireGridManager_InitializeGrid_Statics::PropPointers[] = {
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_UFireGridManager_InitializeGrid_Statics::NewProp_WorldSize,
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_UFireGridManager_InitializeGrid_Statics::NewProp_CellSize,
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_UFireGridManager_InitializeGrid_Statics::NewProp_CubesPerDimension,
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_UFireGridManager_InitializeGrid_Statics::NewProp_GridLength,
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_UFireGridManager_InitializeGrid_Statics::NewProp_GridOrigin,
 	};
 #if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UFunction_UFireGridManager_InitializeGrid_Statics::Function_MetaDataParams[] = {
@@ -180,10 +235,20 @@ static struct FScriptStruct_FireSimulation_StaticRegisterNativesFGridCell
 	}
 	struct Z_Construct_UFunction_UFireGridManager_PopulateGridWithActors_Statics
 	{
+		struct FireGridManager_eventPopulateGridWithActors_Parms
+		{
+			UWorld* World;
+		};
+		static const UE4CodeGen_Private::FObjectPropertyParams NewProp_World;
+		static const UE4CodeGen_Private::FPropertyParamsBase* const PropPointers[];
 #if WITH_METADATA
 		static const UE4CodeGen_Private::FMetaDataPairParam Function_MetaDataParams[];
 #endif
 		static const UE4CodeGen_Private::FFunctionParams FuncParams;
+	};
+	const UE4CodeGen_Private::FObjectPropertyParams Z_Construct_UFunction_UFireGridManager_PopulateGridWithActors_Statics::NewProp_World = { "World", nullptr, (EPropertyFlags)0x0010000000000080, UE4CodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, 1, STRUCT_OFFSET(FireGridManager_eventPopulateGridWithActors_Parms, World), Z_Construct_UClass_UWorld_NoRegister, METADATA_PARAMS(nullptr, 0) };
+	const UE4CodeGen_Private::FPropertyParamsBase* const Z_Construct_UFunction_UFireGridManager_PopulateGridWithActors_Statics::PropPointers[] = {
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_UFireGridManager_PopulateGridWithActors_Statics::NewProp_World,
 	};
 #if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UFunction_UFireGridManager_PopulateGridWithActors_Statics::Function_MetaDataParams[] = {
@@ -192,7 +257,7 @@ static struct FScriptStruct_FireSimulation_StaticRegisterNativesFGridCell
 		{ "ToolTip", "\xd0\x97\xd0\xb0\xd0\xbf\xd0\xbe\xd0\xbb\xd0\xbd\xd0\xb5\xd0\xbd\xd0\xb8\xd0\xb5 \xd1\x81\xd0\xb5\xd1\x82\xd0\xba\xd0\xb8 \xd0\xb0\xd0\xba\xd1\x82\xd0\xbe\xd1\x80\xd0\xb0\xd0\xbc\xd0\xb8 \xd1\x81 \xd0\xba\xd0\xbe\xd0\xbc\xd0\xbf\xd0\xbe\xd0\xbd\xd0\xb5\xd0\xbd\xd1\x82\xd0\xbe\xd0\xbc FireSimulationComponent." },
 	};
 #endif
-	const UE4CodeGen_Private::FFunctionParams Z_Construct_UFunction_UFireGridManager_PopulateGridWithActors_Statics::FuncParams = { (UObject*(*)())Z_Construct_UClass_UFireGridManager, nullptr, "PopulateGridWithActors", nullptr, nullptr, 0, nullptr, 0, RF_Public|RF_Transient|RF_MarkAsNative, (EFunctionFlags)0x04020401, 0, 0, METADATA_PARAMS(Z_Construct_UFunction_UFireGridManager_PopulateGridWithActors_Statics::Function_MetaDataParams, UE_ARRAY_COUNT(Z_Construct_UFunction_UFireGridManager_PopulateGridWithActors_Statics::Function_MetaDataParams)) };
+	const UE4CodeGen_Private::FFunctionParams Z_Construct_UFunction_UFireGridManager_PopulateGridWithActors_Statics::FuncParams = { (UObject*(*)())Z_Construct_UClass_UFireGridManager, nullptr, "PopulateGridWithActors", nullptr, nullptr, sizeof(FireGridManager_eventPopulateGridWithActors_Parms), Z_Construct_UFunction_UFireGridManager_PopulateGridWithActors_Statics::PropPointers, UE_ARRAY_COUNT(Z_Construct_UFunction_UFireGridManager_PopulateGridWithActors_Statics::PropPointers), RF_Public|RF_Transient|RF_MarkAsNative, (EFunctionFlags)0x04020401, 0, 0, METADATA_PARAMS(Z_Construct_UFunction_UFireGridManager_PopulateGridWithActors_Statics::Function_MetaDataParams, UE_ARRAY_COUNT(Z_Construct_UFunction_UFireGridManager_PopulateGridWithActors_Statics::Function_MetaDataParams)) };
 	UFunction* Z_Construct_UFunction_UFireGridManager_PopulateGridWithActors()
 	{
 		static UFunction* ReturnFunction = nullptr;
@@ -221,8 +286,9 @@ static struct FScriptStruct_FireSimulation_StaticRegisterNativesFGridCell
 		(UObject* (*)())Z_Construct_UPackage__Script_FireSimulation,
 	};
 	const FClassFunctionLinkInfo Z_Construct_UClass_UFireGridManager_Statics::FuncInfo[] = {
-		{ &Z_Construct_UFunction_UFireGridManager_InitializeGrid, "InitializeGrid" }, // 2010681856
-		{ &Z_Construct_UFunction_UFireGridManager_PopulateGridWithActors, "PopulateGridWithActors" }, // 3998494520
+		{ &Z_Construct_UFunction_UFireGridManager_DrawGrid, "DrawGrid" }, // 2243842819
+		{ &Z_Construct_UFunction_UFireGridManager_InitializeGrid, "InitializeGrid" }, // 2726632937
+		{ &Z_Construct_UFunction_UFireGridManager_PopulateGridWithActors, "PopulateGridWithActors" }, // 2801214818
 	};
 #if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UFireGridManager_Statics::Class_MetaDataParams[] = {
@@ -259,7 +325,7 @@ static struct FScriptStruct_FireSimulation_StaticRegisterNativesFGridCell
 		}
 		return OuterClass;
 	}
-	IMPLEMENT_CLASS(UFireGridManager, 1449738248);
+	IMPLEMENT_CLASS(UFireGridManager, 2144571896);
 	template<> FIRESIMULATION_API UClass* StaticClass<UFireGridManager>()
 	{
 		return UFireGridManager::StaticClass();

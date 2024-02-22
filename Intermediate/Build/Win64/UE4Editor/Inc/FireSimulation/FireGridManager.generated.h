@@ -8,6 +8,7 @@
 #include "UObject/ScriptMacros.h"
 
 PRAGMA_DISABLE_DEPRECATION_WARNINGS
+class UWorld;
 struct FVector;
 #ifdef FIRESIMULATION_FireGridManager_generated_h
 #error "FireGridManager.generated.h already included, missing '#pragma once' in FireGridManager.h"
@@ -25,12 +26,14 @@ template<> FIRESIMULATION_API UScriptStruct* StaticStruct<struct FGridCell>();
 #define TestProject_Plugins_FireSimulation_Source_FireSimulation_Public_FireGridManager_h_24_RPC_WRAPPERS \
  \
 	DECLARE_FUNCTION(execPopulateGridWithActors); \
+	DECLARE_FUNCTION(execDrawGrid); \
 	DECLARE_FUNCTION(execInitializeGrid);
 
 
 #define TestProject_Plugins_FireSimulation_Source_FireSimulation_Public_FireGridManager_h_24_RPC_WRAPPERS_NO_PURE_DECLS \
  \
 	DECLARE_FUNCTION(execPopulateGridWithActors); \
+	DECLARE_FUNCTION(execDrawGrid); \
 	DECLARE_FUNCTION(execInitializeGrid);
 
 

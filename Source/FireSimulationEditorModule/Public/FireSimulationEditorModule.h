@@ -17,15 +17,13 @@ private:
     TSharedPtr<SDockTab> FireSimulationTab;
 
     /** Text box for inputting the cell size */
-    TSharedPtr<SEditableTextBox> CellSizeTextBox;
+    TSharedPtr<SEditableTextBox> CubesAmountTextBox;
+    TSharedPtr<SEditableTextBox> GridLengthTextBox;
 
     /** Callback for spawning the plugin tab */
     TSharedRef<SDockTab> OnSpawnPluginTab(const FSpawnTabArgs& SpawnTabArgs);
 
     /** Callback for when the 'Initialize Grid' button is clicked */
     FReply OnInitializeGridClicked();
+    FReply OnFillGridClicked();
 };
-
-DECLARE_LOG_CATEGORY_EXTERN(LogFireSimulationEditor, Log, All);
-
-DEFINE_LOG_CATEGORY(LogFireSimulationEditor);

@@ -6,6 +6,9 @@
 #include "Widgets/Input/SButton.h"
 #include "Widgets/Input/SEditableTextBox.h"
 #include "FireGridManager.h"
+#include "UnrealEd.h"
+#include "EngineUtils.h"
+#include "GridOriginActor.h"
 
 static const FName FireSimulationTabName("FireSimulation");
 
@@ -15,7 +18,7 @@ void FFireSimulationEditorModule::StartupModule()
 {
     FGlobalTabmanager::Get()->RegisterNomadTabSpawner(FireSimulationTabName, FOnSpawnTab::CreateRaw(this, &FFireSimulationEditorModule::OnSpawnPluginTab))
         .SetDisplayName(LOCTEXT("FFireSimulationTabTitle", "Fire Simulation"))
-        .SetMenuType(ETabSpawnerMenuType::Hidden);
+        .SetMenuType(ETabSpawnerMenuType::Enabled);
 }
 
 void FFireSimulationEditorModule::ShutdownModule()
@@ -25,7 +28,8 @@ void FFireSimulationEditorModule::ShutdownModule()
 
 TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnTabArgs& SpawnTabArgs)
 {
-    CellSizeTextBox = SNew(SEditableTextBox).HintText(LOCTEXT("CellSizeHint", "Enter Cell Size..."));
+    CubesAmountTextBox = SNew(SEditableTextBox).HintText(LOCTEXT("CellSizeHint", "Enter amount of cubes in 1 dimension..."));
+    GridLengthTextBox = SNew(SEditableTextBox).HintText(LOCTEXT("GridLengthHint", "Enter Grid Length..."));
 
     return SNew(SDockTab)
         .TabRole(ETabRole::NomadTab)
@@ -42,7 +46,13 @@ TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnT
             .FillHeight(1.f)
             .Padding(5)
             [
-                CellSizeTextBox.ToSharedRef()
+                CubesAmountTextBox.ToSharedRef()
+            ]
+            + SVerticalBox::Slot()
+            .FillHeight(1.f)
+            .Padding(5)
+            [
+                GridLengthTextBox.ToSharedRef()
             ]
             +SVerticalBox::Slot()
             .FillHeight(1.f)
@@ -50,33 +60,76 @@ TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnT
             [
                 SNew(SButton)
                 .Text(LOCTEXT("InitializeButtonText", "Initialize Grid"))
-                .OnClicked(this, &FFireSimulationEditorModule::OnInitializeGridClicked)
+                .OnClicked(FOnClicked::CreateRaw(this, &FFireSimulationEditorModule::OnInitializeGridClicked))
+                    
+            ]
+            +SVerticalBox::Slot()
+            .FillHeight(1.f)
+            .Padding(5)
+            [
+                SNew(SButton)
+                    .Text(LOCTEXT("FillActorsButtonText", "Fill Grid with actors"))
+                    .OnClicked(FOnClicked::CreateRaw(this, &FFireSimulationEditorModule::OnFillGridClicked))
+
             ]
         ];
 }
 
 FReply FFireSimulationEditorModule::OnInitializeGridClicked()
 {
-    if (CellSizeTextBox.IsValid())
+    FVector GridOrigin = FVector::ZeroVector; // Значение по умолчанию
+    if (CubesAmountTextBox.IsValid() && GridLengthTextBox.IsValid())
     {
-        // Преобразование текста в число
-        FString CellSizeText = CellSizeTextBox->GetText().ToString();
-        float CellSize = FCString::Atof(*CellSizeText);
-        
-        if (CellSize > 0)
+        FString CubesAmountText = CubesAmountTextBox->GetText().ToString();
+        int32 CubesAmount = FCString::Atoi(*CubesAmountText); // Используйте Atoi для целых чисел
+
+        FString GridLengthText = GridLengthTextBox->GetText().ToString();
+        float GridLength = FCString::Atof(*GridLengthText);
+
+        if (CubesAmount > 0 && GridLength > 0)
         {
-            // Предполагаем, что у вас есть статический метод доступа или глобальный экземпляр UFireGridManager
-            UFireGridManager* GridManager = UFireGridManager::GetInstance();
-            if (GridManager)
+            // Поиск актора GridOriginActor в мире
+            if (GEditor)
             {
-                GridManager->InitializeGrid(CellSize);
-                // Возможно, вам также захочется вызвать здесь PopulateGridWithActors или другие методы
+                UWorld* World = GEditor->GetEditorWorldContext().World();
+                for (TActorIterator<AGridOriginActor> It(World); It; ++It)
+                {
+                    AGridOriginActor* GridOriginActor = *It;
+                    if (GridOriginActor)
+                    {
+                        GridOrigin = GridOriginActor->GetActorLocation();
+                        break; // Предполагаем, что в мире только один такой актор
+                    }
+                }
+
+                UFireGridManager* GridManager = UFireGridManager::GetInstance();
+                if (GridManager)
+                {
+                    GridManager->InitializeGrid(CubesAmount, GridLength, GridOrigin);
+                    GridManager->DrawGrid(true);
+                }
             }
         }
     }
     return FReply::Handled();
 }
 
+FReply FFireSimulationEditorModule::OnFillGridClicked()
+{    
+    UFireGridManager* GridManager = UFireGridManager::GetInstance();
+    if (GridManager)
+    {
+        //#if WITH_EDITOR
+        //#include "UnrealEd.h"
+        if (GEditor)
+        {
+            UWorld* World = GEditor->GetEditorWorldContext().World();
+            GridManager->PopulateGridWithActors(World);
+        }
+        //#endif
+    }   
+    return FReply::Handled();
+}
 
 #undef LOCTEXT_NAMESPACE
 

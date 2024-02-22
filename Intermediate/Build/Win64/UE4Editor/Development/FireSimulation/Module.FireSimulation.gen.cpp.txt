@@ -13,6 +13,13 @@ G:/UE_Projects/TestProject/Plugins/FireSimulation/Intermediate/Build/Win64/UE4Ed
 G:/UE_Projects/TestProject/Plugins/FireSimulation/Intermediate/Build/Win64/UE4Editor/Inc/FireSimulation/FireSimulationComponent.gen.cpp
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation/Public/FireSimulationComponent.h
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\FireSimulationComponent.generated.h
+G:/UE_Projects/TestProject/Plugins/FireSimulation/Intermediate/Build/Win64/UE4Editor/Inc/FireSimulation/GridOriginActor.gen.cpp
+G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation/Public/GridOriginActor.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Engine\Classes\Components/SphereComponent.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Engine\Classes\Components/ShapeComponent.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\ShapeComponent.generated.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\SphereComponent.generated.h
+G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\GridOriginActor.generated.h
 G:/UE_Projects/TestProject/Plugins/FireSimulation/Intermediate/Build/Win64/UE4Editor/Inc/FireSimulation/MaterialData.gen.cpp
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation/Public/MaterialData.h
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\MaterialData.generated.h

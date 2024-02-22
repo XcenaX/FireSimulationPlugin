@@ -21,9 +21,9 @@
 			"LoadingPhase": "Default"
 		},
 		{
-            "Name": "FireSimulationEditorModule",
-            "Type": "Editor",
-            "LoadingPhase": "PostEngineInit"
-        }
+			"Name": "FireSimulationEditorModule",
+			"Type": "Editor",
+			"LoadingPhase": "PostEngineInit"
+		}
 	]
 }

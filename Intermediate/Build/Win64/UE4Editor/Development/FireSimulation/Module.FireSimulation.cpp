@@ -3,4 +3,5 @@
 #include "G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/FireSimulation.cpp"
 #include "G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/FireSimulationComponent.cpp"
 #include "G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/FMaterialSelectionCustomization.cpp"
+#include "G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/GridOriginActor.cpp"
 #include "G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/MaterialDataManager.cpp"

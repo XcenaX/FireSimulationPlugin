@@ -44,7 +44,7 @@ public class FireSimulation : ModuleRules
 				"SlateCore",
                 "Projects",
                 "EditorStyle",
-                "UnrealEd"
+                "UnrealEd",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

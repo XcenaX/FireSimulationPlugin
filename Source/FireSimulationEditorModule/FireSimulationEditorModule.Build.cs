@@ -10,6 +10,7 @@ public class FireSimulationEditorModule : ModuleRules
             new string[]
             {
                 "Core",
+                "FireSimulation"
                 // Другие зависимости модулей...
             }
             );
@@ -21,7 +22,8 @@ public class FireSimulationEditorModule : ModuleRules
                 "Engine",
                 "Slate",
                 "SlateCore",
-                "UnrealEd", // Важно для модулей редактора
+                "UnrealEd",
+                // Важно для модулей редактора
                 // Другие зависимости модулей...
             }
             );
