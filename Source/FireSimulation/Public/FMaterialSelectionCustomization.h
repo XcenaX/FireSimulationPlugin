@@ -5,9 +5,12 @@
 class FIRESIMULATION_API FMaterialSelectionCustomization : public IDetailCustomization
 {
 public:
+    FMaterialSelectionCustomization();
     static TSharedRef<IDetailCustomization> MakeInstance();
 
     virtual void CustomizeDetails(IDetailLayoutBuilder& DetailBuilder) override;
 
-    TArray<TSharedPtr<int32>> MaterialIndices;
+private:
+    TSharedPtr<SComboBox<TSharedPtr<FString>>> MaterialComboBox;
+    const TArray<TSharedPtr<FString>>& MaterialNames;
 };

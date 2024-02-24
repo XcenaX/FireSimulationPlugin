@@ -13,78 +13,66 @@
 #include "MaterialDataManager.h"
 
 
+FMaterialSelectionCustomization::FMaterialSelectionCustomization()
+	: MaterialComboBox(nullptr), MaterialNames(FMaterialDataManager::Get().GetMaterialNames())
+{
+	
+}
+
+
 TSharedRef<IDetailCustomization> FMaterialSelectionCustomization::MakeInstance()
 {
-    return MakeShareable(new FMaterialSelectionCustomization);
+	return MakeShareable(new FMaterialSelectionCustomization);
 }
 
 
 void FMaterialSelectionCustomization::CustomizeDetails(IDetailLayoutBuilder& DetailBuilder)
 {
-    UE_LOG(LogTemp, Warning, TEXT("CustomizeDetails is being called!"));
-    TArray<TWeakObjectPtr<UObject>> ObjectsBeingCustomized;
-    DetailBuilder.GetObjectsBeingCustomized(ObjectsBeingCustomized);
-    UFireSimulationComponent* FireSimulationComponent = nullptr;
+	UE_LOG(LogTemp, Warning, TEXT("CustomizeDetails is being called!"));
+	TArray<TWeakObjectPtr<UObject>> ObjectsBeingCustomized;
+	DetailBuilder.GetObjectsBeingCustomized(ObjectsBeingCustomized);
+	UFireSimulationComponent* FireSimulationComponent = nullptr;
 
-    if (ObjectsBeingCustomized.Num() > 0)
-    {
-        FireSimulationComponent = Cast<UFireSimulationComponent>(ObjectsBeingCustomized[0].Get());
-    }
+	if (ObjectsBeingCustomized.Num() > 0)
+	{
+		FireSimulationComponent = Cast<UFireSimulationComponent>(ObjectsBeingCustomized[0].Get());
+	}
 
-    if (!FireSimulationComponent) return;
-    
-    FString SelectedMaterial = FireSimulationComponent->GetSelectedMaterial();
+	if (!FireSimulationComponent) return;
+	TSharedPtr<IPropertyHandle> MaterialPropertyHandle = DetailBuilder.GetProperty(GET_MEMBER_NAME_CHECKED(UFireSimulationComponent, SelectedMaterial));
 
-    UE_LOG(LogTemp, Log, TEXT("Initializing OptionsSource."));
-    const TArray<TSharedPtr<FString>>& MaterialNames = FMaterialDataManager::Get().GetMaterialNames();
-    UE_LOG(LogTemp, Log, TEXT("OptionsSource now contains %d items."), MaterialNames.Num());
-
-    // Найдите индекс выбранного материала
-    TSharedPtr<FString> InitialSelectedItem;
-    for (const auto& Option : MaterialNames)
-    {
-        if (*Option == SelectedMaterial)
-        {
-            InitialSelectedItem = Option;
-            break;
-        }
-    }
-
-    IDetailCategoryBuilder& Category = DetailBuilder.EditCategory("FireSimulation");
-    Category.AddCustomRow(FText::FromString("Material Selection"))
-        .NameContent()
-        [
-            SNew(STextBlock).Text(FText::FromString("Selected Material"))
-        ]
-        .ValueContent()
-        .MaxDesiredWidth(250.f)
-        [
-            SNew(SComboBox<TSharedPtr<FString>>)
-                .OptionsSource(&MaterialNames)
-                .InitiallySelectedItem(InitialSelectedItem)
-                .OnComboBoxOpening_Lambda([]()
-                    {
-                        UE_LOG(LogTemp, Log, TEXT("ComboBox opening"));
-                    })
-                .OnGenerateWidget_Lambda([](TSharedPtr<FString> InItem)
-                    {
-                        return SNew(STextBlock).Text(FText::FromString(*InItem));
-                    })
-                .OnSelectionChanged_Lambda([FireSimulationComponent](TSharedPtr<FString> NewSelection, ESelectInfo::Type SelectInfo)
-                    {
-                        if (NewSelection.IsValid())
-                        {
-                            FireSimulationComponent->UpdateSelectedMaterial(*NewSelection);
-                        }
-                    })
-                        .Content()
-                        [
-                            SNew(STextBlock)
-                                .Text_Lambda([FireSimulationComponent]() -> FText
-                                    {
-                                        FString CurrentSelectedMaterial = FireSimulationComponent->GetSelectedMaterial();
-                                        return FText::FromString(!CurrentSelectedMaterial.IsEmpty() ? CurrentSelectedMaterial : TEXT("Select a Material"));
-                                    })
-                        ]
-        ];
+	IDetailCategoryBuilder& Category = DetailBuilder.EditCategory("FireSimulation");
+	Category.AddProperty(MaterialPropertyHandle)
+		.CustomWidget()
+		.NameContent()
+		[
+			MaterialPropertyHandle->CreatePropertyNameWidget()
+		]
+		.ValueContent()
+		.MaxDesiredWidth(250.f)
+		[
+			SAssignNew(MaterialComboBox, SComboBox<TSharedPtr<FString>>)
+				.OptionsSource(&MaterialNames)
+				.OnSelectionChanged_Lambda([FireSimulationComponent](TSharedPtr<FString> NewSelection, ESelectInfo::Type SelectInfo)
+					{
+						if (NewSelection.IsValid() && FireSimulationComponent && SelectInfo != ESelectInfo::Direct)
+						{
+							FireSimulationComponent->UpdateSelectedMaterial(*NewSelection);
+						}
+					})
+				.OnGenerateWidget_Lambda([](TSharedPtr<FString> InItem)
+					{
+						return SNew(STextBlock).Text(FText::FromString(*InItem));
+					})
+						.Content()
+						[
+							SNew(STextBlock)
+								.Text_Lambda([MaterialPropertyHandle]() -> FText
+									{
+										FString CurrentSelectedMaterial;
+										MaterialPropertyHandle->GetValue(CurrentSelectedMaterial);
+										return FText::FromString(!CurrentSelectedMaterial.IsEmpty() ? CurrentSelectedMaterial : TEXT("Select a Material"));
+									})
+						]
+		];
 }
