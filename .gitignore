@@ -1,0 +1,47 @@
+# Unreal Engine
+Binaries/
+Intermediate/
+Saved/
+DerivedDataCache/
+*.opensdf
+*.sdf
+*.suo
+*.user
+*.userprefs
+*.vs/
+*.vssscc
+*_PCLauncher*
+*.VC.db
+*.VC.VC.opendb
+
+# Visual Studio
+.vs/
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+
+# Xcode
+*.mode1v3
+*.mode2v3
+*.moved-aside
+*.pbxuser
+*.perspectivev3
+*.xccheckout
+*.xcuserdata
+*.xcworkspacedata
+*.xcscheme
+*.xcuserstate
+
+# Generated files
+*.log
+*.sql
+*.sqlite
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

@@ -1,8 +1,0 @@
-{
-	"BuildId": "17155196",
-	"Modules": 
-	{
-		"FireSimulation": "UE4Editor-FireSimulation.dll",
-		"FireSimulationEditorModule": "UE4Editor-FireSimulationEditorModule.dll"
-	}
-}

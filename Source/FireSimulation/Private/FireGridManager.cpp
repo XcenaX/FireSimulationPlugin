@@ -5,6 +5,7 @@
 #include "FireSimulationComponent.h"
 #include "Components/BoxComponent.h"
 #include <GridActor.h>
+#include <Misc/FileHelper.h>
 
 UFireGridManager* UFireGridManager::Instance = nullptr;
 
@@ -78,7 +79,13 @@ void UFireGridManager::PopulateGridWithActors(UWorld* World, AActor * GridActor)
     if (!BoxComponent) return;
 
     FVector GridSize = BoxComponent->GetScaledBoxExtent() * 2; // Получаем полные размеры сетки
-    FVector CellSize = GridSize / ElementsAmount; // Размер одной ячейки в каждом измерении
+
+    float CellSizeX = (GridSize.X * 2) / ElementsAmount;
+    float CellSizeY = (GridSize.Y * 2) / ElementsAmount;
+    float CellSizeZ = (GridSize.Z * 2) / ElementsAmount;
+    FVector CellSizeVector(CellSizeX, CellSizeY, CellSizeZ);
+
+    FVector CellSize = GridSize / CellSizeVector; // Размер одной ячейки в каждом измерении
 
     // Очищаем и инициализируем сетку
     Grid.SetNum(ElementsAmount);
@@ -97,13 +104,14 @@ void UFireGridManager::PopulateGridWithActors(UWorld* World, AActor * GridActor)
     Params.bTraceComplex = true;
     Params.bReturnPhysicalMaterial = false;
 
+    FString LogText;
     for (int x = 0; x < ElementsAmount; ++x)
     {
         for (int y = 0; y < ElementsAmount; ++y)
         {
             for (int z = 0; z < ElementsAmount; ++z)
             {
-                FVector CellCenter = GridOrigin + FVector(x, y, z) * CellSize + CellSize / 2;
+                FVector CellCenter = GridOrigin + FVector(x * CellSize.X, y * CellSize.Y, z * CellSize.Z) + CellSize / 2;
                 FCollisionShape Box = FCollisionShape::MakeBox(CellSize / 2);
                 TArray<FHitResult> HitResults;
                 World->SweepMultiByChannel(HitResults, CellCenter, CellCenter, FQuat::Identity, ECC_Visibility, Box, Params);
@@ -112,6 +120,7 @@ void UFireGridManager::PopulateGridWithActors(UWorld* World, AActor * GridActor)
                 {
                     if (AActor* HitActor = Hit.GetActor())
                     {
+                        LogText += "(has hit)";
                         if (HitActor->FindComponentByClass<UFireSimulationComponent>())
                         {
                             Grid[x][y][z].OccupyingActor = HitActor;
@@ -119,7 +128,27 @@ void UFireGridManager::PopulateGridWithActors(UWorld* World, AActor * GridActor)
                         }
                     }
                 }
+
+                // LOGS
+                if (Grid[x][y][z].OccupyingActor != nullptr)
+                {
+                    LogText += Grid[x][y][z].OccupyingActor->GetName();
+                }
+                else
+                {
+                    LogText += "NoActor";
+                }
+
+                if (z < Grid[x][y].Num() - 1)
+                {
+                    LogText += ", ";
+                }
             }
+            LogText += "\n";
         }
+        LogText += "-\n";
     }
+    // LOGS
+    FString FilePath = FPaths::ProjectDir() / TEXT("GridLog.txt");
+    FFileHelper::SaveStringToFile(LogText, *FilePath);
 }
