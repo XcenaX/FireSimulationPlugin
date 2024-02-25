@@ -38,38 +38,11 @@ void UFireSimulationComponent::SetFireTexture(UTexture2D* Texture)
 
 void UFireSimulationComponent::UpdateSelectedMaterial(const FString& NewMaterialName)
 {
-<<<<<<< Updated upstream
-#if WITH_EDITOR
-	if (GEditor)
-	{
-		GEditor->BeginTransaction(FText::FromString("Change Selected Material"));
-		Modify();
-	}
-#endif
-	SelectedMaterial = NewMaterialName;
-#if WITH_EDITOR
-	if (GEditor)
-	{
-		GEditor->EndTransaction();
-	}
-#endif
-
-	// Пример дополнительной логики (псевдокод):
-	// UMaterialInterface* Material = LoadMaterialByName(SelectedMaterialName);
-	// if (Material)
-	// {
-	//     ApplyMaterialToMesh(Material); // Функция, которая применяет материал к мешу
-	// }
-=======
     SelectedMaterial = NewMaterialName;
->>>>>>> Stashed changes
 }
 
 FString UFireSimulationComponent::GetSelectedMaterial()
 {
-<<<<<<< Updated upstream
-	return SelectedMaterial;
-=======
     return SelectedMaterial;
 }
 
@@ -96,5 +69,4 @@ void UFireSimulationComponent::PostEditChangeProperty(FPropertyChangedEvent& Pro
             IsWall = false;
         }
     }
->>>>>>> Stashed changes
 }

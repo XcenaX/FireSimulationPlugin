@@ -25,11 +25,8 @@ UFireGridManager* UFireGridManager::GetInstance()
 
 void UFireGridManager::InitializeGrid(int32 CubesPerDimension)
 {
-<<<<<<< Updated upstream
-=======
     ElementsAmount = CubesPerDimension;
 
->>>>>>> Stashed changes
     Grid.SetNum(CubesPerDimension);
     for (int32 i = 0; i < CubesPerDimension; ++i)
     {
@@ -41,11 +38,7 @@ void UFireGridManager::InitializeGrid(int32 CubesPerDimension)
     }
 }
 
-<<<<<<< Updated upstream
-void UFireGridManager::DrawGrid(AActor* GridActor, UWorld* World)
-=======
 void UFireGridManager::DrawGrid(bool bVisible, UWorld * World, AActor * GridActor)
->>>>>>> Stashed changes
 {
     if (!GridActor || !World) return;
 
@@ -77,71 +70,6 @@ void UFireGridManager::DrawGrid(bool bVisible, UWorld * World, AActor * GridActo
 }
 
 
-<<<<<<< Updated upstream
-
-void UFireGridManager::PopulateGridWithActors(UWorld* World)
-{
-    if (!World || ElementsAmount <= 0) return;
-
-    AActor* GridActor = nullptr;
-    for (TActorIterator<AActor> It(World); It; ++It)
-    {
-        if (It->FindComponentByClass<UBoxComponent>()) // Предполагаем, что актор сетки имеет UBoxComponent
-        {
-            GridActor = *It;
-            break; // Берём первого найденного актора
-        }
-    }
-
-    if (!GridActor) return;
-
-    UBoxComponent* GridBounds = GridActor->FindComponentByClass<UBoxComponent>();
-    if (!GridBounds) return;
-
-    FVector GridSize = GridBounds->GetScaledBoxExtent() * 2;
-
-    FVector CellSize(
-        GridSize.X / ElementsAmount,
-        GridSize.Y / ElementsAmount,
-        GridSize.Z / ElementsAmount
-    );
-
-
-    // Очистка сетки перед заполнением
-    Grid.SetNum(ElementsAmount);
-    for (int32 i = 0; i < ElementsAmount; ++i)
-    {
-        Grid[i].SetNum(ElementsAmount);
-        for (int32 j = 0; j < ElementsAmount; ++j)
-        {
-            Grid[i][j].SetNum(ElementsAmount);
-        }
-    }
-
-    FVector GridOrigin = GridBounds->GetComponentLocation() - GridBounds->GetScaledBoxExtent();
-
-    FCollisionQueryParams QueryParams;
-    QueryParams.bTraceComplex = true;
-    QueryParams.bReturnPhysicalMaterial = false;
-
-    for (int32 i = 0; i < ElementsAmount; ++i)
-    {
-        for (int32 j = 0; j < ElementsAmount; ++j)
-        {
-            for (int32 k = 0; k < ElementsAmount; ++k)
-            {
-                FVector CellCenter = GridOrigin + FVector(i * CellSize.X + CellSize.X / 2, j * CellSize.Y + CellSize.Y / 2, k * CellSize.Z + CellSize.Z / 2);
-                TArray<FHitResult> HitResults;
-                World->SweepMultiByChannel(HitResults, CellCenter, CellCenter, FQuat::Identity, ECC_Visibility, FCollisionShape::MakeBox(CellSize / 2), QueryParams);
-
-                for (const FHitResult& Hit : HitResults)
-                {
-                    AActor* Actor = Hit.GetActor();
-                    if (Actor && Actor->FindComponentByClass<UFireSimulationComponent>())
-                    {
-                        Grid[i][j][k].OccupyingActor = Actor;
-                        break; // Прекращаем поиск после первого найденного актора с компонентом
-=======
 void UFireGridManager::PopulateGridWithActors(UWorld* World, AActor * GridActor)
 {
     if (!World || !GridActor || ElementsAmount <= 0) return;
@@ -189,14 +117,9 @@ void UFireGridManager::PopulateGridWithActors(UWorld* World, AActor * GridActor)
                             Grid[x][y][z].OccupyingActor = HitActor;
                             break; // Прекращаем поиск после первого найденного актора
                         }
->>>>>>> Stashed changes
                     }
                 }
             }
         }
     }
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes

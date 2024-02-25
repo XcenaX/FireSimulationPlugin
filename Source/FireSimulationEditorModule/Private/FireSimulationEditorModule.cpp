@@ -79,10 +79,6 @@ TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnT
 
 FReply FFireSimulationEditorModule::OnInitializeGridClicked()
 {
-<<<<<<< Updated upstream
-    FVector GridOrigin = FVector::ZeroVector; // Значение по умолчанию
-=======
->>>>>>> Stashed changes
     if (CubesAmountTextBox.IsValid())
     {
         FString CubesAmountText = CubesAmountTextBox->GetText().ToString();
@@ -98,26 +94,14 @@ FReply FFireSimulationEditorModule::OnInitializeGridClicked()
                 for (TActorIterator<AGridActor> It(World); It; ++It)
                 {
                     GridActor = *It;
-<<<<<<< Updated upstream
-                    if (GridActor)
-                    {
-                        GridOrigin = GridActor->GetActorLocation();
-                        break; // Предполагаем, что в мире только один такой актор
-                    }
-=======
                     break;
->>>>>>> Stashed changes
                 }
 
                 UFireGridManager* GridManager = UFireGridManager::GetInstance();
                 if (GridManager)
                 {
                     GridManager->InitializeGrid(CubesAmount);
-<<<<<<< Updated upstream
-                    GridManager->DrawGrid(GridActor, World);
-=======
                     GridManager->DrawGrid(true, World, GridActor);
->>>>>>> Stashed changes
                 }
             }
         }
@@ -127,12 +111,8 @@ FReply FFireSimulationEditorModule::OnInitializeGridClicked()
 
 FReply FFireSimulationEditorModule::OnClearGridClicked()
 {
-<<<<<<< Updated upstream
-    if (GEditor) {
-=======
     if (GEditor)
     {
->>>>>>> Stashed changes
         UWorld* World = GEditor->GetEditorWorldContext().World();
         FlushPersistentDebugLines(World);
     }
