@@ -1399,5 +1399,5 @@ C:\Program Files\Epic Games\UE_4.27\Engine\Intermediate\Build\Win64\UE4Editor\In
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\UnrealEdMessages\Classes\FileServerMessages.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Intermediate\Build\Win64\UE4Editor\Inc\UnrealEdMessages\FileServerMessages.generated.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\UnrealEd\Public\EditorAnalytics.h
-G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\GridOriginActor.h
-G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\GridOriginActor.generated.h
+G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\GridActor.h
+G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\GridActor.generated.h

@@ -9,7 +9,7 @@
 
 PRAGMA_DISABLE_DEPRECATION_WARNINGS
 class UWorld;
-struct FVector;
+class AActor;
 #ifdef FIRESIMULATION_FireGridManager_generated_h
 #error "FireGridManager.generated.h already included, missing '#pragma once' in FireGridManager.h"
 #endif

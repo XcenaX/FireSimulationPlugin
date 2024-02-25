@@ -2,19 +2,27 @@
 	"RemapUnityFiles": 
 	{
 		"Module.FireSimulation.cpp.obj": [
+			"BuildingGraph.cpp.obj",
+			"DoorComponent.cpp.obj",
 			"FireGridManager.cpp.obj",
 			"FireSimulation.cpp.obj",
 			"FireSimulationComponent.cpp.obj",
 			"FMaterialSelectionCustomization.cpp.obj",
+			"GridActor.cpp.obj",
 			"GridOriginActor.cpp.obj",
-			"MaterialDataManager.cpp.obj"
+			"MaterialDataManager.cpp.obj",
+			"RoomMarker.cpp.obj"
 		],
 		"Module.FireSimulation.gen.cpp.obj": [
+			"BuildingGraph.gen.cpp.obj",
+			"DoorComponent.gen.cpp.obj",
 			"FireGridManager.gen.cpp.obj",
 			"FireSimulation.init.gen.cpp.obj",
 			"FireSimulationComponent.gen.cpp.obj",
+			"GridActor.gen.cpp.obj",
 			"GridOriginActor.gen.cpp.obj",
-			"MaterialData.gen.cpp.obj"
+			"MaterialData.gen.cpp.obj",
+			"RoomMarker.gen.cpp.obj"
 		]
 	}
 }

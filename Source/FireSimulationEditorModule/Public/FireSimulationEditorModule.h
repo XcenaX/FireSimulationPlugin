@@ -25,5 +25,6 @@ private:
 
     /** Callback for when the 'Initialize Grid' button is clicked */
     FReply OnInitializeGridClicked();
+    FReply OnClearGridClicked();
     FReply OnFillGridClicked();
 };

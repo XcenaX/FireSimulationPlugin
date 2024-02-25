@@ -59,13 +59,12 @@ void EmptyLinkFunctionForGeneratedCodeFireSimulationComponent() {}
 #endif
 #if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UFireSimulationComponent_Statics::NewProp_SelectedMaterial_MetaData[] = {
-		{ "Comment", "// \xd0\x9c\xd0\xb0\xd1\x82\xd0\xb5\xd1\x80\xd0\xb8\xd0\xb0\xd0\xbb \xd0\xbe\xd0\xb1\xd1\x8a\xd0\xb5\xd0\xba\xd1\x82\xd0\xb0, \xd0\xbd\xd1\x83\xd0\xb6\xd0\xb5\xd0\xbd \xd0\xb4\xd0\xbb\xd1\x8f \xd1\x80\xd0\xb0\xd1\x81\xd1\x87\xd0\xb5\xd1\x82\xd0\xbe\xd0\xb2 \xd1\x80\xd0\xb0\xd1\x81\xd0\xbf\xd1\x80\xd0\xbe\xd1\x81\xd1\x82\xd1\x80\xd0\xb0\xd0\xbd\xd0\xb5\xd0\xbd\xd0\xb8\xd1\x8f \xd0\xbe\xd0\xb3\xd0\xbd\xd1\x8f \xd0\xb8 \xd0\xb4\xd1\x8b\xd0\xbc\xd0\xb0\n" },
+		{ "Category", "Fire Simulation" },
 		{ "Hidden", "" },
 		{ "ModuleRelativePath", "Public/FireSimulationComponent.h" },
-		{ "ToolTip", "\xd0\x9c\xd0\xb0\xd1\x82\xd0\xb5\xd1\x80\xd0\xb8\xd0\xb0\xd0\xbb \xd0\xbe\xd0\xb1\xd1\x8a\xd0\xb5\xd0\xba\xd1\x82\xd0\xb0, \xd0\xbd\xd1\x83\xd0\xb6\xd0\xb5\xd0\xbd \xd0\xb4\xd0\xbb\xd1\x8f \xd1\x80\xd0\xb0\xd1\x81\xd1\x87\xd0\xb5\xd1\x82\xd0\xbe\xd0\xb2 \xd1\x80\xd0\xb0\xd1\x81\xd0\xbf\xd1\x80\xd0\xbe\xd1\x81\xd1\x82\xd1\x80\xd0\xb0\xd0\xbd\xd0\xb5\xd0\xbd\xd0\xb8\xd1\x8f \xd0\xbe\xd0\xb3\xd0\xbd\xd1\x8f \xd0\xb8 \xd0\xb4\xd1\x8b\xd0\xbc\xd0\xb0" },
 	};
 #endif
-	const UE4CodeGen_Private::FStrPropertyParams Z_Construct_UClass_UFireSimulationComponent_Statics::NewProp_SelectedMaterial = { "SelectedMaterial", nullptr, (EPropertyFlags)0x0010000000004000, UE4CodeGen_Private::EPropertyGenFlags::Str, RF_Public|RF_Transient|RF_MarkAsNative, 1, STRUCT_OFFSET(UFireSimulationComponent, SelectedMaterial), METADATA_PARAMS(Z_Construct_UClass_UFireSimulationComponent_Statics::NewProp_SelectedMaterial_MetaData, UE_ARRAY_COUNT(Z_Construct_UClass_UFireSimulationComponent_Statics::NewProp_SelectedMaterial_MetaData)) };
+	const UE4CodeGen_Private::FStrPropertyParams Z_Construct_UClass_UFireSimulationComponent_Statics::NewProp_SelectedMaterial = { "SelectedMaterial", nullptr, (EPropertyFlags)0x0010000000000001, UE4CodeGen_Private::EPropertyGenFlags::Str, RF_Public|RF_Transient|RF_MarkAsNative, 1, STRUCT_OFFSET(UFireSimulationComponent, SelectedMaterial), METADATA_PARAMS(Z_Construct_UClass_UFireSimulationComponent_Statics::NewProp_SelectedMaterial_MetaData, UE_ARRAY_COUNT(Z_Construct_UClass_UFireSimulationComponent_Statics::NewProp_SelectedMaterial_MetaData)) };
 #if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UFireSimulationComponent_Statics::NewProp_IsBurning_MetaData[] = {
 		{ "Category", "Fire Simulation" },
@@ -110,7 +109,7 @@ void EmptyLinkFunctionForGeneratedCodeFireSimulationComponent() {}
 		}
 		return OuterClass;
 	}
-	IMPLEMENT_CLASS(UFireSimulationComponent, 18979166);
+	IMPLEMENT_CLASS(UFireSimulationComponent, 4259382332);
 	template<> FIRESIMULATION_API UClass* StaticClass<UFireSimulationComponent>()
 	{
 		return UFireSimulationComponent::StaticClass();

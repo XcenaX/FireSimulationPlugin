@@ -22,10 +22,8 @@ UFireGridManager* UFireGridManager::GetInstance()
     return Instance;
 }
 
-void UFireGridManager::InitializeGrid(int32 CubesPerDimension, float GridLength, const FVector& NewGridOrigin)
+void UFireGridManager::InitializeGrid(int32 CubesPerDimension)
 {
-    GridCellSize = GridLength / CubesPerDimension;
-
     Grid.SetNum(CubesPerDimension);
     for (int32 i = 0; i < CubesPerDimension; ++i)
     {
@@ -35,75 +33,106 @@ void UFireGridManager::InitializeGrid(int32 CubesPerDimension, float GridLength,
             Grid[i][j].SetNum(CubesPerDimension);
         }
     }
-
-    // Установка начала координат сетки
-    this->GridOrigin = NewGridOrigin;
 }
 
-void UFireGridManager::DrawGrid(bool bVisible)
+void UFireGridManager::DrawGrid(AActor* GridActor, UWorld* World)
 {
-    UWorld* World = GEditor->GetEditorWorldContext().World();
+    if (!GridActor || !World) return;
+
+    UBoxComponent* BoxComponent = Cast<UBoxComponent>(GridActor->GetComponentByClass(UBoxComponent::StaticClass()));
+    if (!BoxComponent) return;
+
+    FVector Origin = BoxComponent->GetComponentLocation();
+    FVector BoxExtent = BoxComponent->GetScaledBoxExtent();
+
+    // Рассчитываем размер ячейки для каждого измерения
+    float CellSizeX = (BoxExtent.X * 2) / ElementsAmount;
+    float CellSizeY = (BoxExtent.Y * 2) / ElementsAmount;
+    float CellSizeZ = (BoxExtent.Z * 2) / ElementsAmount;
+
     FlushPersistentDebugLines(World);
 
-    if (!bVisible)
-    {        
-        return;
-    }
-
-    for (int32 i = 0; i < Grid.Num(); ++i)
+    // Рисование сетки
+    for (int x = 0; x < ElementsAmount; ++x)
     {
-        for (int32 j = 0; j < Grid[i].Num(); ++j)
+        for (int y = 0; y < ElementsAmount; ++y)
         {
-            for (int32 k = 0; k < Grid[i][j].Num(); ++k)
+            for (int z = 0; z < ElementsAmount; ++z)
             {
-                FVector Center = GridOrigin + FVector(i * GridCellSize, j * GridCellSize, k * GridCellSize) + FVector(GridCellSize / 2);
-                DrawDebugBox(World, Center, FVector(GridCellSize / 2), FColor::Red, true, -1.0f, 0, 2);
+                FVector CellOrigin = Origin + FVector(x * CellSizeX, y * CellSizeY, z * CellSizeZ) - BoxExtent + FVector(CellSizeX / 2, CellSizeY / 2, CellSizeZ / 2);
+                DrawDebugBox(World, CellOrigin, FVector(CellSizeX / 2, CellSizeY / 2, CellSizeZ / 2), FColor::Blue, true, -1.f, 0, 1);
             }
         }
     }
 }
+
 
 
 void UFireGridManager::PopulateGridWithActors(UWorld* World)
 {
-    if (!World) return;
+    if (!World || ElementsAmount <= 0) return;
 
-    // Очистка сетки перед заполнением
-    for (auto& Column : Grid)
-    {
-        for (auto& Row : Column)
-        {
-            for (FGridCell& Cell : Row)
-            {
-                Cell.OccupyingActor = nullptr;
-            }
-        }
-    }
-
+    AActor* GridActor = nullptr;
     for (TActorIterator<AActor> It(World); It; ++It)
     {
-        AActor* Actor = *It;
-        UFireSimulationComponent* FireComp = Actor->FindComponentByClass<UFireSimulationComponent>();
-        if (FireComp)
+        if (It->FindComponentByClass<UBoxComponent>()) // Предполагаем, что актор сетки имеет UBoxComponent
         {
-            FVector ActorLocation = Actor->GetActorLocation();
-            int32 x, y, z;
-            if (GetCellIndex(ActorLocation, x, y, z))
+            GridActor = *It;
+            break; // Берём первого найденного актора
+        }
+    }
+
+    if (!GridActor) return;
+
+    UBoxComponent* GridBounds = GridActor->FindComponentByClass<UBoxComponent>();
+    if (!GridBounds) return;
+
+    FVector GridSize = GridBounds->GetScaledBoxExtent() * 2;
+
+    FVector CellSize(
+        GridSize.X / ElementsAmount,
+        GridSize.Y / ElementsAmount,
+        GridSize.Z / ElementsAmount
+    );
+
+
+    // Очистка сетки перед заполнением
+    Grid.SetNum(ElementsAmount);
+    for (int32 i = 0; i < ElementsAmount; ++i)
+    {
+        Grid[i].SetNum(ElementsAmount);
+        for (int32 j = 0; j < ElementsAmount; ++j)
+        {
+            Grid[i][j].SetNum(ElementsAmount);
+        }
+    }
+
+    FVector GridOrigin = GridBounds->GetComponentLocation() - GridBounds->GetScaledBoxExtent();
+
+    FCollisionQueryParams QueryParams;
+    QueryParams.bTraceComplex = true;
+    QueryParams.bReturnPhysicalMaterial = false;
+
+    for (int32 i = 0; i < ElementsAmount; ++i)
+    {
+        for (int32 j = 0; j < ElementsAmount; ++j)
+        {
+            for (int32 k = 0; k < ElementsAmount; ++k)
             {
-                // Убедитесь, что массив Grid инициализирован и имеет достаточный размер перед обращением к Grid[x][y][z]
-                Grid[x][y][z].OccupyingActor = Actor;
+                FVector CellCenter = GridOrigin + FVector(i * CellSize.X + CellSize.X / 2, j * CellSize.Y + CellSize.Y / 2, k * CellSize.Z + CellSize.Z / 2);
+                TArray<FHitResult> HitResults;
+                World->SweepMultiByChannel(HitResults, CellCenter, CellCenter, FQuat::Identity, ECC_Visibility, FCollisionShape::MakeBox(CellSize / 2), QueryParams);
+
+                for (const FHitResult& Hit : HitResults)
+                {
+                    AActor* Actor = Hit.GetActor();
+                    if (Actor && Actor->FindComponentByClass<UFireSimulationComponent>())
+                    {
+                        Grid[i][j][k].OccupyingActor = Actor;
+                        break; // Прекращаем поиск после первого найденного актора с компонентом
+                    }
+                }
             }
         }
     }
-}
-
-
-bool UFireGridManager::GetCellIndex(const FVector& Location, int32& OutX, int32& OutY, int32& OutZ) const
-{
-    OutX = FMath::FloorToInt(Location.X / GridCellSize);
-    OutY = FMath::FloorToInt(Location.Y / GridCellSize);
-    OutZ = FMath::FloorToInt(Location.Z / GridCellSize);
-
-    // Проверка, что индексы находятся в пределах сетки
-    return OutX >= 0 && OutX < Grid.Num() && OutY >= 0 && OutY < Grid[OutX].Num() && OutZ >= 0 && OutZ < Grid[OutX][OutY].Num();
 }

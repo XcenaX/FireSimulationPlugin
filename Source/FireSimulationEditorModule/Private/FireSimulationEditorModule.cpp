@@ -8,7 +8,7 @@
 #include "FireGridManager.h"
 #include "UnrealEd.h"
 #include "EngineUtils.h"
-#include "GridOriginActor.h"
+#include "GridActor.h"
 
 static const FName FireSimulationTabName("FireSimulation");
 
@@ -29,8 +29,7 @@ void FFireSimulationEditorModule::ShutdownModule()
 TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnTabArgs& SpawnTabArgs)
 {
     CubesAmountTextBox = SNew(SEditableTextBox).HintText(LOCTEXT("CellSizeHint", "Enter amount of cubes in 1 dimension..."));
-    GridLengthTextBox = SNew(SEditableTextBox).HintText(LOCTEXT("GridLengthHint", "Enter Grid Length..."));
-
+    
     return SNew(SDockTab)
         .TabRole(ETabRole::NomadTab)
         [
@@ -47,13 +46,7 @@ TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnT
             .Padding(5)
             [
                 CubesAmountTextBox.ToSharedRef()
-            ]
-            + SVerticalBox::Slot()
-            .FillHeight(1.f)
-            .Padding(5)
-            [
-                GridLengthTextBox.ToSharedRef()
-            ]
+            ]            
             +SVerticalBox::Slot()
             .FillHeight(1.f)
             .Padding(5)
@@ -62,6 +55,15 @@ TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnT
                 .Text(LOCTEXT("InitializeButtonText", "Initialize Grid"))
                 .OnClicked(FOnClicked::CreateRaw(this, &FFireSimulationEditorModule::OnInitializeGridClicked))
                     
+            ]
+            + SVerticalBox::Slot()
+            .FillHeight(1.f)
+            .Padding(5)
+            [
+                SNew(SButton)
+                    .Text(LOCTEXT("ClearButtonText", "Clear Grid"))
+                    .OnClicked(FOnClicked::CreateRaw(this, &FFireSimulationEditorModule::OnClearGridClicked))
+
             ]
             +SVerticalBox::Slot()
             .FillHeight(1.f)
@@ -78,26 +80,24 @@ TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnT
 FReply FFireSimulationEditorModule::OnInitializeGridClicked()
 {
     FVector GridOrigin = FVector::ZeroVector; // Значение по умолчанию
-    if (CubesAmountTextBox.IsValid() && GridLengthTextBox.IsValid())
+    if (CubesAmountTextBox.IsValid())
     {
         FString CubesAmountText = CubesAmountTextBox->GetText().ToString();
         int32 CubesAmount = FCString::Atoi(*CubesAmountText); // Используйте Atoi для целых чисел
 
-        FString GridLengthText = GridLengthTextBox->GetText().ToString();
-        float GridLength = FCString::Atof(*GridLengthText);
-
-        if (CubesAmount > 0 && GridLength > 0)
+        if (CubesAmount > 0)
         {
             // Поиск актора GridOriginActor в мире
             if (GEditor)
             {
                 UWorld* World = GEditor->GetEditorWorldContext().World();
-                for (TActorIterator<AGridOriginActor> It(World); It; ++It)
+                AGridActor* GridActor = nullptr;
+                for (TActorIterator<AGridActor> It(World); It; ++It)
                 {
-                    AGridOriginActor* GridOriginActor = *It;
-                    if (GridOriginActor)
+                    GridActor = *It;
+                    if (GridActor)
                     {
-                        GridOrigin = GridOriginActor->GetActorLocation();
+                        GridOrigin = GridActor->GetActorLocation();
                         break; // Предполагаем, что в мире только один такой актор
                     }
                 }
@@ -105,11 +105,20 @@ FReply FFireSimulationEditorModule::OnInitializeGridClicked()
                 UFireGridManager* GridManager = UFireGridManager::GetInstance();
                 if (GridManager)
                 {
-                    GridManager->InitializeGrid(CubesAmount, GridLength, GridOrigin);
-                    GridManager->DrawGrid(true);
+                    GridManager->InitializeGrid(CubesAmount);
+                    GridManager->DrawGrid(GridActor, World);
                 }
             }
         }
+    }
+    return FReply::Handled();
+}
+
+FReply FFireSimulationEditorModule::OnClearGridClicked()
+{
+    if (GEditor) {
+        UWorld* World = GEditor->GetEditorWorldContext().World();
+        FlushPersistentDebugLines(World);
     }
     return FReply::Handled();
 }

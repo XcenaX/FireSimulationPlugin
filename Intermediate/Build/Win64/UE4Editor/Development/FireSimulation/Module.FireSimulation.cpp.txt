@@ -1,11 +1,23 @@
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Development\FireSimulation\Definitions.FireSimulation.h
-G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/FireGridManager.cpp
-G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\FireGridManager.h
+G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/BuildingGraph.cpp
+G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\BuildingGraph.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\CoreUObject\Public\UObject/NoExportTypes.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\CoreUObject\Public\UObject/PropertyAccessUtil.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Core\Public\Math/UnitConversion.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Core\Public\Math/UnitConversion.inl
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Core\Public\Internationalization/PolyglotTextData.h
+G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\BuildingGraph.generated.h
+G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/DoorComponent.cpp
+G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\DoorComponent.h
+G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\RoomMarker.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Engine\Classes\Components/BoxComponent.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Engine\Classes\Components/ShapeComponent.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\ShapeComponent.generated.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\BoxComponent.generated.h
+G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\RoomMarker.generated.h
+G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\DoorComponent.generated.h
+G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/FireGridManager.cpp
+G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\FireGridManager.h
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\FireGridManager.generated.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Engine\Public\EngineUtils.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Core\Public\ProfilingDebugging/ProfilingHelpers.h
@@ -205,13 +217,9 @@ C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Engine\Classes\Engine/
 C:\Program Files\Epic Games\UE_4.27\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\ServerStatReplicator.generated.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\GameModeBase.generated.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Engine\Classes\Components/CapsuleComponent.h
-C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Engine\Classes\Components/ShapeComponent.h
-C:\Program Files\Epic Games\UE_4.27\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\ShapeComponent.generated.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\CapsuleComponent.generated.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Engine\Classes\Components/SphereComponent.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\SphereComponent.generated.h
-C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Engine\Classes\Components/BoxComponent.h
-C:\Program Files\Epic Games\UE_4.27\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\BoxComponent.generated.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Engine\Classes\Components/AudioComponent.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Engine\Classes\Sound/SoundWave.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Engine\Classes\Sound/SoundBase.h
@@ -1423,7 +1431,11 @@ C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\PropertyEditor\Public\P
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\PropertyEditor\Public\SResetToDefaultMenu.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\ActorPickerMode\Public\ActorPickerMode.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\SceneDepthPickerMode\Public\SceneDepthPickerMode.h
+G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/GridActor.cpp
+G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\GridActor.h
+G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\GridActor.generated.h
 G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/GridOriginActor.cpp
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\GridOriginActor.h
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\GridOriginActor.generated.h
 G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/MaterialDataManager.cpp
+G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/RoomMarker.cpp

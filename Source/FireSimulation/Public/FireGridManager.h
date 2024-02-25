@@ -26,13 +26,13 @@ class FIRESIMULATION_API UFireGridManager : public UObject
 public:
     UFireGridManager();
 
-    // Инициализация сетки на основе размера мира и размера куба сетки.
+    // Инициализация сетки на основе количества элементов в одном измерении.
     UFUNCTION(BlueprintCallable)
-    void InitializeGrid(int32 CubesPerDimension, float GridLength, const FVector& GridOrigin);
+    void InitializeGrid(int32 CubesPerDimension);
 
     // Визуализация сетки.
     UFUNCTION(BlueprintCallable)
-    void DrawGrid(bool bVisible);
+    void DrawGrid(AActor* GridActor, UWorld* World);
 
     // Заполнение сетки акторами с компонентом FireSimulationComponent.
     UFUNCTION(BlueprintCallable)
@@ -42,16 +42,11 @@ public:
     static UFireGridManager* GetInstance();
 
 private:
-    // Размер одного куба в сетке.
-    float GridCellSize;
+    // Количество элементов в одном измерении.
+    float ElementsAmount;
 
     // Трехмерный массив ячеек.
     TArray<TArray<TArray<FGridCell>>> Grid;
-
-    FVector GridOrigin;
-
-    // Вспомогательная функция для определения индекса ячейки по мировым координатам.
-    bool GetCellIndex(const FVector& Location, int32& OutX, int32& OutY, int32& OutZ) const;
 
     // Статический экземпляр для синглтона.
     static UFireGridManager* Instance;
