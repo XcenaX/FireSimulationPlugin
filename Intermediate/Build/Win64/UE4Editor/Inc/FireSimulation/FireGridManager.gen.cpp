@@ -118,20 +118,12 @@ static struct FScriptStruct_FireSimulation_StaticRegisterNativesFGridCell
 	}
 	DEFINE_FUNCTION(UFireGridManager::execDrawGrid)
 	{
-<<<<<<< Updated upstream
-		P_GET_OBJECT(AActor,Z_Param_GridActor);
-		P_GET_OBJECT(UWorld,Z_Param_World);
-		P_FINISH;
-		P_NATIVE_BEGIN;
-		P_THIS->DrawGrid(Z_Param_GridActor,Z_Param_World);
-=======
 		P_GET_UBOOL(Z_Param_bVisible);
 		P_GET_OBJECT(UWorld,Z_Param_World);
 		P_GET_OBJECT(AActor,Z_Param_GridActor);
 		P_FINISH;
 		P_NATIVE_BEGIN;
 		P_THIS->DrawGrid(Z_Param_bVisible,Z_Param_World,Z_Param_GridActor);
->>>>>>> Stashed changes
 		P_NATIVE_END;
 	}
 	DEFINE_FUNCTION(UFireGridManager::execInitializeGrid)
@@ -156,13 +148,6 @@ static struct FScriptStruct_FireSimulation_StaticRegisterNativesFGridCell
 	{
 		struct FireGridManager_eventDrawGrid_Parms
 		{
-<<<<<<< Updated upstream
-			AActor* GridActor;
-			UWorld* World;
-		};
-		static const UE4CodeGen_Private::FObjectPropertyParams NewProp_GridActor;
-		static const UE4CodeGen_Private::FObjectPropertyParams NewProp_World;
-=======
 			bool bVisible;
 			UWorld* World;
 			AActor* GridActor;
@@ -171,20 +156,12 @@ static struct FScriptStruct_FireSimulation_StaticRegisterNativesFGridCell
 		static const UE4CodeGen_Private::FBoolPropertyParams NewProp_bVisible;
 		static const UE4CodeGen_Private::FObjectPropertyParams NewProp_World;
 		static const UE4CodeGen_Private::FObjectPropertyParams NewProp_GridActor;
->>>>>>> Stashed changes
 		static const UE4CodeGen_Private::FPropertyParamsBase* const PropPointers[];
 #if WITH_METADATA
 		static const UE4CodeGen_Private::FMetaDataPairParam Function_MetaDataParams[];
 #endif
 		static const UE4CodeGen_Private::FFunctionParams FuncParams;
 	};
-<<<<<<< Updated upstream
-	const UE4CodeGen_Private::FObjectPropertyParams Z_Construct_UFunction_UFireGridManager_DrawGrid_Statics::NewProp_GridActor = { "GridActor", nullptr, (EPropertyFlags)0x0010000000000080, UE4CodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, 1, STRUCT_OFFSET(FireGridManager_eventDrawGrid_Parms, GridActor), Z_Construct_UClass_AActor_NoRegister, METADATA_PARAMS(nullptr, 0) };
-	const UE4CodeGen_Private::FObjectPropertyParams Z_Construct_UFunction_UFireGridManager_DrawGrid_Statics::NewProp_World = { "World", nullptr, (EPropertyFlags)0x0010000000000080, UE4CodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, 1, STRUCT_OFFSET(FireGridManager_eventDrawGrid_Parms, World), Z_Construct_UClass_UWorld_NoRegister, METADATA_PARAMS(nullptr, 0) };
-	const UE4CodeGen_Private::FPropertyParamsBase* const Z_Construct_UFunction_UFireGridManager_DrawGrid_Statics::PropPointers[] = {
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_UFireGridManager_DrawGrid_Statics::NewProp_GridActor,
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_UFireGridManager_DrawGrid_Statics::NewProp_World,
-=======
 	void Z_Construct_UFunction_UFireGridManager_DrawGrid_Statics::NewProp_bVisible_SetBit(void* Obj)
 	{
 		((FireGridManager_eventDrawGrid_Parms*)Obj)->bVisible = 1;
@@ -196,7 +173,6 @@ static struct FScriptStruct_FireSimulation_StaticRegisterNativesFGridCell
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_UFireGridManager_DrawGrid_Statics::NewProp_bVisible,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_UFireGridManager_DrawGrid_Statics::NewProp_World,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_UFireGridManager_DrawGrid_Statics::NewProp_GridActor,
->>>>>>> Stashed changes
 	};
 #if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UFunction_UFireGridManager_DrawGrid_Statics::Function_MetaDataParams[] = {
@@ -306,15 +282,9 @@ static struct FScriptStruct_FireSimulation_StaticRegisterNativesFGridCell
 		(UObject* (*)())Z_Construct_UPackage__Script_FireSimulation,
 	};
 	const FClassFunctionLinkInfo Z_Construct_UClass_UFireGridManager_Statics::FuncInfo[] = {
-<<<<<<< Updated upstream
-		{ &Z_Construct_UFunction_UFireGridManager_DrawGrid, "DrawGrid" }, // 3402065500
-		{ &Z_Construct_UFunction_UFireGridManager_InitializeGrid, "InitializeGrid" }, // 2977590755
-		{ &Z_Construct_UFunction_UFireGridManager_PopulateGridWithActors, "PopulateGridWithActors" }, // 2801214818
-=======
 		{ &Z_Construct_UFunction_UFireGridManager_DrawGrid, "DrawGrid" }, // 3560441685
-		{ &Z_Construct_UFunction_UFireGridManager_InitializeGrid, "InitializeGrid" }, // 3844065708
+		{ &Z_Construct_UFunction_UFireGridManager_InitializeGrid, "InitializeGrid" }, // 2977590755
 		{ &Z_Construct_UFunction_UFireGridManager_PopulateGridWithActors, "PopulateGridWithActors" }, // 4288182840
->>>>>>> Stashed changes
 	};
 #if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UFireGridManager_Statics::Class_MetaDataParams[] = {
@@ -351,11 +321,7 @@ static struct FScriptStruct_FireSimulation_StaticRegisterNativesFGridCell
 		}
 		return OuterClass;
 	}
-<<<<<<< Updated upstream
-	IMPLEMENT_CLASS(UFireGridManager, 2543102016);
-=======
-	IMPLEMENT_CLASS(UFireGridManager, 1609848277);
->>>>>>> Stashed changes
+	IMPLEMENT_CLASS(UFireGridManager, 593692483);
 	template<> FIRESIMULATION_API UClass* StaticClass<UFireGridManager>()
 	{
 		return UFireGridManager::StaticClass();

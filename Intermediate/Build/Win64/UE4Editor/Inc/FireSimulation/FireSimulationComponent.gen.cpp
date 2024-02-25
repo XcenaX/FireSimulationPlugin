@@ -147,11 +147,7 @@ void EmptyLinkFunctionForGeneratedCodeFireSimulationComponent() {}
 		}
 		return OuterClass;
 	}
-<<<<<<< Updated upstream
-	IMPLEMENT_CLASS(UFireSimulationComponent, 4259382332);
-=======
-	IMPLEMENT_CLASS(UFireSimulationComponent, 2271542024);
->>>>>>> Stashed changes
+	IMPLEMENT_CLASS(UFireSimulationComponent, 2149693386);
 	template<> FIRESIMULATION_API UClass* StaticClass<UFireSimulationComponent>()
 	{
 		return UFireSimulationComponent::StaticClass();

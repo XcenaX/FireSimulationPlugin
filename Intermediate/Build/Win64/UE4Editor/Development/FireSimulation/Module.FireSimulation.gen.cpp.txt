@@ -30,12 +30,6 @@ G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation/Public/G
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Engine\Classes\Components/SphereComponent.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\SphereComponent.generated.h
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\GridActor.generated.h
-<<<<<<< Updated upstream
-G:/UE_Projects/TestProject/Plugins/FireSimulation/Intermediate/Build/Win64/UE4Editor/Inc/FireSimulation/GridOriginActor.gen.cpp
-G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation/Public/GridOriginActor.h
-G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\GridOriginActor.generated.h
-=======
->>>>>>> Stashed changes
 G:/UE_Projects/TestProject/Plugins/FireSimulation/Intermediate/Build/Win64/UE4Editor/Inc/FireSimulation/MaterialData.gen.cpp
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation/Public/MaterialData.h
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\MaterialData.generated.h

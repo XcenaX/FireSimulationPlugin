@@ -5,9 +5,5 @@
 #include "G:/UE_Projects/TestProject/Plugins/FireSimulation/Intermediate/Build/Win64/UE4Editor/Inc/FireSimulation/FireSimulation.init.gen.cpp"
 #include "G:/UE_Projects/TestProject/Plugins/FireSimulation/Intermediate/Build/Win64/UE4Editor/Inc/FireSimulation/FireSimulationComponent.gen.cpp"
 #include "G:/UE_Projects/TestProject/Plugins/FireSimulation/Intermediate/Build/Win64/UE4Editor/Inc/FireSimulation/GridActor.gen.cpp"
-<<<<<<< Updated upstream
-#include "G:/UE_Projects/TestProject/Plugins/FireSimulation/Intermediate/Build/Win64/UE4Editor/Inc/FireSimulation/GridOriginActor.gen.cpp"
-=======
->>>>>>> Stashed changes
 #include "G:/UE_Projects/TestProject/Plugins/FireSimulation/Intermediate/Build/Win64/UE4Editor/Inc/FireSimulation/MaterialData.gen.cpp"
 #include "G:/UE_Projects/TestProject/Plugins/FireSimulation/Intermediate/Build/Win64/UE4Editor/Inc/FireSimulation/RoomMarker.gen.cpp"
