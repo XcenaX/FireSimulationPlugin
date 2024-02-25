@@ -79,13 +79,7 @@ void UFireGridManager::PopulateGridWithActors(UWorld* World, AActor * GridActor)
     if (!BoxComponent) return;
 
     FVector GridSize = BoxComponent->GetScaledBoxExtent() * 2; // Получаем полные размеры сетки
-
-    float CellSizeX = (GridSize.X * 2) / ElementsAmount;
-    float CellSizeY = (GridSize.Y * 2) / ElementsAmount;
-    float CellSizeZ = (GridSize.Z * 2) / ElementsAmount;
-    FVector CellSizeVector(CellSizeX, CellSizeY, CellSizeZ);
-
-    FVector CellSize = GridSize / CellSizeVector; // Размер одной ячейки в каждом измерении
+    FVector CellSize(GridSize.X / ElementsAmount, GridSize.Y / ElementsAmount, GridSize.Z / ElementsAmount);
 
     // Очищаем и инициализируем сетку
     Grid.SetNum(ElementsAmount);
@@ -114,13 +108,12 @@ void UFireGridManager::PopulateGridWithActors(UWorld* World, AActor * GridActor)
                 FVector CellCenter = GridOrigin + FVector(x * CellSize.X, y * CellSize.Y, z * CellSize.Z) + CellSize / 2;
                 FCollisionShape Box = FCollisionShape::MakeBox(CellSize / 2);
                 TArray<FHitResult> HitResults;
-                World->SweepMultiByChannel(HitResults, CellCenter, CellCenter, FQuat::Identity, ECC_Visibility, Box, Params);
+                World->SweepMultiByChannel(HitResults, CellCenter, CellCenter, FQuat::Identity, ECC_WorldStatic, Box, Params);
 
                 for (const FHitResult& Hit : HitResults)
                 {
                     if (AActor* HitActor = Hit.GetActor())
                     {
-                        LogText += "(has hit)";
                         if (HitActor->FindComponentByClass<UFireSimulationComponent>())
                         {
                             Grid[x][y][z].OccupyingActor = HitActor;
@@ -129,6 +122,8 @@ void UFireGridManager::PopulateGridWithActors(UWorld* World, AActor * GridActor)
                     }
                 }
 
+                DrawDebugBox(World, CellCenter, CellSize / 2, FColor::Green, false, 5.0f, 0, 2);
+
                 // LOGS
                 if (Grid[x][y][z].OccupyingActor != nullptr)
                 {
@@ -136,7 +131,7 @@ void UFireGridManager::PopulateGridWithActors(UWorld* World, AActor * GridActor)
                 }
                 else
                 {
-                    LogText += "NoActor";
+                    LogText += "*";
                 }
 
                 if (z < Grid[x][y].Num() - 1)
