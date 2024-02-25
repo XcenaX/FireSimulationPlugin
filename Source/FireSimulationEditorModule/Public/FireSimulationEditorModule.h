@@ -27,4 +27,5 @@ private:
     FReply OnInitializeGridClicked();
     FReply OnClearGridClicked();
     FReply OnFillGridClicked();
+    FReply OnClearGridClicked();
 };

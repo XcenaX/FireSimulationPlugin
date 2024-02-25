@@ -28,6 +28,16 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fire Simulation")
     bool IsBurning;
 
+    // Является ли обьект стеной (стены гореть не мгоут)
+    UPROPERTY(EditAnywhere, Category = "Fire Simulation")
+    bool IsWall = false;
+
+    // Является ли обьект дверью (служит для связи между комнатами)
+    UPROPERTY(EditAnywhere, Category = "Fire Simulation")
+    bool IsDoor = false;
+
     void UpdateSelectedMaterial(const FString& NewMaterialName);
     FString GetSelectedMaterial();
+
+    virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 };

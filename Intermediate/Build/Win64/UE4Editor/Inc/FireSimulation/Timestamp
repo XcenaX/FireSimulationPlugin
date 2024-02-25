@@ -1,8 +1,16 @@
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\BuildingGraph.h
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\DoorComponent.h
+<<<<<<< Updated upstream
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\FireSimulationComponent.h
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\GridOriginActor.h
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\MaterialData.h
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\RoomMarker.h
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\FireGridManager.h
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\GridActor.h
+=======
+G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\FireGridManager.h
+G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\RoomMarker.h
+G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\GridActor.h
+G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\FireSimulationComponent.h
+G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\MaterialData.h
+>>>>>>> Stashed changes

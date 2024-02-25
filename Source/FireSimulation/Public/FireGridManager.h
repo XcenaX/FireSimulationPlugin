@@ -32,17 +32,17 @@ public:
 
     // Визуализация сетки.
     UFUNCTION(BlueprintCallable)
-    void DrawGrid(AActor* GridActor, UWorld* World);
+    void DrawGrid(bool bVisible, UWorld* World, AActor* GridActor);
 
     // Заполнение сетки акторами с компонентом FireSimulationComponent.
     UFUNCTION(BlueprintCallable)
-    void PopulateGridWithActors(UWorld* World);
+    void PopulateGridWithActors(UWorld* World, AActor* GridActor);
 
     // Получить экземпляр менеджера сетки.
     static UFireGridManager* GetInstance();
 
 private:
-    // Количество элементов в одном измерении.
+    // Количество элементов в сетке в одном измерении.
     float ElementsAmount;
 
     // Трехмерный массив ячеек.

@@ -6,6 +6,9 @@
 #include "G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/FireSimulationComponent.cpp"
 #include "G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/FMaterialSelectionCustomization.cpp"
 #include "G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/GridActor.cpp"
+<<<<<<< Updated upstream
 #include "G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/GridOriginActor.cpp"
+=======
+>>>>>>> Stashed changes
 #include "G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/MaterialDataManager.cpp"
 #include "G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/RoomMarker.cpp"

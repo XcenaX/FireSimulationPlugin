@@ -38,6 +38,7 @@ void UFireSimulationComponent::SetFireTexture(UTexture2D* Texture)
 
 void UFireSimulationComponent::UpdateSelectedMaterial(const FString& NewMaterialName)
 {
+<<<<<<< Updated upstream
 #if WITH_EDITOR
 	if (GEditor)
 	{
@@ -59,9 +60,41 @@ void UFireSimulationComponent::UpdateSelectedMaterial(const FString& NewMaterial
 	// {
 	//     ApplyMaterialToMesh(Material); // Функция, которая применяет материал к мешу
 	// }
+=======
+    SelectedMaterial = NewMaterialName;
+>>>>>>> Stashed changes
 }
 
 FString UFireSimulationComponent::GetSelectedMaterial()
 {
+<<<<<<< Updated upstream
 	return SelectedMaterial;
+=======
+    return SelectedMaterial;
+}
+
+// функция которая не позволяет одновременно установить IsWall = true и IsBurning = true
+void UFireSimulationComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+    Super::PostEditChangeProperty(PropertyChangedEvent);
+
+    FName PropertyName = (PropertyChangedEvent.Property != nullptr) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
+
+    if (PropertyName == GET_MEMBER_NAME_CHECKED(UFireSimulationComponent, IsWall))
+    {
+        if (IsWall)
+        {
+            // Если IsWall установлено в true, IsDoor должно быть false
+            IsDoor = false;
+        }
+    }
+    else if (PropertyName == GET_MEMBER_NAME_CHECKED(UFireSimulationComponent, IsDoor))
+    {
+        if (IsDoor)
+        {
+            // Если IsDoor установлено в true, IsWall должно быть false
+            IsWall = false;
+        }
+    }
+>>>>>>> Stashed changes
 }

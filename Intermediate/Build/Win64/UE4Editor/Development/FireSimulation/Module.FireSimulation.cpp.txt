@@ -35,6 +35,7 @@ C:\Program Files\Epic Games\UE_4.27\Engine\Intermediate\Build\Win64\UE4Editor\In
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\CoreUObject\Public\UObject/ConstructorHelpers.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\WorldSettings.generated.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Engine\Public\DrawDebugHelpers.h
+<<<<<<< Updated upstream
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\UnrealEd\Public\UnrealEd.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Core\Public\Misc/MonolithicHeaderBoilerplate.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Engine\Public\Engine.h
@@ -1404,8 +1405,14 @@ C:\Program Files\Epic Games\UE_4.27\Engine\Intermediate\Build\Win64\UE4Editor\In
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\UnrealEdMessages\Classes\FileServerMessages.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Intermediate\Build\Win64\UE4Editor\Inc\UnrealEdMessages\FileServerMessages.generated.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\UnrealEd\Public\EditorAnalytics.h
+=======
+>>>>>>> Stashed changes
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\FireSimulationComponent.h
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\FireSimulationComponent.generated.h
+G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\GridActor.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Engine\Classes\Components/SphereComponent.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\SphereComponent.generated.h
+G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\GridActor.generated.h
 G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/FireSimulation.cpp
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\FireSimulation.h
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\FMaterialSelectionCustomization.h
@@ -1414,6 +1421,14 @@ G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\M
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\MaterialData.h
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\MaterialData.generated.h
 G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/FireSimulationComponent.cpp
+C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Json\Public\Dom/JsonObject.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Json\Public\JsonGlobals.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Json\Public\Serialization/JsonTypes.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Json\Public\Dom/JsonValue.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Json\Public\Serialization/JsonSerializer.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Json\Public\Serialization/JsonReader.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Json\Public\Serialization/JsonWriter.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Core\Public\Misc/FileHelper.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Projects\Public\Interfaces/IPluginManager.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Projects\Public\PluginDescriptor.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Projects\Public\ModuleDescriptor.h
@@ -1432,10 +1447,13 @@ C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\PropertyEditor\Public\S
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\ActorPickerMode\Public\ActorPickerMode.h
 C:\Program Files\Epic Games\UE_4.27\Engine\Source\Editor\SceneDepthPickerMode\Public\SceneDepthPickerMode.h
 G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/GridActor.cpp
+<<<<<<< Updated upstream
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\GridActor.h
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\GridActor.generated.h
 G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/GridOriginActor.cpp
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Source\FireSimulation\Public\GridOriginActor.h
 G:\UE_Projects\TestProject\Plugins\FireSimulation\Intermediate\Build\Win64\UE4Editor\Inc\FireSimulation\GridOriginActor.generated.h
+=======
+>>>>>>> Stashed changes
 G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/MaterialDataManager.cpp
 G:/UE_Projects/TestProject/Plugins/FireSimulation/Source/FireSimulation/Private/RoomMarker.cpp

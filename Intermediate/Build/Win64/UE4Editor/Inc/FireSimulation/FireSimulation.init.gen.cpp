@@ -21,8 +21,13 @@ void EmptyLinkFunctionForGeneratedCodeFireSimulation_init() {}
 				nullptr,
 				0,
 				PKG_CompiledIn | 0x00000000,
+<<<<<<< Updated upstream
 				0x0A77A06C,
 				0xC3C84CE2,
+=======
+				0x2E494582,
+				0x02536006,
+>>>>>>> Stashed changes
 				METADATA_PARAMS(nullptr, 0)
 			};
 			UE4CodeGen_Private::ConstructUPackage(ReturnPackage, PackageParams);

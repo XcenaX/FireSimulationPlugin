@@ -52,7 +52,7 @@ TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnT
             .Padding(5)
             [
                 SNew(SButton)
-                .Text(LOCTEXT("InitializeButtonText", "Initialize Grid"))
+                .Text(LOCTEXT("InitializeButtonText", "Draw Grid"))
                 .OnClicked(FOnClicked::CreateRaw(this, &FFireSimulationEditorModule::OnInitializeGridClicked))
                     
             ]
@@ -79,15 +79,18 @@ TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnT
 
 FReply FFireSimulationEditorModule::OnInitializeGridClicked()
 {
+<<<<<<< Updated upstream
     FVector GridOrigin = FVector::ZeroVector; // Значение по умолчанию
+=======
+>>>>>>> Stashed changes
     if (CubesAmountTextBox.IsValid())
     {
         FString CubesAmountText = CubesAmountTextBox->GetText().ToString();
-        int32 CubesAmount = FCString::Atoi(*CubesAmountText); // Используйте Atoi для целых чисел
+        int32 CubesAmount = FCString::Atoi(*CubesAmountText);     
 
         if (CubesAmount > 0)
         {
-            // Поиск актора GridOriginActor в мире
+            // Поиск актора GridActor в мире
             if (GEditor)
             {
                 UWorld* World = GEditor->GetEditorWorldContext().World();
@@ -95,18 +98,26 @@ FReply FFireSimulationEditorModule::OnInitializeGridClicked()
                 for (TActorIterator<AGridActor> It(World); It; ++It)
                 {
                     GridActor = *It;
+<<<<<<< Updated upstream
                     if (GridActor)
                     {
                         GridOrigin = GridActor->GetActorLocation();
                         break; // Предполагаем, что в мире только один такой актор
                     }
+=======
+                    break;
+>>>>>>> Stashed changes
                 }
 
                 UFireGridManager* GridManager = UFireGridManager::GetInstance();
                 if (GridManager)
                 {
                     GridManager->InitializeGrid(CubesAmount);
+<<<<<<< Updated upstream
                     GridManager->DrawGrid(GridActor, World);
+=======
+                    GridManager->DrawGrid(true, World, GridActor);
+>>>>>>> Stashed changes
                 }
             }
         }
@@ -116,7 +127,12 @@ FReply FFireSimulationEditorModule::OnInitializeGridClicked()
 
 FReply FFireSimulationEditorModule::OnClearGridClicked()
 {
+<<<<<<< Updated upstream
     if (GEditor) {
+=======
+    if (GEditor)
+    {
+>>>>>>> Stashed changes
         UWorld* World = GEditor->GetEditorWorldContext().World();
         FlushPersistentDebugLines(World);
     }
@@ -133,7 +149,13 @@ FReply FFireSimulationEditorModule::OnFillGridClicked()
         if (GEditor)
         {
             UWorld* World = GEditor->GetEditorWorldContext().World();
-            GridManager->PopulateGridWithActors(World);
+            AGridActor* GridActor = nullptr;
+            for (TActorIterator<AGridActor> It(World); It; ++It)
+            {
+                GridActor = *It;
+                break;
+            }
+            GridManager->PopulateGridWithActors(World, GridActor);
         }
         //#endif
     }   

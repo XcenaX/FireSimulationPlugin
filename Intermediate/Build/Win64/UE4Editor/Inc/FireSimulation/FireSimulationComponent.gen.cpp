@@ -40,6 +40,16 @@ void EmptyLinkFunctionForGeneratedCodeFireSimulationComponent() {}
 #endif
 		static void NewProp_IsBurning_SetBit(void* Obj);
 		static const UE4CodeGen_Private::FBoolPropertyParams NewProp_IsBurning;
+#if WITH_METADATA
+		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_IsWall_MetaData[];
+#endif
+		static void NewProp_IsWall_SetBit(void* Obj);
+		static const UE4CodeGen_Private::FBoolPropertyParams NewProp_IsWall;
+#if WITH_METADATA
+		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_IsDoor_MetaData[];
+#endif
+		static void NewProp_IsDoor_SetBit(void* Obj);
+		static const UE4CodeGen_Private::FBoolPropertyParams NewProp_IsDoor;
 		static const UE4CodeGen_Private::FPropertyParamsBase* const PropPointers[];
 		static const FCppClassTypeInfoStatic StaticCppClassTypeInfo;
 		static const UE4CodeGen_Private::FClassParams ClassParams;
@@ -78,9 +88,37 @@ void EmptyLinkFunctionForGeneratedCodeFireSimulationComponent() {}
 		((UFireSimulationComponent*)Obj)->IsBurning = 1;
 	}
 	const UE4CodeGen_Private::FBoolPropertyParams Z_Construct_UClass_UFireSimulationComponent_Statics::NewProp_IsBurning = { "IsBurning", nullptr, (EPropertyFlags)0x0010000000000005, UE4CodeGen_Private::EPropertyGenFlags::Bool | UE4CodeGen_Private::EPropertyGenFlags::NativeBool, RF_Public|RF_Transient|RF_MarkAsNative, 1, sizeof(bool), sizeof(UFireSimulationComponent), &Z_Construct_UClass_UFireSimulationComponent_Statics::NewProp_IsBurning_SetBit, METADATA_PARAMS(Z_Construct_UClass_UFireSimulationComponent_Statics::NewProp_IsBurning_MetaData, UE_ARRAY_COUNT(Z_Construct_UClass_UFireSimulationComponent_Statics::NewProp_IsBurning_MetaData)) };
+#if WITH_METADATA
+	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UFireSimulationComponent_Statics::NewProp_IsWall_MetaData[] = {
+		{ "Category", "Fire Simulation" },
+		{ "Comment", "// \xd0\xaf\xd0\xb2\xd0\xbb\xd1\x8f\xd0\xb5\xd1\x82\xd1\x81\xd1\x8f \xd0\xbb\xd0\xb8 \xd0\xbe\xd0\xb1\xd1\x8c\xd0\xb5\xd0\xba\xd1\x82 \xd1\x81\xd1\x82\xd0\xb5\xd0\xbd\xd0\xbe\xd0\xb9 (\xd1\x81\xd1\x82\xd0\xb5\xd0\xbd\xd1\x8b \xd0\xb3\xd0\xbe\xd1\x80\xd0\xb5\xd1\x82\xd1\x8c \xd0\xbd\xd0\xb5 \xd0\xbc\xd0\xb3\xd0\xbe\xd1\x83\xd1\x82)\n" },
+		{ "ModuleRelativePath", "Public/FireSimulationComponent.h" },
+		{ "ToolTip", "\xd0\xaf\xd0\xb2\xd0\xbb\xd1\x8f\xd0\xb5\xd1\x82\xd1\x81\xd1\x8f \xd0\xbb\xd0\xb8 \xd0\xbe\xd0\xb1\xd1\x8c\xd0\xb5\xd0\xba\xd1\x82 \xd1\x81\xd1\x82\xd0\xb5\xd0\xbd\xd0\xbe\xd0\xb9 (\xd1\x81\xd1\x82\xd0\xb5\xd0\xbd\xd1\x8b \xd0\xb3\xd0\xbe\xd1\x80\xd0\xb5\xd1\x82\xd1\x8c \xd0\xbd\xd0\xb5 \xd0\xbc\xd0\xb3\xd0\xbe\xd1\x83\xd1\x82)" },
+	};
+#endif
+	void Z_Construct_UClass_UFireSimulationComponent_Statics::NewProp_IsWall_SetBit(void* Obj)
+	{
+		((UFireSimulationComponent*)Obj)->IsWall = 1;
+	}
+	const UE4CodeGen_Private::FBoolPropertyParams Z_Construct_UClass_UFireSimulationComponent_Statics::NewProp_IsWall = { "IsWall", nullptr, (EPropertyFlags)0x0010000000000001, UE4CodeGen_Private::EPropertyGenFlags::Bool | UE4CodeGen_Private::EPropertyGenFlags::NativeBool, RF_Public|RF_Transient|RF_MarkAsNative, 1, sizeof(bool), sizeof(UFireSimulationComponent), &Z_Construct_UClass_UFireSimulationComponent_Statics::NewProp_IsWall_SetBit, METADATA_PARAMS(Z_Construct_UClass_UFireSimulationComponent_Statics::NewProp_IsWall_MetaData, UE_ARRAY_COUNT(Z_Construct_UClass_UFireSimulationComponent_Statics::NewProp_IsWall_MetaData)) };
+#if WITH_METADATA
+	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UFireSimulationComponent_Statics::NewProp_IsDoor_MetaData[] = {
+		{ "Category", "Fire Simulation" },
+		{ "Comment", "// \xd0\xaf\xd0\xb2\xd0\xbb\xd1\x8f\xd0\xb5\xd1\x82\xd1\x81\xd1\x8f \xd0\xbb\xd0\xb8 \xd0\xbe\xd0\xb1\xd1\x8c\xd0\xb5\xd0\xba\xd1\x82 \xd0\xb4\xd0\xb2\xd0\xb5\xd1\x80\xd1\x8c\xd1\x8e (\xd1\x81\xd0\xbb\xd1\x83\xd0\xb6\xd0\xb8\xd1\x82 \xd0\xb4\xd0\xbb\xd1\x8f \xd1\x81\xd0\xb2\xd1\x8f\xd0\xb7\xd0\xb8 \xd0\xbc\xd0\xb5\xd0\xb6\xd0\xb4\xd1\x83 \xd0\xba\xd0\xbe\xd0\xbc\xd0\xbd\xd0\xb0\xd1\x82\xd0\xb0\xd0\xbc\xd0\xb8)\n" },
+		{ "ModuleRelativePath", "Public/FireSimulationComponent.h" },
+		{ "ToolTip", "\xd0\xaf\xd0\xb2\xd0\xbb\xd1\x8f\xd0\xb5\xd1\x82\xd1\x81\xd1\x8f \xd0\xbb\xd0\xb8 \xd0\xbe\xd0\xb1\xd1\x8c\xd0\xb5\xd0\xba\xd1\x82 \xd0\xb4\xd0\xb2\xd0\xb5\xd1\x80\xd1\x8c\xd1\x8e (\xd1\x81\xd0\xbb\xd1\x83\xd0\xb6\xd0\xb8\xd1\x82 \xd0\xb4\xd0\xbb\xd1\x8f \xd1\x81\xd0\xb2\xd1\x8f\xd0\xb7\xd0\xb8 \xd0\xbc\xd0\xb5\xd0\xb6\xd0\xb4\xd1\x83 \xd0\xba\xd0\xbe\xd0\xbc\xd0\xbd\xd0\xb0\xd1\x82\xd0\xb0\xd0\xbc\xd0\xb8)" },
+	};
+#endif
+	void Z_Construct_UClass_UFireSimulationComponent_Statics::NewProp_IsDoor_SetBit(void* Obj)
+	{
+		((UFireSimulationComponent*)Obj)->IsDoor = 1;
+	}
+	const UE4CodeGen_Private::FBoolPropertyParams Z_Construct_UClass_UFireSimulationComponent_Statics::NewProp_IsDoor = { "IsDoor", nullptr, (EPropertyFlags)0x0010000000000001, UE4CodeGen_Private::EPropertyGenFlags::Bool | UE4CodeGen_Private::EPropertyGenFlags::NativeBool, RF_Public|RF_Transient|RF_MarkAsNative, 1, sizeof(bool), sizeof(UFireSimulationComponent), &Z_Construct_UClass_UFireSimulationComponent_Statics::NewProp_IsDoor_SetBit, METADATA_PARAMS(Z_Construct_UClass_UFireSimulationComponent_Statics::NewProp_IsDoor_MetaData, UE_ARRAY_COUNT(Z_Construct_UClass_UFireSimulationComponent_Statics::NewProp_IsDoor_MetaData)) };
 	const UE4CodeGen_Private::FPropertyParamsBase* const Z_Construct_UClass_UFireSimulationComponent_Statics::PropPointers[] = {
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UFireSimulationComponent_Statics::NewProp_SelectedMaterial,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UFireSimulationComponent_Statics::NewProp_IsBurning,
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UFireSimulationComponent_Statics::NewProp_IsWall,
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UFireSimulationComponent_Statics::NewProp_IsDoor,
 	};
 	const FCppClassTypeInfoStatic Z_Construct_UClass_UFireSimulationComponent_Statics::StaticCppClassTypeInfo = {
 		TCppClassTypeTraits<UFireSimulationComponent>::IsAbstract,
@@ -109,7 +147,11 @@ void EmptyLinkFunctionForGeneratedCodeFireSimulationComponent() {}
 		}
 		return OuterClass;
 	}
+<<<<<<< Updated upstream
 	IMPLEMENT_CLASS(UFireSimulationComponent, 4259382332);
+=======
+	IMPLEMENT_CLASS(UFireSimulationComponent, 2271542024);
+>>>>>>> Stashed changes
 	template<> FIRESIMULATION_API UClass* StaticClass<UFireSimulationComponent>()
 	{
 		return UFireSimulationComponent::StaticClass();
