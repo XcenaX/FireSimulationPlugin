@@ -54,9 +54,9 @@ bool FMaterialDataManager::LoadMaterialData()
     return true;
 }
 
-const FMaterialData* FMaterialDataManager::GetMaterialData(const FString& MaterialName) const
+FMaterialData* FMaterialDataManager::GetMaterialData(FString MaterialName)
 {
-    const FMaterialData* FoundMaterialData = MaterialDataMap.Find(MaterialName);
+    FMaterialData* FoundMaterialData = MaterialDataMap.Find(MaterialName);
     if (FoundMaterialData)
     {
         return FoundMaterialData;

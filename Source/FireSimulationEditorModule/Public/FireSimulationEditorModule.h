@@ -18,7 +18,9 @@ private:
 
     /** Text box for inputting the cell size */
     TSharedPtr<SEditableTextBox> CubesAmountTextBox;
-    TSharedPtr<SEditableTextBox> GridLengthTextBox;
+    TSharedPtr<SEditableTextBox> ThreadsTextBox;
+    UClass* SelectedActorClass = nullptr;
+
 
     /** Callback for spawning the plugin tab */
     TSharedRef<SDockTab> OnSpawnPluginTab(const FSpawnTabArgs& SpawnTabArgs);
@@ -27,4 +29,6 @@ private:
     FReply OnInitializeGridClicked();
     FReply OnClearGridClicked();
     FReply OnFillGridClicked();
+    FReply OnSelectActorClassClicked();
+    FReply OnPickActorClassClicked();
 };

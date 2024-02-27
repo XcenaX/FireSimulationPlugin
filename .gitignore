@@ -13,6 +13,7 @@ DerivedDataCache/
 *_PCLauncher*
 *.VC.db
 *.VC.VC.opendb
+G
 
 # Visual Studio
 .vs/

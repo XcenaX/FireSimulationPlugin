@@ -57,7 +57,8 @@ void FMaterialSelectionCustomization::CustomizeDetails(IDetailLayoutBuilder& Det
 					{
 						if (NewSelection.IsValid() && FireSimulationComponent && SelectInfo != ESelectInfo::Direct)
 						{
-							FireSimulationComponent->UpdateSelectedMaterial(*NewSelection);
+							FMaterialData* Material = FMaterialDataManager::Get().GetMaterialData(*NewSelection);
+							FireSimulationComponent->UpdateSelectedMaterial(Material);
 						}
 					})
 				.OnGenerateWidget_Lambda([](TSharedPtr<FString> InItem)

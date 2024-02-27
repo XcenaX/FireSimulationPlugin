@@ -23,6 +23,7 @@ public class FireSimulationEditorModule : ModuleRules
                 "Slate",
                 "SlateCore",
                 "UnrealEd",
+                "EditorStyle"
                 // Важно для модулей редактора
                 // Другие зависимости модулей...
             }

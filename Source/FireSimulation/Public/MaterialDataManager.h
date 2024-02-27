@@ -17,7 +17,7 @@ public:
     bool LoadMaterialData();
 
     // Получение данных о материале по имени
-    const FMaterialData* GetMaterialData(const FString& MaterialName) const;
+    FMaterialData* GetMaterialData(FString MaterialName);
 
     const TArray<TSharedPtr<FString>>& GetMaterialNames() const;
 

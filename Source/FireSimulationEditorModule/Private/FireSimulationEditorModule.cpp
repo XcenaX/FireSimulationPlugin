@@ -9,6 +9,9 @@
 #include "UnrealEd.h"
 #include "EngineUtils.h"
 #include "GridActor.h"
+#include "Kismet2/SClassPickerDialog.h"
+#include "ClassViewerModule.h"
+#include "ClassViewerFilter.h"
 
 static const FName FireSimulationTabName("FireSimulation");
 
@@ -29,7 +32,8 @@ void FFireSimulationEditorModule::ShutdownModule()
 TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnTabArgs& SpawnTabArgs)
 {
     CubesAmountTextBox = SNew(SEditableTextBox).HintText(LOCTEXT("CellSizeHint", "Enter amount of cubes in 1 dimension..."));
-    
+    ThreadsTextBox = SNew(SEditableTextBox).HintText(LOCTEXT("ThreadsHint", "Enter amount of threads to use in fire simulation..."));
+
     return SNew(SDockTab)
         .TabRole(ETabRole::NomadTab)
         [
@@ -46,7 +50,21 @@ TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnT
             .Padding(5)
             [
                 CubesAmountTextBox.ToSharedRef()
-            ]            
+            ]
+            +SVerticalBox::Slot()
+            .FillHeight(1.f)
+            .Padding(5)
+            [
+                ThreadsTextBox.ToSharedRef()
+            ]
+            +SVerticalBox::Slot()
+            .FillHeight(1.f)
+            .Padding(5)
+            [
+                SNew(SButton)
+                    .Text(LOCTEXT("PickActorClassButtonText", "Pick Actor Class for FireElement"))
+                    .OnClicked(FOnClicked::CreateRaw(this, &FFireSimulationEditorModule::OnPickActorClassClicked))
+            ]
             +SVerticalBox::Slot()
             .FillHeight(1.f)
             .Padding(5)
@@ -84,7 +102,10 @@ FReply FFireSimulationEditorModule::OnInitializeGridClicked()
         FString CubesAmountText = CubesAmountTextBox->GetText().ToString();
         int32 CubesAmount = FCString::Atoi(*CubesAmountText);     
 
-        if (CubesAmount > 0)
+        FString ThreadsText = ThreadsTextBox->GetText().ToString();
+        int32 Threads = FCString::Atoi(*ThreadsText);
+
+        if (CubesAmount > 0 && Threads > 0)
         {
             // Поиск актора GridActor в мире
             if (GEditor)
@@ -100,7 +121,7 @@ FReply FFireSimulationEditorModule::OnInitializeGridClicked()
                 UFireGridManager* GridManager = UFireGridManager::GetInstance();
                 if (GridManager)
                 {
-                    GridManager->InitializeGrid(CubesAmount);
+                    GridManager->InitializeGrid(CubesAmount, Threads);
                     GridManager->DrawGrid(true, World, GridActor);
                 }
             }
@@ -139,6 +160,36 @@ FReply FFireSimulationEditorModule::OnFillGridClicked()
         }
         //#endif
     }   
+    return FReply::Handled();
+}
+
+FReply FFireSimulationEditorModule::OnPickActorClassClicked()
+{
+    FClassViewerInitializationOptions Options;
+    Options.Mode = EClassViewerMode::ClassPicker;
+    Options.DisplayMode = EClassViewerDisplayMode::ListView;    
+
+    // Callback, который вызывается при выборе класса пользователем
+    auto OnClassPicked = FOnClassPicked::CreateLambda([this](UClass* SelectedClass)
+        {
+            if (SelectedClass != nullptr)
+            {
+                // Здесь логика обработки выбранного класса, например, сохранение выбранного класса для дальнейшего использования
+                SelectedActorClass = SelectedClass;
+            }
+        });
+
+    
+    const FText TitleText = FText::FromString(TEXT("Выберите класс актора"));
+    UClass* ChosenClass = nullptr;
+    const bool bPressedOk = SClassPickerDialog::PickClass(TitleText, Options, ChosenClass, AActor::StaticClass());
+
+    if (bPressedOk && ChosenClass != nullptr)
+    {
+        SelectedActorClass = ChosenClass;
+        UFireGridManager::GetInstance()->FireActor = SelectedActorClass;
+    }
+
     return FReply::Handled();
 }
 

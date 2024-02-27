@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/BoxComponent.h"
+#include "FireSimulationComponent.h"
 #include "RoomMarker.generated.h"
 
 UCLASS()
@@ -19,6 +20,8 @@ protected:
 public:    
     UPROPERTY(VisibleAnywhere, Category="Room")
     UBoxComponent* RoomBounds;
+
+    FMaterialData CalculateAverageMaterialData();
 
     // Custom properties
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Room")

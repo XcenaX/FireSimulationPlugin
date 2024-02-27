@@ -7,11 +7,13 @@
 #if WITH_EDITOR
 #include "Editor.h"
 #endif
+#include <MaterialData.h>
 
 UFireSimulationComponent::UFireSimulationComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.
 	PrimaryComponentTick.bCanEverTick = true;
+    Mass = 10;
 }
 
 void UFireSimulationComponent::BeginPlay()
@@ -36,15 +38,19 @@ void UFireSimulationComponent::SetFireTexture(UTexture2D* Texture)
 	// Установка текстуры огня
 }
 
-void UFireSimulationComponent::UpdateSelectedMaterial(const FString& NewMaterialName)
+void UFireSimulationComponent::UpdateSelectedMaterial(FMaterialData* NewMaterial)
 {
-    SelectedMaterial = NewMaterialName;
+    SelectedMaterial.BurningRate                        = NewMaterial->BurningRate;
+    SelectedMaterial.CarbonDioxide_kg_per_kg            = NewMaterial->CarbonDioxide_kg_per_kg;
+    SelectedMaterial.CarbonMonoxide_kg_per_kg           = NewMaterial->CarbonMonoxide_kg_per_kg;
+    SelectedMaterial.HydrogenChloride_kg_per_kg         = NewMaterial->HydrogenChloride_kg_per_kg;
+    SelectedMaterial.LinearFlameSpeed                   = NewMaterial->LinearFlameSpeed;
+    SelectedMaterial.LowestHeatOfCombustion_kJ_per_kg   = NewMaterial->LowestHeatOfCombustion_kJ_per_kg;
+    SelectedMaterial.Name                               = NewMaterial->Name;
+    SelectedMaterial.OxygenConsumption_kg_per_kg        = NewMaterial->OxygenConsumption_kg_per_kg;
+    SelectedMaterial.SmokeGeneration                    = NewMaterial->SmokeGeneration;
 }
 
-FString UFireSimulationComponent::GetSelectedMaterial()
-{
-    return SelectedMaterial;
-}
 
 // функция которая не позволяет одновременно установить IsWall = true и IsBurning = true
 void UFireSimulationComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
@@ -55,18 +61,10 @@ void UFireSimulationComponent::PostEditChangeProperty(FPropertyChangedEvent& Pro
 
     if (PropertyName == GET_MEMBER_NAME_CHECKED(UFireSimulationComponent, IsWall))
     {
-        if (IsWall)
-        {
-            // Если IsWall установлено в true, IsDoor должно быть false
-            IsDoor = false;
-        }
+        IsBurning = false;        
     }
-    else if (PropertyName == GET_MEMBER_NAME_CHECKED(UFireSimulationComponent, IsDoor))
+    else if (PropertyName == GET_MEMBER_NAME_CHECKED(UFireSimulationComponent, IsBurning))
     {
-        if (IsDoor)
-        {
-            // Если IsDoor установлено в true, IsWall должно быть false
-            IsWall = false;
-        }
+        IsWall = false;        
     }
 }

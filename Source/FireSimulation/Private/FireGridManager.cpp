@@ -24,9 +24,10 @@ UFireGridManager* UFireGridManager::GetInstance()
     return Instance;
 }
 
-void UFireGridManager::InitializeGrid(int32 CubesPerDimension)
+void UFireGridManager::InitializeGrid(int32 CubesPerDimension, int32 NewThreads)
 {
     ElementsAmount = CubesPerDimension;
+    Threads = NewThreads;
 
     Grid.SetNum(CubesPerDimension);
     for (int32 i = 0; i < CubesPerDimension; ++i)
@@ -35,8 +36,17 @@ void UFireGridManager::InitializeGrid(int32 CubesPerDimension)
         for (int32 j = 0; j < CubesPerDimension; ++j)
         {
             Grid[i][j].SetNum(CubesPerDimension);
+            for (int32 k = 0; k < CubesPerDimension; k++) {
+                Grid[i][j][k].x = i;
+                Grid[i][j][k].y = j;
+                Grid[i][j][k].z = k;
+                
+                Grid[i][j][k].OccupyingActor = nullptr;
+            }
         }
     }
+
+    ActorCellsCount.Empty();
 }
 
 void UFireGridManager::DrawGrid(bool bVisible, UWorld * World, AActor * GridActor)
@@ -117,6 +127,16 @@ void UFireGridManager::PopulateGridWithActors(UWorld* World, AActor * GridActor)
                         if (HitActor->FindComponentByClass<UFireSimulationComponent>())
                         {
                             Grid[x][y][z].OccupyingActor = HitActor;
+                            
+                            if (ActorCellsCount.Contains(HitActor))
+                            {
+                                ActorCellsCount[HitActor]++;
+                            }
+                            else
+                            {
+                                ActorCellsCount.Add(HitActor, 1);
+                            }
+                             
                             break; // Прекращаем поиск после первого найденного актора
                         }
                     }
@@ -146,4 +166,84 @@ void UFireGridManager::PopulateGridWithActors(UWorld* World, AActor * GridActor)
     // LOGS
     FString FilePath = FPaths::ProjectDir() / TEXT("GridLog.txt");
     FFileHelper::SaveStringToFile(LogText, *FilePath);
+}
+
+TArray<FGridCell> UFireGridManager::GetBurningCells() {
+    TArray<FGridCell> BurningCells;
+    for (int i = 0; i < Grid.Num(); i++) {
+        for (int j = 0; j < Grid.Num(); j++) {
+            for (int k = 0; k < Grid.Num(); k++) {
+                if (Grid[i][j][k].Status == BURNING) {
+                    BurningCells.Add(Grid[i][j][k]);
+                }
+            }
+        }
+    }
+    return BurningCells;
+}
+
+
+void UFireGridManager::CreateFireActor(FGridCell Cell)
+{
+    UWorld* World = GEditor->GetEditorWorldContext().World();
+
+    if (!FireActor || !World)
+    {
+        return;
+    }
+
+    AGridActor* GridActor = nullptr;
+    for (TActorIterator<AGridActor> It(World); It; ++It)
+    {
+        GridActor = *It;
+        break;
+    }
+
+    UBoxComponent* BoxComponent = GridActor->FindComponentByClass<UBoxComponent>();
+
+    FVector GridSize = BoxComponent->GetScaledBoxExtent() * 2; // Получаем полные размеры сетки
+    FVector CellSize(GridSize.X / ElementsAmount, GridSize.Y / ElementsAmount, GridSize.Z / ElementsAmount);
+    FVector GridOrigin = BoxComponent->GetComponentLocation() - GridSize / 2; // Начальная точка сетки
+
+    FVector CellCenter = GridOrigin + FVector(Cell.x * CellSize.X, Cell.y * CellSize.Y, Cell.z * CellSize.Z) + CellSize / 2;
+
+
+    FActorSpawnParameters SpawnParams;
+    FRotator Rotation(0);
+    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+    AActor* SpawnedActor = World->SpawnActor<AActor>(FireActor, CellCenter, Rotation, SpawnParams);
+
+    FBox ActorBounds = SpawnedActor->GetComponentsBoundingBox(true);
+    FVector ActorSize = ActorBounds.GetSize();
+
+    // Вычисление коэффициента масштабирования для каждого измерения
+    float ScaleX = CellSize.X / ActorSize.X;
+    float ScaleY = CellSize.Y / ActorSize.Y;
+    float ScaleZ = CellSize.Z / ActorSize.Z;
+
+    // Выбор минимального коэффициента масштабирования для сохранения пропорций
+    float UniformScaleFactor = FMath::Min(ScaleX, FMath::Min(ScaleY, ScaleZ));
+
+    // Проверка, требуется ли масштабирование (если актор уже помещается в ячейку, его размер не изменяется)
+    if (UniformScaleFactor < 1.0f)
+    {
+        // Применение одинакового масштабирования к актору для сохранения пропорций
+        SpawnedActor->SetActorScale3D(FVector(UniformScaleFactor));
+    }
+
+    Cell.FireActor = SpawnedActor;
+}
+
+void UFireGridManager::RemoveBurntActor(FGridCell Cell) {
+    for (const auto& ElemX : Grid) {
+        for (const auto& ElemY : ElemX) {
+            for (const auto& ElemZ : ElemY) {
+                if (ElemZ.OccupyingActor == Cell.OccupyingActor) {
+                    Cell.FireActor->Destroy();
+                }
+            }
+        }
+    }
+
+    Cell.OccupyingActor->Destroy();
 }

@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
+#include <MaterialData.h>
 #include "FireSimulationComponent.generated.h"
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -22,7 +23,13 @@ public:
     void SetFireTexture(UTexture2D* Texture);
 
 	UPROPERTY(EditAnywhere, Category = "Fire Simulation", meta = (Hidden))
-    FString SelectedMaterial;
+    FString SelectedMaterialName;
+
+    FMaterialData SelectedMaterial;
+
+    // Масса предмета (кг) (по умолчанию = 10)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fire Simulation")
+    int Mass;
 
     // Свойство означает является ли этот обьект точкой возгорания
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fire Simulation")
@@ -32,12 +39,7 @@ public:
     UPROPERTY(EditAnywhere, Category = "Fire Simulation")
     bool IsWall = false;
 
-    // Является ли обьект дверью (служит для связи между комнатами)
-    UPROPERTY(EditAnywhere, Category = "Fire Simulation")
-    bool IsDoor = false;
-
-    void UpdateSelectedMaterial(const FString& NewMaterialName);
-    FString GetSelectedMaterial();
+    void UpdateSelectedMaterial(FMaterialData* NewMaterial);
 
     virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 };

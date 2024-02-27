@@ -4,6 +4,10 @@
 #include "UObject/NoExportTypes.h"
 #include "FireGridManager.generated.h"
 
+#define EMPTY 0
+#define BURNING 1   
+#define BURNT 2
+
 USTRUCT(BlueprintType)
 struct FGridCell
 {
@@ -13,6 +17,13 @@ public:
     // Ссылка на актора в ячейке. Может быть nullptr, если ячейка пуста.
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     AActor* OccupyingActor = nullptr;
+    int Status = EMPTY;
+    int x;
+    int y;
+    int z;
+    int time = 0; // время которое горит ячейка (секунд)
+    AActor* FireActor = nullptr;
+
 };
 
 /**
@@ -28,7 +39,7 @@ public:
 
     // Инициализация сетки на основе количества элементов в одном измерении.
     UFUNCTION(BlueprintCallable)
-    void InitializeGrid(int32 CubesPerDimension);
+    void InitializeGrid(int32 CubesPerDimension, int32 Threads);
 
     // Визуализация сетки.
     UFUNCTION(BlueprintCallable)
@@ -38,16 +49,32 @@ public:
     UFUNCTION(BlueprintCallable)
     void PopulateGridWithActors(UWorld* World, AActor* GridActor);
 
+    // Создает Актор огня в загоревшейся ячейке
+    UFUNCTION(BlueprintCallable)
+    void CreateFireActor(FGridCell Cell);
+
+    // Удаляет сгоревший обьект и огонь который на нем был
+    UFUNCTION(BlueprintCallable)
+    void RemoveBurntActor(FGridCell Cell);
+
     // Получить экземпляр менеджера сетки.
     static UFireGridManager* GetInstance();
 
-private:
-    // Количество элементов в сетке в одном измерении.
-    float ElementsAmount;
+    TArray<FGridCell> GetBurningCells();
 
     // Трехмерный массив ячеек.
     TArray<TArray<TArray<FGridCell>>> Grid;
 
+    // Количество элементов в сетке в одном измерении.
+    float ElementsAmount;
+    // Количество поток
+    int Threads;
+    // Класс актора огня который будет создаваться на месте загоревшейся ячейки
+    UClass* FireActor;
+
+    TMap<AActor*, int> ActorCellsCount;
+
+private:
     // Статический экземпляр для синглтона.
     static UFireGridManager* Instance;
 };
