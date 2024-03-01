@@ -40,6 +40,21 @@ void UFireSimulationComponent::SetFireTexture(UTexture2D* Texture)
 
 void UFireSimulationComponent::UpdateSelectedMaterial(FMaterialData NewMaterial)
 {
+	#if WITH_EDITOR
+		if (GEditor)
+		{
+			GEditor->BeginTransaction(FText::FromString("Change Selected Material"));
+			Modify();
+		}
+	#endif
+		SelectedMaterial = NewMaterial.Name;
+	#if WITH_EDITOR
+		if (GEditor)
+		{
+			GEditor->EndTransaction();
+		}
+	#endif
+
     SelectedMaterialData = NewMaterial;
 }
 
