@@ -45,7 +45,7 @@ FMaterialData ARoomMarker::CalculateAverageMaterialData()
         UFireSimulationComponent* FireComp = Actor->FindComponentByClass<UFireSimulationComponent>();
         if (FireComp && RoomBounds->IsOverlappingActor(Actor))
         {
-            FMaterialData ActorMaterialData = FireComp->SelectedMaterial;
+            FMaterialData ActorMaterialData = FireComp->SelectedMaterialData;
             // Агрегация значений
             AverageMaterialData.LowestHeatOfCombustion_kJ_per_kg += ActorMaterialData.LowestHeatOfCombustion_kJ_per_kg;
             AverageMaterialData.BurningRate += ActorMaterialData.BurningRate;

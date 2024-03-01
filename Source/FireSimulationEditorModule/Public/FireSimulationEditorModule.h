@@ -20,6 +20,7 @@ private:
     TSharedPtr<SEditableTextBox> CubesAmountTextBox;
     TSharedPtr<SEditableTextBox> ThreadsTextBox;
     UClass* SelectedActorClass = nullptr;
+    //UParticleSystem* SelectedActorClass = nullptr;
 
 
     /** Callback for spawning the plugin tab */
@@ -29,6 +30,6 @@ private:
     FReply OnInitializeGridClicked();
     FReply OnClearGridClicked();
     FReply OnFillGridClicked();
-    FReply OnSelectActorClassClicked();
+    void OnParticleSystemSelected(const FAssetData& AssetData);
     FReply OnPickActorClassClicked();
 };

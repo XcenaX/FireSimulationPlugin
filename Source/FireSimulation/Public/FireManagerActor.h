@@ -51,6 +51,9 @@ private:
     TArray<FVector> NewListRemovalIndices;
     TArray<FVector> FireListRemovalIndices;
 
-    UFireGridManager* FireManager;
+    UFireGridManager* GridManager;
+
+    float TimeAccumulator;
+
 
 };

@@ -54,16 +54,25 @@ bool FMaterialDataManager::LoadMaterialData()
     return true;
 }
 
-FMaterialData* FMaterialDataManager::GetMaterialData(FString MaterialName)
+FMaterialData FMaterialDataManager::GetMaterialData(FString MaterialName)
 {
+    FMaterialData NewMaterialData;
     FMaterialData* FoundMaterialData = MaterialDataMap.Find(MaterialName);
     if (FoundMaterialData)
     {
-        return FoundMaterialData;
+        NewMaterialData.BurningRate = FoundMaterialData->BurningRate;
+        NewMaterialData.CarbonDioxide_kg_per_kg = FoundMaterialData->CarbonDioxide_kg_per_kg;
+        NewMaterialData.CarbonMonoxide_kg_per_kg = FoundMaterialData->CarbonMonoxide_kg_per_kg;
+        NewMaterialData.HydrogenChloride_kg_per_kg = FoundMaterialData->HydrogenChloride_kg_per_kg;
+        NewMaterialData.LinearFlameSpeed = FoundMaterialData->LinearFlameSpeed;
+        NewMaterialData.LowestHeatOfCombustion_kJ_per_kg = FoundMaterialData->LowestHeatOfCombustion_kJ_per_kg;
+        NewMaterialData.OxygenConsumption_kg_per_kg = FoundMaterialData->OxygenConsumption_kg_per_kg;
+        NewMaterialData.SmokeGeneration = FoundMaterialData->SmokeGeneration;
+        return NewMaterialData;
     }
     else
     {
-        return nullptr;
+        return NewMaterialData;
     }
 }
 

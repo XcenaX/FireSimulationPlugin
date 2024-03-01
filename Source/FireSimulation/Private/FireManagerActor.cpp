@@ -3,16 +3,13 @@
 #include "FireSimulationComponent.h"
 #include <MaterialData.h>
 #include <Async/Async.h>
+#include <MaterialDataManager.h>
 
 // Sets default values
 AFireManagerActor::AFireManagerActor()
 {
     // Set this actor to call Tick() every frame. You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = true;
-    FireManager = UFireGridManager::GetInstance();
-    Threads = FireManager->Threads;
-    Cells = FireManager->Grid;
-
 }
 
 // Called when the game starts or when spawned
@@ -20,6 +17,10 @@ void AFireManagerActor::BeginPlay()
 {
     Super::BeginPlay();
     
+    GridManager = UFireGridManager::GetInstance();
+    Threads = GridManager->Threads;
+    Cells = GridManager->Grid;
+
     InitializeFireSpread();
 }
 
@@ -28,13 +29,23 @@ void AFireManagerActor::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    UpdateFireSpread();
+    // Суммируем прошедшее время
+    TimeAccumulator += DeltaTime;
+
+    // Проверяем, прошла ли секунда
+    if (TimeAccumulator >= 1.0f)
+    {
+        UpdateFireSpread();
+        // Сбрасываем счетчик времени
+        TimeAccumulator -= 1.0f;
+    }    
 }
 
 void AFireManagerActor::InitializeFireSpread()
-{
-    // Переносим изначально горящие акторы в список для дальнейшей обработки
-    TArray<FGridCell> BurningCells = FireManager->GetBurningCells();
+{    
+    // Переносим изначально горящие акторы в список для дальнейшей обработки    
+    TArray<FGridCell> BurningCells = GridManager->GetBurningCells();
+    NewList.Empty(BurningCells.Num());
     for (int i = 0; i < BurningCells.Num(); i++) {
         NewList.Add(BurningCells[i]);
     }
@@ -42,8 +53,8 @@ void AFireManagerActor::InitializeFireSpread()
 
 void AFireManagerActor::UpdateFireSpread()
 {
+    UE_LOG(LogTemp, Warning, TEXT("CheckList: %d; FireList: %d; NewList: %d"), CheckList.Num(), FireList.Num(), NewList.Num());
     if (CheckList.Num() > 0 || NewList.Num() > 0 || FireList.Num() > 0) {
-        
         if (CheckList.Num() > 500) {
             //parallelProcessList(CheckList, &AFireManagerActor::processCheckList, CheckListRemovalIndices);
             parallelProcessList(CheckList, [this](int32 Start, int32 End, TArray<FVector>& CoordsToRemove) {
@@ -86,7 +97,11 @@ void AFireManagerActor::processCheckList(int32 StartIndex, int32 EndIndex, TArra
     FScopeLock ScopeLock(&ListMutex);
     for (int32 i = StartIndex; i < EndIndex; ++i)
     {
-        FGridCell& Cell = CheckList[i];
+        FGridCell Cell = CheckList[i];
+
+        if (Cell.OccupyingActor == nullptr) {
+            continue;
+        }
 
         int32 FP = CalculateFP(Cells, Cell.x, Cell.y, Cell.z);
 
@@ -97,12 +112,14 @@ void AFireManagerActor::processCheckList(int32 StartIndex, int32 EndIndex, TArra
             UFireSimulationComponent* FireComp = Cast<UFireSimulationComponent>(Cell.OccupyingActor->GetComponentByClass(UFireSimulationComponent::StaticClass()));
             if (FireComp)
             {
-                FMaterialData SelectedMaterial = FireComp->SelectedMaterial;
+                FMaterialData SelectedMaterial = FireComp->SelectedMaterialData;
                 LinearSpeed = SelectedMaterial.LinearFlameSpeed;
             }
         }
 
         double Probability = (LinearSpeed * FP) / 4.0;
+
+        UE_LOG(LogTemp, Warning, TEXT("LinearSpeed: %d; Probability: %d;"), LinearSpeed, Probability);
 
         if (FMath::RandRange(0.0f, 1.0f) < Probability)
         {
@@ -114,8 +131,12 @@ void AFireManagerActor::processCheckList(int32 StartIndex, int32 EndIndex, TArra
 
 void AFireManagerActor::processNewList(int32 StartIndex, int32 EndIndex, TArray<FVector>& CoordsToRemove) {
     FScopeLock ScopeLock(&ListMutex);
-    for (size_t i = StartIndex; i < EndIndex; ++i) {
-        FGridCell cell = CheckList[i];
+    for (int32 i = StartIndex; i < EndIndex; ++i) {
+        FGridCell cell = NewList[i];
+        
+        if (cell.OccupyingActor == nullptr) {
+            continue;
+        }
 
         int x = cell.x;
         int y = cell.y;
@@ -139,11 +160,8 @@ void AFireManagerActor::processNewList(int32 StartIndex, int32 EndIndex, TArray<
                         newY >= 0 && newY < Cells.Num() &&
                         newZ >= 0 && newZ < Cells.Num()) {
 
-                        UFireSimulationComponent* FireComp = Cast<UFireSimulationComponent>(Cells[newX][newY][newZ].OccupyingActor->GetComponentByClass(UFireSimulationComponent::StaticClass()));
-                        bool IsWall = FireComp->IsWall;
-
                         // Проверяем состояние соседнего пикселя и стену на карте
-                        if (Cells[newX][newY][newZ].Status < BURNING && !IsWall) {
+                        if (Cells[newX][newY][newZ].Status < BURNING && Cells[newX][newY][newZ].OccupyingActor != nullptr) {
                             CheckList.Add(Cells[newX][newY][newZ]);
                         }
                     }
@@ -154,29 +172,36 @@ void AFireManagerActor::processNewList(int32 StartIndex, int32 EndIndex, TArray<
         cell.Status = BURNING;
         FireList.Add(cell);
         CoordsToRemove.Add(FVector(cell.x, cell.y, cell.z));
-        FireManager->CreateFireActor(cell); // Создает актор огня в этой ячейке
+        GridManager->CreateFireActor(cell); // Создает актор огня в этой ячейке
     }
 
 }
 
 void AFireManagerActor::processFireList(int32 StartIndex, int32 EndIndex, TArray<FVector>& CoordsToRemove) {
     FScopeLock ScopeLock(&ListMutex);
-    for (size_t i = StartIndex; i < EndIndex; ++i) {
-        FGridCell cell = CheckList[i];
+    for (int32 i = StartIndex; i < EndIndex; ++i) {
+        FGridCell cell = FireList[i];
+
+        if (cell.OccupyingActor == nullptr) {
+            continue;            
+        }
 
         UFireSimulationComponent* FireComp = Cast<UFireSimulationComponent>(cell.OccupyingActor->GetComponentByClass(UFireSimulationComponent::StaticClass()));
-        FMaterialData SelectedMaterial = FireComp->SelectedMaterial;
+
+        if (FireComp->IsWall) {
+            continue;
+        }
 
         if (cell.Status == BURNING) {
             cell.time += 1;
-            double A = 1.05 * SelectedMaterial.BurningRate * pow(SelectedMaterial.LinearFlameSpeed, 2);
+            double A = 1.05 * FireComp->SelectedMaterialData.BurningRate * pow(FireComp->SelectedMaterialData.LinearFlameSpeed, 2);
             double burntMass = A * pow(cell.time, 3);
-
+            
             if (FireComp->Mass <= burntMass) {
                 cell.Status = BURNT;
-                FireManager->ActorCellsCount[cell.OccupyingActor]--;
-                if (FireManager->ActorCellsCount[cell.OccupyingActor] == 0) {
-                    FireManager->RemoveBurntActor(cell); // Обьект сгорел, удаляем этот актор и огонь на нем
+                GridManager->ActorCellsCount[cell.OccupyingActor]--;
+                if (GridManager->ActorCellsCount[cell.OccupyingActor] == 0) {
+                    GridManager->RemoveBurntActor(cell); // Обьект сгорел, удаляем этот актор и огонь на нем
                 }
                 CoordsToRemove.Add(FVector(cell.x, cell.y, cell.z));
             }
@@ -227,6 +252,7 @@ void AFireManagerActor::RemoveCellsByCoords(TArray<FGridCell>& List, TArray<FVec
         if (CoordsToRemove.Contains(CellCoords))
         {
             List.RemoveAt(Index);
+            CoordsToRemove.Remove(CellCoords);
         }
     }
 }

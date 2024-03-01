@@ -57,7 +57,7 @@ void FMaterialSelectionCustomization::CustomizeDetails(IDetailLayoutBuilder& Det
 					{
 						if (NewSelection.IsValid() && FireSimulationComponent && SelectInfo != ESelectInfo::Direct)
 						{
-							FMaterialData* Material = FMaterialDataManager::Get().GetMaterialData(*NewSelection);
+							FMaterialData Material = FMaterialDataManager::Get().GetMaterialData(*NewSelection);
 							FireSimulationComponent->UpdateSelectedMaterial(Material);
 						}
 					})

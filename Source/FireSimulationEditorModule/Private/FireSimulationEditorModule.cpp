@@ -12,6 +12,8 @@
 #include "Kismet2/SClassPickerDialog.h"
 #include "ClassViewerModule.h"
 #include "ClassViewerFilter.h"
+#include <IContentBrowserSingleton.h>
+#include <ContentBrowserModule.h>
 
 static const FName FireSimulationTabName("FireSimulation");
 
@@ -168,17 +170,6 @@ FReply FFireSimulationEditorModule::OnPickActorClassClicked()
     FClassViewerInitializationOptions Options;
     Options.Mode = EClassViewerMode::ClassPicker;
     Options.DisplayMode = EClassViewerDisplayMode::ListView;    
-
-    // Callback, который вызывается при выборе класса пользователем
-    auto OnClassPicked = FOnClassPicked::CreateLambda([this](UClass* SelectedClass)
-        {
-            if (SelectedClass != nullptr)
-            {
-                // Здесь логика обработки выбранного класса, например, сохранение выбранного класса для дальнейшего использования
-                SelectedActorClass = SelectedClass;
-            }
-        });
-
     
     const FText TitleText = FText::FromString(TEXT("Выберите класс актора"));
     UClass* ChosenClass = nullptr;
@@ -190,8 +181,28 @@ FReply FFireSimulationEditorModule::OnPickActorClassClicked()
         UFireGridManager::GetInstance()->FireActor = SelectedActorClass;
     }
 
+    //FAssetPickerConfig AssetPickerConfig;
+    //AssetPickerConfig.Filter.ClassNames.Add(UParticleSystem::StaticClass()->GetFName());
+    //AssetPickerConfig.OnAssetSelected = FOnAssetSelected::CreateRaw(this, &FFireSimulationEditorModule::OnParticleSystemSelected);
+    //AssetPickerConfig.InitialAssetViewType = EAssetViewType::List;
+    //AssetPickerConfig.bAllowNullSelection = false;
+    //AssetPickerConfig.bShowBottomToolbar = true;
+    //AssetPickerConfig.AssetShowWarningText = NSLOCTEXT("Fire Simulation Editor", "NoParticleSystemWarning", "No Particle Systems found.");
+
+    //// Создаем и отображаем диалоговое окно с ассет пикером
+    //FContentBrowserModule& ContentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
+    //ContentBrowserModule.Get().CreateAssetPicker(AssetPickerConfig);
+
     return FReply::Handled();
 }
+
+//void FFireSimulationEditorModule::OnParticleSystemSelected(const FAssetData& AssetData) {
+//    UParticleSystem* SelectedParticleSystem = Cast<UParticleSystem>(AssetData.GetAsset());
+//    if (SelectedParticleSystem)
+//    {
+//        SelectedActorClass = SelectedParticleSystem;
+//    }
+//}
 
 #undef LOCTEXT_NAMESPACE
 

@@ -38,17 +38,9 @@ void UFireSimulationComponent::SetFireTexture(UTexture2D* Texture)
 	// Установка текстуры огня
 }
 
-void UFireSimulationComponent::UpdateSelectedMaterial(FMaterialData* NewMaterial)
+void UFireSimulationComponent::UpdateSelectedMaterial(FMaterialData NewMaterial)
 {
-    SelectedMaterial.BurningRate                        = NewMaterial->BurningRate;
-    SelectedMaterial.CarbonDioxide_kg_per_kg            = NewMaterial->CarbonDioxide_kg_per_kg;
-    SelectedMaterial.CarbonMonoxide_kg_per_kg           = NewMaterial->CarbonMonoxide_kg_per_kg;
-    SelectedMaterial.HydrogenChloride_kg_per_kg         = NewMaterial->HydrogenChloride_kg_per_kg;
-    SelectedMaterial.LinearFlameSpeed                   = NewMaterial->LinearFlameSpeed;
-    SelectedMaterial.LowestHeatOfCombustion_kJ_per_kg   = NewMaterial->LowestHeatOfCombustion_kJ_per_kg;
-    SelectedMaterial.Name                               = NewMaterial->Name;
-    SelectedMaterial.OxygenConsumption_kg_per_kg        = NewMaterial->OxygenConsumption_kg_per_kg;
-    SelectedMaterial.SmokeGeneration                    = NewMaterial->SmokeGeneration;
+    SelectedMaterialData = NewMaterial;
 }
 
 

@@ -127,6 +127,11 @@ void UFireGridManager::PopulateGridWithActors(UWorld* World, AActor * GridActor)
                         if (HitActor->FindComponentByClass<UFireSimulationComponent>())
                         {
                             Grid[x][y][z].OccupyingActor = HitActor;
+                            Grid[x][y][z].Status = BURNING;
+
+                            if (!HitActor->FindComponentByClass<UFireSimulationComponent>()->IsBurning) {
+                                Grid[x][y][z].Status = EMPTY;
+                            }
                             
                             if (ActorCellsCount.Contains(HitActor))
                             {
@@ -147,7 +152,7 @@ void UFireGridManager::PopulateGridWithActors(UWorld* World, AActor * GridActor)
                 // LOGS
                 if (Grid[x][y][z].OccupyingActor != nullptr)
                 {
-                    LogText += Grid[x][y][z].OccupyingActor->GetName();
+                    LogText += "O";//Grid[x][y][z].OccupyingActor->GetName();
                 }
                 else
                 {
