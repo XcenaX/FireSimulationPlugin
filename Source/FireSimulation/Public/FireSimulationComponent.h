@@ -25,8 +25,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Fire Simulation", meta = (Hidden))
     FString SelectedMaterial;
 
-    FMaterialData SelectedMaterialData;
-
     // Масса предмета (кг) (по умолчанию = 10)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fire Simulation")
     int Mass;
@@ -39,7 +37,7 @@ public:
     UPROPERTY(EditAnywhere, Category = "Fire Simulation")
     bool IsWall = false;
 
-    void UpdateSelectedMaterial(FMaterialData NewMaterial);
+    void UpdateSelectedMaterial(FString NewMaterial);
 
     virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 };

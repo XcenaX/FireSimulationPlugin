@@ -3,6 +3,7 @@
 #include "FireSimulationComponent.h"
 #include "Components/BoxComponent.h"
 #include "UnrealEd.h"
+#include <MaterialDataManager.h>
 
 ARoomMarker::ARoomMarker()
 {
@@ -45,16 +46,16 @@ FMaterialData ARoomMarker::CalculateAverageMaterialData()
         UFireSimulationComponent* FireComp = Actor->FindComponentByClass<UFireSimulationComponent>();
         if (FireComp && RoomBounds->IsOverlappingActor(Actor))
         {
-            FMaterialData ActorMaterialData = FireComp->SelectedMaterialData;
+            const FMaterialData* ActorMaterialData = FMaterialDataManager::Get().GetMaterialData(*FireComp->SelectedMaterial);
             // Агрегация значений
-            AverageMaterialData.LowestHeatOfCombustion_kJ_per_kg += ActorMaterialData.LowestHeatOfCombustion_kJ_per_kg;
-            AverageMaterialData.BurningRate += ActorMaterialData.BurningRate;
-            AverageMaterialData.CarbonDioxide_kg_per_kg += ActorMaterialData.CarbonDioxide_kg_per_kg;
-            AverageMaterialData.CarbonMonoxide_kg_per_kg += ActorMaterialData.CarbonMonoxide_kg_per_kg;
-            AverageMaterialData.HydrogenChloride_kg_per_kg += ActorMaterialData.HydrogenChloride_kg_per_kg;
-            AverageMaterialData.LinearFlameSpeed += ActorMaterialData.LinearFlameSpeed;
-            AverageMaterialData.OxygenConsumption_kg_per_kg += ActorMaterialData.OxygenConsumption_kg_per_kg;
-            AverageMaterialData.SmokeGeneration += ActorMaterialData.SmokeGeneration;
+            AverageMaterialData.LowestHeatOfCombustion_kJ_per_kg += ActorMaterialData->LowestHeatOfCombustion_kJ_per_kg;
+            AverageMaterialData.BurningRate += ActorMaterialData->BurningRate;
+            AverageMaterialData.CarbonDioxide_kg_per_kg += ActorMaterialData->CarbonDioxide_kg_per_kg;
+            AverageMaterialData.CarbonMonoxide_kg_per_kg += ActorMaterialData->CarbonMonoxide_kg_per_kg;
+            AverageMaterialData.HydrogenChloride_kg_per_kg += ActorMaterialData->HydrogenChloride_kg_per_kg;
+            AverageMaterialData.LinearFlameSpeed += ActorMaterialData->LinearFlameSpeed;
+            AverageMaterialData.OxygenConsumption_kg_per_kg += ActorMaterialData->OxygenConsumption_kg_per_kg;
+            AverageMaterialData.SmokeGeneration += ActorMaterialData->SmokeGeneration;
             ActorCount++;
         }
     }

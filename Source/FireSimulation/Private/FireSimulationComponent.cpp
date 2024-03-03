@@ -38,7 +38,7 @@ void UFireSimulationComponent::SetFireTexture(UTexture2D* Texture)
 	// Установка текстуры огня
 }
 
-void UFireSimulationComponent::UpdateSelectedMaterial(FMaterialData NewMaterial)
+void UFireSimulationComponent::UpdateSelectedMaterial(FString NewMaterial)
 {
 	#if WITH_EDITOR
 		if (GEditor)
@@ -47,15 +47,13 @@ void UFireSimulationComponent::UpdateSelectedMaterial(FMaterialData NewMaterial)
 			Modify();
 		}
 	#endif
-		SelectedMaterial = NewMaterial.Name;
+		SelectedMaterial = NewMaterial;
 	#if WITH_EDITOR
 		if (GEditor)
 		{
 			GEditor->EndTransaction();
 		}
 	#endif
-
-    SelectedMaterialData = NewMaterial;
 }
 
 

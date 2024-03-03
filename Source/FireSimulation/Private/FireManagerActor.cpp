@@ -112,8 +112,7 @@ void AFireManagerActor::processCheckList(int32 StartIndex, int32 EndIndex, TArra
             UFireSimulationComponent* FireComp = Cast<UFireSimulationComponent>(Cell.OccupyingActor->GetComponentByClass(UFireSimulationComponent::StaticClass()));
             if (FireComp)
             {
-                FMaterialData SelectedMaterial = FireComp->SelectedMaterialData;
-                LinearSpeed = SelectedMaterial.LinearFlameSpeed;
+                LinearSpeed = FMaterialDataManager::Get().GetMaterialData(*(FireComp->SelectedMaterial))->LinearFlameSpeed;
             }
         }
 
@@ -194,7 +193,7 @@ void AFireManagerActor::processFireList(int32 StartIndex, int32 EndIndex, TArray
 
         if (cell.Status == BURNING) {
             cell.time += 1;
-            double A = 1.05 * FireComp->SelectedMaterialData.BurningRate * pow(FireComp->SelectedMaterialData.LinearFlameSpeed, 2);
+            double A = 1.05 * FMaterialDataManager::Get().GetMaterialData(*FireComp->SelectedMaterial)->BurningRate * pow(FMaterialDataManager::Get().GetMaterialData(*FireComp->SelectedMaterial)->LinearFlameSpeed, 2);
             double burntMass = A * pow(cell.time, 3);
             
             if (FireComp->Mass <= burntMass) {
