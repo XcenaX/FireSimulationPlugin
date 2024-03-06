@@ -37,14 +37,19 @@ public:
     void RemoveCellsByCoords(TArray<FGridCell>& List, TArray<FVector>& CoordsToRemove);
     int CalculateFP(TArray<TArray<TArray<FGridCell>>> cells, int x, int y, int z);
 
-    AActor* CreateFireActor(UClass* ActorClass, const FVector& Location);
+    // Показывает скрытые акторы; Тушит весь огонь
+    UFUNCTION(BlueprintCallable)
+    void RestoreScene();
+
+    void OnEndPIE(const bool bIsSimulating);
+
 
 private:
     TArray<FGridCell> CheckList;
     TArray<FGridCell> FireList;
     TArray<FGridCell> NewList;
     int32 Threads;
-    TArray<TArray<TArray<FGridCell>>> Cells;
+
     FCriticalSection ListMutex;
 
     TArray<FVector> CheckListRemovalIndices;

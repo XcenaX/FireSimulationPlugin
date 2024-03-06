@@ -4,6 +4,9 @@
 #include "DrawDebugHelpers.h"
 #include "FireSimulationComponent.h"
 #include "Components/BoxComponent.h"
+#include "Particles/ParticleSystem.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include <GridActor.h>
 #include <Misc/FileHelper.h>
 
@@ -147,8 +150,6 @@ void UFireGridManager::PopulateGridWithActors(UWorld* World, AActor * GridActor)
                     }
                 }
 
-                DrawDebugBox(World, CellCenter, CellSize / 2, FColor::Green, false, 5.0f, 0, 2);
-
                 // LOGS
                 if (Grid[x][y][z].OccupyingActor != nullptr)
                 {
@@ -168,6 +169,22 @@ void UFireGridManager::PopulateGridWithActors(UWorld* World, AActor * GridActor)
         }
         LogText += "-\n";
     }
+
+    for (int x = 0; x < ElementsAmount; ++x)
+    {
+        for (int y = 0; y < ElementsAmount; ++y)
+        {
+            for (int z = 0; z < ElementsAmount; ++z)
+            {
+                if (Grid[x][y][z].OccupyingActor != nullptr) {
+                    UFireSimulationComponent* FireComp = Cast<UFireSimulationComponent>(Grid[x][y][z].OccupyingActor->GetComponentByClass(UFireSimulationComponent::StaticClass()));
+                    Grid[x][y][z].mass = FireComp->Mass / ActorCellsCount[Grid[x][y][z].OccupyingActor];
+                }
+            }
+        }
+    }
+
+
     // LOGS
     FString FilePath = FPaths::ProjectDir() / TEXT("GridLog.txt");
     FFileHelper::SaveStringToFile(LogText, *FilePath);
@@ -192,7 +209,7 @@ void UFireGridManager::CreateFireActor(FGridCell Cell)
 {
     UWorld* World = GEditor->GetEditorWorldContext().World();
 
-    if (!FireActor || !World)
+    if (!SelectedParticle|| !World)
     {
         return;
     }
@@ -204,6 +221,7 @@ void UFireGridManager::CreateFireActor(FGridCell Cell)
         break;
     }
 
+    // Вычисляем локацию ячейки
     UBoxComponent* BoxComponent = GridActor->FindComponentByClass<UBoxComponent>();
 
     FVector GridSize = BoxComponent->GetScaledBoxExtent() * 2; // Получаем полные размеры сетки
@@ -212,19 +230,33 @@ void UFireGridManager::CreateFireActor(FGridCell Cell)
 
     FVector CellCenter = GridOrigin + FVector(Cell.x * CellSize.X, Cell.y * CellSize.Y, Cell.z * CellSize.Z) + CellSize / 2;
 
-
+    // Создаем актор огня
     FActorSpawnParameters SpawnParams;
     FRotator Rotation(0);
     SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-    AActor* SpawnedActor = World->SpawnActor<AActor>(FireActor, CellCenter, Rotation, SpawnParams);
+    AActor* SpawnedActor = World->SpawnActor<AActor>(AActor::StaticClass(), CellCenter, Rotation, SpawnParams);
+    
+    UParticleSystem* SelectedParticleSystem = Cast<UParticleSystem>(SelectedParticle);
+    //UParticleSystemComponent* ParticleSystemComponent = UGameplayStatics::SpawnEmitterAtLocation(World, SelectedParticleSystem, CellCenter, Rotation);
 
-    FBox ActorBounds = SpawnedActor->GetComponentsBoundingBox(true);
-    FVector ActorSize = ActorBounds.GetSize();
+    // ДОбавляем компонент ParticleSystem к актору
+    UParticleSystemComponent* ParticleSystemComponent = NewObject<UParticleSystemComponent>(SpawnedActor, UParticleSystemComponent::StaticClass());
+    SpawnedActor->AddInstanceComponent(ParticleSystemComponent);
+    ParticleSystemComponent->SetTemplate(SelectedParticleSystem);
+    ParticleSystemComponent->RegisterComponent(); // Регистрация компонента 
+    ParticleSystemComponent->SetRelativeLocation(CellCenter);
+    
+    // FBox ActorBounds = SpawnedActor->GetComponentsBoundingBox(true);
+    // FVector ActorSize = ActorBounds.GetSize();
+
+    FBoxSphereBounds Bounds = ParticleSystemComponent->Bounds;
+    FVector BoxExtent = Bounds.BoxExtent; // Половины размеров ограничивающего объема во всех трех направлениях
+    FVector SphereRadius = FVector(Bounds.SphereRadius); // Радиус ограничивающего сферы
 
     // Вычисление коэффициента масштабирования для каждого измерения
-    float ScaleX = CellSize.X / ActorSize.X;
-    float ScaleY = CellSize.Y / ActorSize.Y;
-    float ScaleZ = CellSize.Z / ActorSize.Z;
+    float ScaleX = CellSize.X / SphereRadius.X;
+    float ScaleY = CellSize.Y / SphereRadius.Y;
+    float ScaleZ = CellSize.Z / SphereRadius.Z;
 
     // Выбор минимального коэффициента масштабирования для сохранения пропорций
     float UniformScaleFactor = FMath::Min(ScaleX, FMath::Min(ScaleY, ScaleZ));
@@ -233,22 +265,27 @@ void UFireGridManager::CreateFireActor(FGridCell Cell)
     if (UniformScaleFactor < 1.0f)
     {
         // Применение одинакового масштабирования к актору для сохранения пропорций
-        SpawnedActor->SetActorScale3D(FVector(UniformScaleFactor));
+        ParticleSystemComponent->SetWorldScale3D(FVector(UniformScaleFactor));
     }
+    ParticleSystemComponent->Activate();
 
     Cell.FireActor = SpawnedActor;
 }
 
-void UFireGridManager::RemoveBurntActor(FGridCell Cell) {
+void UFireGridManager::RemoveBurntActor(FGridCell& Cell) {
     for (const auto& ElemX : Grid) {
         for (const auto& ElemY : ElemX) {
             for (const auto& ElemZ : ElemY) {
-                if (ElemZ.OccupyingActor == Cell.OccupyingActor) {
+                if (ElemZ.OccupyingActor == Cell.OccupyingActor && Cell.FireActor && !Cell.FireActor->IsPendingKill()) {
                     Cell.FireActor->Destroy();
+                    Cell.FireActor = nullptr;
                 }
             }
         }
     }
 
-    Cell.OccupyingActor->Destroy();
+    if (Cell.OccupyingActor && !Cell.OccupyingActor->IsPendingKill()) {
+        Cell.OccupyingActor->SetActorHiddenInGame(true);
+        Cell.OccupyingActor->MarkComponentsRenderStateDirty();
+    }
 }

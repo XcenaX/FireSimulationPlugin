@@ -27,7 +27,7 @@ public:
 
     // Масса предмета (кг) (по умолчанию = 10)
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fire Simulation")
-    int Mass;
+    float Mass;
 
     // Свойство означает является ли этот обьект точкой возгорания
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fire Simulation")

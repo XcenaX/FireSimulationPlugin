@@ -3,7 +3,6 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 #include "Widgets/Docking/SDockTab.h"
-#include "Widgets/Input/SEditableTextBox.h"
 
 class FFireSimulationEditorModule : public IModuleInterface
 {
@@ -12,18 +11,14 @@ public:
     virtual void StartupModule() override;
     virtual void ShutdownModule() override;
 
+    void ShowNotification(FString message);
+
 private:
-    /** Handle to the test tab */
     TSharedPtr<SDockTab> FireSimulationTab;
 
-    /** Text box for inputting the cell size */
     TSharedPtr<SEditableTextBox> CubesAmountTextBox;
     TSharedPtr<SEditableTextBox> ThreadsTextBox;
-    UClass* SelectedActorClass = nullptr;
-    //UParticleSystem* SelectedActorClass = nullptr;
-
-
-    /** Callback for spawning the plugin tab */
+    
     TSharedRef<SDockTab> OnSpawnPluginTab(const FSpawnTabArgs& SpawnTabArgs);
 
     /** Callback for when the 'Initialize Grid' button is clicked */

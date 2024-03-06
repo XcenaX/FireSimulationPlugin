@@ -14,6 +14,9 @@
 #include "ClassViewerFilter.h"
 #include <IContentBrowserSingleton.h>
 #include <ContentBrowserModule.h>
+#include "Widgets/Input/SEditableTextBox.h"
+#include "Widgets/Notifications/SNotificationList.h"
+#include "Framework/Notifications/NotificationManager.h"
 
 static const FName FireSimulationTabName("FireSimulation");
 
@@ -64,7 +67,7 @@ TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnT
             .Padding(5)
             [
                 SNew(SButton)
-                    .Text(LOCTEXT("PickActorClassButtonText", "Pick Actor Class for FireElement"))
+                    .Text(LOCTEXT("PickActorClassButtonText", "Pick Fire Visualisation"))
                     .OnClicked(FOnClicked::CreateRaw(this, &FFireSimulationEditorModule::OnPickActorClassClicked))
             ]
             +SVerticalBox::Slot()
@@ -107,7 +110,7 @@ FReply FFireSimulationEditorModule::OnInitializeGridClicked()
         FString ThreadsText = ThreadsTextBox->GetText().ToString();
         int32 Threads = FCString::Atoi(*ThreadsText);
 
-        if (CubesAmount > 0 && Threads > 0)
+        if (CubesAmount > 0)
         {
             // Поиск актора GridActor в мире
             if (GEditor)
@@ -122,11 +125,19 @@ FReply FFireSimulationEditorModule::OnInitializeGridClicked()
 
                 UFireGridManager* GridManager = UFireGridManager::GetInstance();
                 if (GridManager)
-                {
-                    GridManager->InitializeGrid(CubesAmount, Threads);
-                    GridManager->DrawGrid(true, World, GridActor);
+                {                    
+                    if (CubesAmount > 30) {
+                        ShowNotification("Building a grid with so many cells can take up a lot of resources! Operation cancelled!");
+                    }
+                    else {
+                        GridManager->InitializeGrid(CubesAmount, Threads);
+                        GridManager->DrawGrid(true, World, GridActor);
+                    }
                 }
             }
+        }
+        else {
+            ShowNotification("Enter cubes amount per dimension to draw Grid!");
         }
     }
     return FReply::Handled();
@@ -144,8 +155,14 @@ FReply FFireSimulationEditorModule::OnClearGridClicked()
 
 FReply FFireSimulationEditorModule::OnFillGridClicked()
 {    
+    FString CubesAmountText = CubesAmountTextBox->GetText().ToString();
+    int32 CubesAmount = FCString::Atoi(*CubesAmountText);
+
+    FString ThreadsText = ThreadsTextBox->GetText().ToString();
+    int32 Threads = FCString::Atoi(*ThreadsText);
+
     UFireGridManager* GridManager = UFireGridManager::GetInstance();
-    if (GridManager)
+    if (GridManager && CubesAmount > 0)
     {
         //#if WITH_EDITOR
         //#include "UnrealEd.h"
@@ -158,7 +175,10 @@ FReply FFireSimulationEditorModule::OnFillGridClicked()
                 GridActor = *It;
                 break;
             }
+            GridManager->InitializeGrid(CubesAmount, Threads);
             GridManager->PopulateGridWithActors(World, GridActor);
+            ShowNotification("Grid was successfully filled with Actors!");
+
         }
         //#endif
     }   
@@ -167,7 +187,7 @@ FReply FFireSimulationEditorModule::OnFillGridClicked()
 
 FReply FFireSimulationEditorModule::OnPickActorClassClicked()
 {
-    FClassViewerInitializationOptions Options;
+    /*FClassViewerInitializationOptions Options;
     Options.Mode = EClassViewerMode::ClassPicker;
     Options.DisplayMode = EClassViewerDisplayMode::ListView;    
     
@@ -179,19 +199,39 @@ FReply FFireSimulationEditorModule::OnPickActorClassClicked()
     {
         SelectedActorClass = ChosenClass;
         UFireGridManager::GetInstance()->FireActor = SelectedActorClass;
-    }
+    }*/
 
-    //FAssetPickerConfig AssetPickerConfig;
-    //AssetPickerConfig.Filter.ClassNames.Add(UParticleSystem::StaticClass()->GetFName());
-    //AssetPickerConfig.OnAssetSelected = FOnAssetSelected::CreateRaw(this, &FFireSimulationEditorModule::OnParticleSystemSelected);
-    //AssetPickerConfig.InitialAssetViewType = EAssetViewType::List;
-    //AssetPickerConfig.bAllowNullSelection = false;
-    //AssetPickerConfig.bShowBottomToolbar = true;
-    //AssetPickerConfig.AssetShowWarningText = NSLOCTEXT("Fire Simulation Editor", "NoParticleSystemWarning", "No Particle Systems found.");
 
-    //// Создаем и отображаем диалоговое окно с ассет пикером
-    //FContentBrowserModule& ContentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
-    //ContentBrowserModule.Get().CreateAssetPicker(AssetPickerConfig);
+    // Настройка конфигурации пикера ассетов
+    FAssetPickerConfig AssetPickerConfig;
+    AssetPickerConfig.Filter.ClassNames.Add(UParticleSystem::StaticClass()->GetFName());
+    AssetPickerConfig.OnAssetSelected = FOnAssetSelected::CreateLambda([this](const FAssetData& AssetData)
+        {
+            UObject* SelectedObject = AssetData.GetAsset();
+            UFireGridManager::GetInstance()->SelectedParticle = SelectedObject;
+
+            ShowNotification("Fire Visualisation was picked!");
+        });
+
+    // Создание виджета для пикера ассетов
+    FContentBrowserModule& ContentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
+    TSharedRef<SWidget> AssetPicker = SNew(SBox)
+        .WidthOverride(500.f)
+        .HeightOverride(400.f)
+        [
+            ContentBrowserModule.Get().CreateAssetPicker(AssetPickerConfig)
+        ];
+
+    // Создание и отображение диалогового окна
+    TSharedRef<SWindow> PickerWindow = SNew(SWindow)
+        .Title(FText::FromString("Pick Fire visualisation"))
+        .ClientSize(FVector2D(600, 500))
+        [
+            AssetPicker
+        ];
+
+    FSlateApplication::Get().AddModalWindow(PickerWindow, nullptr, false);
+
 
     return FReply::Handled();
 }
@@ -203,6 +243,12 @@ FReply FFireSimulationEditorModule::OnPickActorClassClicked()
 //        SelectedActorClass = SelectedParticleSystem;
 //    }
 //}
+void FFireSimulationEditorModule::ShowNotification(FString message) {
+    FNotificationInfo Info(FText::FromString(message));
+    Info.ExpireDuration = 5.0f;
+    FSlateNotificationManager::Get().AddNotification(Info);
+}
+
 
 #undef LOCTEXT_NAMESPACE
 

@@ -1,4 +1,4 @@
-#include "MaterialDataManager.h"
+﻿#include "MaterialDataManager.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
 #include "Serialization/JsonSerializer.h"
@@ -43,9 +43,13 @@ bool FMaterialDataManager::LoadMaterialData()
             MaterialData.HydrogenChloride_kg_per_kg = JsonObject->GetObjectField("GasEmission")->GetNumberField("HydrogenChloride_kg_per_kg");
 
             MaterialDataMap.Add(MaterialData.Name, MaterialData);
+
+            //UE_LOG(LogTemp, Warning, TEXT("%s: %f ; %f ; %f ; %f ; %f"), *MaterialData.Name, MaterialData.BurningRate, MaterialData.CarbonDioxide_kg_per_kg, MaterialData.CarbonMonoxide_kg_per_kg, MaterialData.LinearFlameSpeed, MaterialData.SmokeGeneration);
+
         }
     }
     UE_LOG(LogTemp, Warning, TEXT("Loaded %d materials from %s"), MaterialDataMap.Num(), *FilePath);
+    
     MaterialNamesCache.Empty();
     for (const auto& Pair : MaterialDataMap)
     {

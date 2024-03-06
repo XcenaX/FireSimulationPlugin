@@ -13,7 +13,7 @@ UFireSimulationComponent::UFireSimulationComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.
 	PrimaryComponentTick.bCanEverTick = true;
-    Mass = 10;
+    Mass = 10.0;
 }
 
 void UFireSimulationComponent::BeginPlay()

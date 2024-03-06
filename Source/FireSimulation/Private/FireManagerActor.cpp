@@ -18,10 +18,17 @@ void AFireManagerActor::BeginPlay()
     Super::BeginPlay();
     
     GridManager = UFireGridManager::GetInstance();
-    Threads = GridManager->Threads;
-    Cells = GridManager->Grid;
+    Threads = GridManager->Threads;    
 
     InitializeFireSpread();
+
+    FEditorDelegates::EndPIE.AddUObject(this, &AFireManagerActor::OnEndPIE);
+}
+
+// После завершения игры в редакторе возвращаем все сгоревшие акторы на место и тушим пожар
+void AFireManagerActor::OnEndPIE(const bool bIsSimulating)
+{
+    RestoreScene();
 }
 
 // Called every frame
@@ -103,7 +110,7 @@ void AFireManagerActor::processCheckList(int32 StartIndex, int32 EndIndex, TArra
             continue;
         }
 
-        int32 FP = CalculateFP(Cells, Cell.x, Cell.y, Cell.z);
+        int32 FP = CalculateFP(GridManager->Grid, Cell.x, Cell.y, Cell.z);
 
         float LinearSpeed = 0.8f; // Default value
 
@@ -116,9 +123,9 @@ void AFireManagerActor::processCheckList(int32 StartIndex, int32 EndIndex, TArra
             }
         }
 
-        double Probability = (LinearSpeed * FP) / 4.0;
+        float Probability = (LinearSpeed * FP) / 4.0;
 
-        UE_LOG(LogTemp, Warning, TEXT("LinearSpeed: %d; Probability: %d;"), LinearSpeed, Probability);
+        // UE_LOG(LogTemp, Warning, TEXT("LinearSpeed: %f; Probability: %f;"), LinearSpeed, Probability);
 
         if (FMath::RandRange(0.0f, 1.0f) < Probability)
         {
@@ -154,6 +161,7 @@ void AFireManagerActor::processNewList(int32 StartIndex, int32 EndIndex, TArray<
                     int newY = y + dy;
                     int newZ = z + dz;
 
+                    TArray<TArray<TArray<FGridCell>>> Cells = GridManager->Grid;
                     // Проверяем, что координаты находятся в пределах комнаты
                     if (newX >= 0 && newX < Cells.Num() &&
                         newY >= 0 && newY < Cells.Num() &&
@@ -192,11 +200,15 @@ void AFireManagerActor::processFireList(int32 StartIndex, int32 EndIndex, TArray
         }
 
         if (cell.Status == BURNING) {
-            cell.time += 1;
-            double A = 1.05 * FMaterialDataManager::Get().GetMaterialData(*FireComp->SelectedMaterial)->BurningRate * pow(FMaterialDataManager::Get().GetMaterialData(*FireComp->SelectedMaterial)->LinearFlameSpeed, 2);
-            double burntMass = A * pow(cell.time, 3);
+            FireList[i].time += 1;
+            const FMaterialData * SelectedMaterial = FMaterialDataManager::Get().GetMaterialData(*FireComp->SelectedMaterial);
+
+            float A = 1.05 * SelectedMaterial->BurningRate * pow(SelectedMaterial->LinearFlameSpeed, 2);
+            float burntMass = A * pow(cell.time, 3);
             
-            if (FireComp->Mass <= burntMass) {
+            UE_LOG(LogTemp, Warning, TEXT("Burning rate: %f; FlameSpeed: %f; BurnMass: %f / %f; Time: %d"), SelectedMaterial->BurningRate, SelectedMaterial->LinearFlameSpeed, burntMass, cell.mass, cell.time);
+            
+            if (cell.mass <= burntMass) {
                 cell.Status = BURNT;
                 GridManager->ActorCellsCount[cell.OccupyingActor]--;
                 if (GridManager->ActorCellsCount[cell.OccupyingActor] == 0) {
@@ -314,4 +326,26 @@ int AFireManagerActor::CalculateFP(TArray<TArray<TArray<FGridCell>>> cells, int 
     }
 
     return 2 * a + b;
+}
+
+void AFireManagerActor::RestoreScene() { // Делает невидимые(сгоревшие) акторы видимымм. Удаляет все акторы огня.
+    int GridSizeX = GridManager->Grid.Num();
+    for (int i = 0; i < GridSizeX; ++i) {
+        int GridSizeY = GridManager->Grid[i].Num();
+        for (int j = 0; j < GridSizeY; ++j) {
+            int GridSizeZ = GridManager->Grid[i][j].Num();
+            for (int k = 0; k < GridSizeZ; ++k) {
+                FGridCell& Cell = GridManager->Grid[i][j][k];
+                if (Cell.OccupyingActor && !Cell.OccupyingActor->IsPendingKill()) {
+                    Cell.OccupyingActor->SetActorHiddenInGame(false);
+                    Cell.OccupyingActor->MarkComponentsRenderStateDirty();
+                }
+                if (Cell.FireActor) {
+                    Cell.FireActor->Destroy();
+                    Cell.FireActor = nullptr;
+                }
+            }
+        }
+    }
+
 }

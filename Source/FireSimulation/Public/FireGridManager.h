@@ -17,13 +17,13 @@ public:
     // Ссылка на актора в ячейке. Может быть nullptr, если ячейка пуста.
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     AActor* OccupyingActor = nullptr;
-    int Status = EMPTY;
-    int x;
-    int y;
-    int z;
-    int time = 0; // время которое горит ячейка (секунд)
+    int32 Status = EMPTY;
+    int32 x;
+    int32 y;
+    int32 z;
+    int32 time = 0; // время которое горит ячейка (секунд)
+    float mass = 0; // масса кокретной ячейки (не объекта в целом) (кг)
     AActor* FireActor = nullptr;
-
 };
 
 /**
@@ -53,9 +53,9 @@ public:
     UFUNCTION(BlueprintCallable)
     void CreateFireActor(FGridCell Cell);
 
-    // Удаляет сгоревший обьект и огонь который на нем был
+    // Скрывает сгоревший обьект и удаляет огонь который на нем был
     UFUNCTION(BlueprintCallable)
-    void RemoveBurntActor(FGridCell Cell);
+    void RemoveBurntActor(FGridCell& Cell);
 
     // Получить экземпляр менеджера сетки.
     static UFireGridManager* GetInstance();
@@ -69,8 +69,9 @@ public:
     float ElementsAmount;
     // Количество поток
     int Threads;
-    // Класс актора огня который будет создаваться на месте загоревшейся ячейки
-    UClass* FireActor;
+    // Класс актора огня который будет создаваться на месте загоревшейся ячейки    
+
+    UObject* SelectedParticle;
 
     TMap<AActor*, int> ActorCellsCount;
 
