@@ -74,3 +74,19 @@ FMaterialData ARoomMarker::CalculateAverageMaterialData()
 
     return AverageMaterialData;
 }
+
+float ARoomMarker::GetRoomArea() { // Возвращает площадь комнаты
+    if (RoomBounds)
+    {
+        FVector BoxSize = RoomBounds->GetScaledBoxExtent();
+
+        float Length = BoxSize.X * 2;
+        float Width = BoxSize.Y * 2;
+        float Height = BoxSize.Z * 2;
+
+        float SurfaceArea = 2 * (Length * Width + Width * Height + Height * Length);
+        return SurfaceArea;
+    }
+
+    return 0.0f;
+}

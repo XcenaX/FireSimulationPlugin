@@ -36,68 +36,104 @@ void FFireSimulationEditorModule::ShutdownModule()
 
 TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnTabArgs& SpawnTabArgs)
 {
-    CubesAmountTextBox = SNew(SEditableTextBox).HintText(LOCTEXT("CellSizeHint", "Enter amount of cubes in 1 dimension..."));
-    ThreadsTextBox = SNew(SEditableTextBox).HintText(LOCTEXT("ThreadsHint", "Enter amount of threads to use in fire simulation..."));
+    CubesAmountTextBox = SNew(SEditableTextBox)
+        .Padding(FMargin(5.0f, 0.0f, 2.5f, 0.0f))
+        .HintText(LOCTEXT("CellSizeHint", "Enter amount of cubes in 1 dimension..."));
+    ThreadsTextBox = SNew(SEditableTextBox)
+        .Padding(FMargin(5.0f, 0.0f, 2.5f, 0.0f))
+        .HintText(LOCTEXT("ThreadsHint", "Enter amount of threads to use in fire simulation..."));
+    PickFireButton = SNew(SButton)
+        .VAlign(VAlign_Center)
+        .Text(AFireGridManager::GetInstance()->SelectedParticleFire != nullptr
+            ? FText::FromName(AFireGridManager::GetInstance()->SelectedParticleFire->GetFName())
+            : LOCTEXT("PickActorClassButtonText", "Pick Fire Visualisation"))
+        .ContentPadding(FMargin(10.0f))
+        .OnClicked(FOnClicked::CreateRaw(this, &FFireSimulationEditorModule::OnPickActorClassClicked));
+    PickFogButton = SNew(SButton)
+        .VAlign(VAlign_Center)
+        .Text(AFireGridManager::GetInstance()->SelectedParticleFog != nullptr
+            ? FText::FromName(AFireGridManager::GetInstance()->SelectedParticleFog->GetFName())
+            : LOCTEXT("PickFogClassButtonText", "Pick Fog Visualisation"))
+        .ContentPadding(FMargin(10.0f))
+        .OnClicked(FOnClicked::CreateRaw(this, &FFireSimulationEditorModule::OnPickFogClassClicked));
+
 
     return SNew(SDockTab)
         .TabRole(ETabRole::NomadTab)
         [
             SNew(SVerticalBox)
-            +SVerticalBox::Slot()
-            .FillHeight(1.f)
-            .Padding(5)
-            [
-                SNew(STextBlock)
-                .Text(LOCTEXT("FireGridManagerTab", "Fire Grid Manager"))
-            ]
-            +SVerticalBox::Slot()
-            .FillHeight(1.f)
-            .Padding(5)
-            [
-                CubesAmountTextBox.ToSharedRef()
-            ]
-            +SVerticalBox::Slot()
-            .FillHeight(1.f)
-            .Padding(5)
-            [
-                ThreadsTextBox.ToSharedRef()
-            ]
-            +SVerticalBox::Slot()
-            .FillHeight(1.f)
-            .Padding(5)
-            [
-                SNew(SButton)
-                    .Text(LOCTEXT("PickActorClassButtonText", "Pick Fire Visualisation"))
-                    .OnClicked(FOnClicked::CreateRaw(this, &FFireSimulationEditorModule::OnPickActorClassClicked))
-            ]
-            +SVerticalBox::Slot()
-            .FillHeight(1.f)
-            .Padding(5)
-            [
-                SNew(SButton)
-                .Text(LOCTEXT("InitializeButtonText", "Draw Grid"))
-                .OnClicked(FOnClicked::CreateRaw(this, &FFireSimulationEditorModule::OnInitializeGridClicked))
-                    
-            ]
-            + SVerticalBox::Slot()
-            .FillHeight(1.f)
-            .Padding(5)
-            [
-                SNew(SButton)
-                    .Text(LOCTEXT("ClearButtonText", "Clear Grid"))
-                    .OnClicked(FOnClicked::CreateRaw(this, &FFireSimulationEditorModule::OnClearGridClicked))
-
-            ]
-            +SVerticalBox::Slot()
-            .FillHeight(1.f)
-            .Padding(5)
-            [
-                SNew(SButton)
-                    .Text(LOCTEXT("FillActorsButtonText", "Fill Grid with actors"))
-                    .OnClicked(FOnClicked::CreateRaw(this, &FFireSimulationEditorModule::OnFillGridClicked))
-
-            ]
+                + SVerticalBox::Slot()                
+                .Padding(5)
+                [
+                    SNew(STextBlock)
+                        .Text(LOCTEXT("FireGridManagerTab", "Fire Grid Manager"))
+                ]
+                + SVerticalBox::Slot()
+                .Padding(5)
+                [
+                    CubesAmountTextBox.ToSharedRef()
+                ]
+                + SVerticalBox::Slot()
+                .AutoHeight()
+                .Padding(5)
+                [
+                    ThreadsTextBox.ToSharedRef()
+                ]
+                + SVerticalBox::Slot()
+                .AutoHeight()
+                .Padding(5)
+                [
+                    SNew(SHorizontalBox)
+                        + SHorizontalBox::Slot()
+                        .FillWidth(0.45)
+                        .Padding(FMargin(2.5f, 0.0f, 5.0f, 0.0f))
+                        [
+                            PickFireButton.ToSharedRef()
+                        ]
+                        + SHorizontalBox::Slot()
+                        .FillWidth(0.45)
+                        .Padding(FMargin(5.0f, 0.0f, 2.5f, 0.0f))
+                        [
+                            PickFogButton.ToSharedRef()
+                        ]
+                ]
+                + SVerticalBox::Slot()
+                .AutoHeight()
+                .Padding(5)
+                [
+                    SNew(SHorizontalBox)
+                        + SHorizontalBox::Slot()
+                        .FillWidth(0.45)
+                        .Padding(FMargin(2.5f, 0.0f, 5.0f, 0.0f))
+                        [
+                            SNew(SButton)
+                                .Text(LOCTEXT("InitializeButtonText", "Draw Grid"))
+                                .ContentPadding(FMargin(10.0f))
+                                .OnClicked(FOnClicked::CreateRaw(this, &FFireSimulationEditorModule::OnInitializeGridClicked))
+                        ]
+                        + SHorizontalBox::Slot()
+                        .FillWidth(0.45)
+                        .Padding(FMargin(5.0f, 0.0f, 2.5f, 0.0f))
+                        [
+                            SNew(SButton)
+                                .Text(LOCTEXT("ClearButtonText", "Clear Grid"))
+                                .ContentPadding(FMargin(10.0f))
+                                .OnClicked(FOnClicked::CreateRaw(this, &FFireSimulationEditorModule::OnClearGridClicked))
+                        ]
+                ]
+                + SVerticalBox::Slot()
+                .AutoHeight()
+                .Padding(5)
+                [
+                    SNew(SButton)
+                        .Text(LOCTEXT("FillActorsButtonText", "Fill Grid with actors"))
+                        .ContentPadding(FMargin(10.0f))
+                        .OnClicked(FOnClicked::CreateRaw(this, &FFireSimulationEditorModule::OnFillGridClicked))
+                ]
         ];
+
+
+
 }
 
 FReply FFireSimulationEditorModule::OnInitializeGridClicked()
@@ -123,7 +159,7 @@ FReply FFireSimulationEditorModule::OnInitializeGridClicked()
                     break;
                 }
 
-                UFireGridManager* GridManager = UFireGridManager::GetInstance();
+                AFireGridManager* GridManager = AFireGridManager::GetInstance();
                 if (GridManager)
                 {                    
                     if (CubesAmount > 30) {
@@ -161,7 +197,7 @@ FReply FFireSimulationEditorModule::OnFillGridClicked()
     FString ThreadsText = ThreadsTextBox->GetText().ToString();
     int32 Threads = FCString::Atoi(*ThreadsText);
 
-    UFireGridManager* GridManager = UFireGridManager::GetInstance();
+    AFireGridManager* GridManager = AFireGridManager::GetInstance();
     if (GridManager && CubesAmount > 0)
     {
         //#if WITH_EDITOR
@@ -187,28 +223,13 @@ FReply FFireSimulationEditorModule::OnFillGridClicked()
 
 FReply FFireSimulationEditorModule::OnPickActorClassClicked()
 {
-    /*FClassViewerInitializationOptions Options;
-    Options.Mode = EClassViewerMode::ClassPicker;
-    Options.DisplayMode = EClassViewerDisplayMode::ListView;    
-    
-    const FText TitleText = FText::FromString(TEXT("Выберите класс актора"));
-    UClass* ChosenClass = nullptr;
-    const bool bPressedOk = SClassPickerDialog::PickClass(TitleText, Options, ChosenClass, AActor::StaticClass());
-
-    if (bPressedOk && ChosenClass != nullptr)
-    {
-        SelectedActorClass = ChosenClass;
-        UFireGridManager::GetInstance()->FireActor = SelectedActorClass;
-    }*/
-
-
     // Настройка конфигурации пикера ассетов
     FAssetPickerConfig AssetPickerConfig;
     AssetPickerConfig.Filter.ClassNames.Add(UParticleSystem::StaticClass()->GetFName());
     AssetPickerConfig.OnAssetSelected = FOnAssetSelected::CreateLambda([this](const FAssetData& AssetData)
         {
             UObject* SelectedObject = AssetData.GetAsset();
-            UFireGridManager::GetInstance()->SelectedParticle = SelectedObject;
+            AFireGridManager::GetInstance()->SelectedParticleFire = SelectedObject;
 
             ShowNotification("Fire Visualisation was picked!");
         });
@@ -236,19 +257,48 @@ FReply FFireSimulationEditorModule::OnPickActorClassClicked()
     return FReply::Handled();
 }
 
-//void FFireSimulationEditorModule::OnParticleSystemSelected(const FAssetData& AssetData) {
-//    UParticleSystem* SelectedParticleSystem = Cast<UParticleSystem>(AssetData.GetAsset());
-//    if (SelectedParticleSystem)
-//    {
-//        SelectedActorClass = SelectedParticleSystem;
-//    }
-//}
+
+FReply FFireSimulationEditorModule::OnPickFogClassClicked()
+{
+    // Настройка конфигурации пикера ассетов
+    FAssetPickerConfig AssetPickerConfig;
+    AssetPickerConfig.Filter.ClassNames.Add(UParticleSystem::StaticClass()->GetFName());
+    AssetPickerConfig.OnAssetSelected = FOnAssetSelected::CreateLambda([this](const FAssetData& AssetData)
+        {
+            UObject* SelectedObject = AssetData.GetAsset();
+            AFireGridManager::GetInstance()->SelectedParticleFog = SelectedObject;
+
+            ShowNotification("Fog Visualisation was picked!");
+        });
+
+    // Создание виджета для пикера ассетов
+    FContentBrowserModule& ContentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
+    TSharedRef<SWidget> AssetPicker = SNew(SBox)
+        .WidthOverride(500.f)
+        .HeightOverride(400.f)
+        [
+            ContentBrowserModule.Get().CreateAssetPicker(AssetPickerConfig)
+        ];
+
+    // Создание и отображение диалогового окна
+    TSharedRef<SWindow> PickerWindow = SNew(SWindow)
+        .Title(FText::FromString("Pick Fog visualisation"))
+        .ClientSize(FVector2D(600, 500))
+        [
+            AssetPicker
+        ];
+
+    FSlateApplication::Get().AddModalWindow(PickerWindow, nullptr, false);
+
+
+    return FReply::Handled();
+}
+
 void FFireSimulationEditorModule::ShowNotification(FString message) {
     FNotificationInfo Info(FText::FromString(message));
     Info.ExpireDuration = 5.0f;
     FSlateNotificationManager::Get().AddNotification(Info);
 }
-
 
 #undef LOCTEXT_NAMESPACE
 

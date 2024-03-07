@@ -83,7 +83,7 @@ class URoomNode : public UObject
 {
     GENERATED_BODY()
 
-public:
+public: // “ут нужно добавить ссылку на актор комнаты (RoomMarker)
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Room")
     int32 RoomID;
 
@@ -136,7 +136,7 @@ struct FGraphEdge
 {
     GENERATED_BODY()
 
-public:
+public: // тут нужно добавить ссылку на актор компонента двери (DoorComponent)
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Door")
     int32 RoomStartID;
     

@@ -22,6 +22,7 @@ public:
     UBoxComponent* RoomBounds;
 
     FMaterialData CalculateAverageMaterialData();
+    float GetRoomArea();
 
     // Custom properties
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Room")

@@ -30,12 +30,12 @@ public:
  * Класс для управления трехмерной сеткой распространения огня.
  */
 UCLASS()
-class FIRESIMULATION_API UFireGridManager : public UObject
+class FIRESIMULATION_API AFireGridManager : public AActor
 {
     GENERATED_BODY()
 
 public:
-    UFireGridManager();
+    AFireGridManager();
 
     // Инициализация сетки на основе количества элементов в одном измерении.
     UFUNCTION(BlueprintCallable)
@@ -51,14 +51,14 @@ public:
 
     // Создает Актор огня в загоревшейся ячейке
     UFUNCTION(BlueprintCallable)
-    void CreateFireActor(FGridCell Cell);
+    void CreateFireActor(FGridCell Cell, UWorld * World);
 
     // Скрывает сгоревший обьект и удаляет огонь который на нем был
     UFUNCTION(BlueprintCallable)
     void RemoveBurntActor(FGridCell& Cell);
 
     // Получить экземпляр менеджера сетки.
-    static UFireGridManager* GetInstance();
+    static AFireGridManager* GetInstance();
 
     TArray<FGridCell> GetBurningCells();
 
@@ -71,11 +71,12 @@ public:
     int Threads;
     // Класс актора огня который будет создаваться на месте загоревшейся ячейки    
 
-    UObject* SelectedParticle;
+    UObject* SelectedParticleFire;
+    UObject* SelectedParticleFog;
 
     TMap<AActor*, int> ActorCellsCount;
 
 private:
     // Статический экземпляр для синглтона.
-    static UFireGridManager* Instance;
+    static AFireGridManager* Instance;
 };

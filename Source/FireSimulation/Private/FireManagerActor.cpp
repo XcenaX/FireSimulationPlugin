@@ -17,7 +17,7 @@ void AFireManagerActor::BeginPlay()
 {
     Super::BeginPlay();
     
-    GridManager = UFireGridManager::GetInstance();
+    GridManager = AFireGridManager::GetInstance();
     Threads = GridManager->Threads;    
 
     InitializeFireSpread();
@@ -28,6 +28,7 @@ void AFireManagerActor::BeginPlay()
 // После завершения игры в редакторе возвращаем все сгоревшие акторы на место и тушим пожар
 void AFireManagerActor::OnEndPIE(const bool bIsSimulating)
 {
+    UE_LOG(LogTemp, Warning, TEXT("GAME ENDED"));
     RestoreScene();
 }
 
@@ -42,6 +43,11 @@ void AFireManagerActor::Tick(float DeltaTime)
     // Проверяем, прошла ли секунда
     if (TimeAccumulator >= 1.0f)
     {
+        if (GetWorld()) {
+            UE_LOG(LogTemp, Warning, TEXT("FireManagerActor: GetWorld TRUE"));
+        } else{
+            UE_LOG(LogTemp, Warning, TEXT("FireManagerActor: GetWorld FALSE"));
+        }
         UpdateFireSpread();
         // Сбрасываем счетчик времени
         TimeAccumulator -= 1.0f;
@@ -151,10 +157,7 @@ void AFireManagerActor::processNewList(int32 StartIndex, int32 EndIndex, TArray<
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {
                 for (int dz = -1; dz <= 1; dz++) {
-                    // Убедимся, что мы проверяем только по одной оси за раз
-                    if (dx != 0 && dy != 0 || dx != 0 && dz != 0 || dy != 0 && dz != 0) continue;
-
-                    // Пропускаем сам пиксель
+                    // Пропускаем саму ячейку
                     if (dx == 0 && dy == 0 && dz == 0) continue;
 
                     int newX = x + dx;
@@ -162,12 +165,12 @@ void AFireManagerActor::processNewList(int32 StartIndex, int32 EndIndex, TArray<
                     int newZ = z + dz;
 
                     TArray<TArray<TArray<FGridCell>>> Cells = GridManager->Grid;
-                    // Проверяем, что координаты находятся в пределах комнаты
+                    // Проверяем, что координаты находятся в пределах сетки
                     if (newX >= 0 && newX < Cells.Num() &&
-                        newY >= 0 && newY < Cells.Num() &&
-                        newZ >= 0 && newZ < Cells.Num()) {
+                        newY >= 0 && newY < Cells[0].Num() &&
+                        newZ >= 0 && newZ < Cells[0][0].Num()) {
 
-                        // Проверяем состояние соседнего пикселя и стену на карте
+                        // Проверяем состояние соседней ячейки и наличие в ней актора
                         if (Cells[newX][newY][newZ].Status < BURNING && Cells[newX][newY][newZ].OccupyingActor != nullptr) {
                             CheckList.Add(Cells[newX][newY][newZ]);
                         }
@@ -176,10 +179,11 @@ void AFireManagerActor::processNewList(int32 StartIndex, int32 EndIndex, TArray<
             }
         }
 
+
         cell.Status = BURNING;
         FireList.Add(cell);
         CoordsToRemove.Add(FVector(cell.x, cell.y, cell.z));
-        GridManager->CreateFireActor(cell); // Создает актор огня в этой ячейке
+        GridManager->CreateFireActor(cell, GetWorld()); // Создает актор огня в этой ячейке
     }
 
 }
@@ -210,9 +214,12 @@ void AFireManagerActor::processFireList(int32 StartIndex, int32 EndIndex, TArray
             
             if (cell.mass <= burntMass) {
                 cell.Status = BURNT;
-                GridManager->ActorCellsCount[cell.OccupyingActor]--;
+                GridManager->ActorCellsCount[FireList[i].OccupyingActor]--;
+
+                UE_LOG(LogTemp, Warning, TEXT("CELLS COUNT: %d;"), GridManager->ActorCellsCount[FireList[i].OccupyingActor]);
+                
                 if (GridManager->ActorCellsCount[cell.OccupyingActor] == 0) {
-                    GridManager->RemoveBurntActor(cell); // Обьект сгорел, удаляем этот актор и огонь на нем
+                    GridManager->RemoveBurntActor(FireList[i]); // Обьект сгорел, удаляем этот актор и огонь на нем
                 }
                 CoordsToRemove.Add(FVector(cell.x, cell.y, cell.z));
             }
@@ -269,80 +276,63 @@ void AFireManagerActor::RemoveCellsByCoords(TArray<FGridCell>& List, TArray<FVec
 }
 
 
-int AFireManagerActor::CalculateFP(TArray<TArray<TArray<FGridCell>>> cells, int x, int y, int z) {
-    int a = 0;    
-    int b = 0;
+int AFireManagerActor::CalculateFP(const TArray<TArray<TArray<FGridCell>>> Cells, int x, int y, int z) {
+    int directNeighborCount = 0; // Для прямых соседей
+    int diagonalNeighborCount = 0; // Для диагональных соседей
 
     for (int dx = -1; dx <= 1; dx++) {
         for (int dy = -1; dy <= 1; dy++) {
             for (int dz = -1; dz <= 1; dz++) {
-                // Убедимся, что мы проверяем только по одной оси за раз
-                if ((dx != 0 && dy != 0) || (dx != 0 && dz != 0) || (dy != 0 && dz != 0)) continue;
-
-                // Пропускаем сам пиксель
+                // Пропускаем саму ячейку
                 if (dx == 0 && dy == 0 && dz == 0) continue;
 
                 int newX = x + dx;
                 int newY = y + dy;
                 int newZ = z + dz;
 
-                // Проверяем, что координаты находятся в пределах комнаты
-                if (newX >= 0 && newX < cells.Num() &&
-                    newY >= 0 && newY < cells.Num() &&
-                    newZ >= 0 && newZ < cells.Num()) {
-
-                    // Проверяем состояние соседнего пикселя
-                    if (cells[newX][newY][newZ].Status== BURNING) {
-                        a++;
+                // Проверяем, что координаты находятся в пределах границ
+                if (newX >= 0 && newX < Cells.Num() && newY >= 0 && newY < Cells[0].Num() && newZ >= 0 && newZ < Cells[0][0].Num()) {
+                    // Проверяем состояние соседней ячейки
+                    if (Cells[newX][newY][newZ].Status == BURNING) {
+                        // Если сосед по одной из осей (прямой сосед)
+                        if (dx == 0 || dy == 0 || dz == 0) {
+                            directNeighborCount++;
+                        }
+                        else {
+                            // Диагональный сосед
+                            diagonalNeighborCount++;
+                        }
                     }
                 }
             }
         }
     }
 
-    // Дополнительно проверяем диагональные соседи (влияют вдвое меньше)
-    for (int dx = -1; dx <= 1; dx += 2) {
-        for (int dy = -1; dy <= 1; dy += 2) {
-            for (int dz = -1; dz <= 1; dz += 2) {
-                // Пропускаем центральный пиксель
-                if (dx == 0 && dy == 0 && dz == 0) continue;
-
-                int newX = x + dx;
-                int newY = y + dy;
-                int newZ = z + dz;
-
-                // Проверяем, что координаты находятся в пределах комнаты
-                if (newX >= 0 && newX < cells.Num() &&
-                    newY >= 0 && newY < cells.Num() &&
-                    newZ >= 0 && newZ < cells.Num()) {
-
-                    // Проверяем состояние соседнего пикселя
-                    if (cells[newX][newY][newZ].Status== BURNING) {
-                        b++; // Влияние вдвое меньше
-                    }
-                }
-            }
-        }
-    }
-
-    return 2 * a + b;
+    return 2 * directNeighborCount + diagonalNeighborCount;
 }
+
 
 void AFireManagerActor::RestoreScene() { // Делает невидимые(сгоревшие) акторы видимымм. Удаляет все акторы огня.
     int GridSizeX = GridManager->Grid.Num();
+
+    UE_LOG(LogTemp, Warning, TEXT("GRID SIZE: %d"), GridSizeX);
+
     for (int i = 0; i < GridSizeX; ++i) {
         int GridSizeY = GridManager->Grid[i].Num();
         for (int j = 0; j < GridSizeY; ++j) {
             int GridSizeZ = GridManager->Grid[i][j].Num();
             for (int k = 0; k < GridSizeZ; ++k) {
                 FGridCell& Cell = GridManager->Grid[i][j][k];
-                if (Cell.OccupyingActor && !Cell.OccupyingActor->IsPendingKill()) {
+                if (Cell.OccupyingActor) {                    
                     Cell.OccupyingActor->SetActorHiddenInGame(false);
+                    Cell.OccupyingActor->SetActorEnableCollision(true);
+                    Cell.OccupyingActor->SetActorTickEnabled(true);
                     Cell.OccupyingActor->MarkComponentsRenderStateDirty();
                 }
                 if (Cell.FireActor) {
-                    Cell.FireActor->Destroy();
+                    bool destroyed = Cell.FireActor->Destroy();
                     Cell.FireActor = nullptr;
+                    UE_LOG(LogTemp, Warning, TEXT("FIRE ACTOR DESTROYED: %b"), destroyed);
                 }
             }
         }

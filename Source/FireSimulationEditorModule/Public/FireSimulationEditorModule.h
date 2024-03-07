@@ -14,10 +14,15 @@ public:
     void ShowNotification(FString message);
 
 private:
+
     TSharedPtr<SDockTab> FireSimulationTab;
 
     TSharedPtr<SEditableTextBox> CubesAmountTextBox;
     TSharedPtr<SEditableTextBox> ThreadsTextBox;
+    
+    TSharedPtr<SButton> PickFireButton;
+    TSharedPtr<SButton> PickFogButton;
+
     
     TSharedRef<SDockTab> OnSpawnPluginTab(const FSpawnTabArgs& SpawnTabArgs);
 
@@ -25,6 +30,6 @@ private:
     FReply OnInitializeGridClicked();
     FReply OnClearGridClicked();
     FReply OnFillGridClicked();
-    void OnParticleSystemSelected(const FAssetData& AssetData);
     FReply OnPickActorClassClicked();
+    FReply OnPickFogClassClicked();
 };
