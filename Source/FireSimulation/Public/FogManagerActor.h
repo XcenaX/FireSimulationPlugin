@@ -20,6 +20,8 @@ protected:
     virtual void BeginPlay() override;
 
 public:
+    static AFogManagerActor* GetInstance();
+
     // Called every frame
     virtual void Tick(float DeltaTime) override;
 
@@ -37,4 +39,6 @@ private:
     float TimeAccumulator;
     float TotalTime;
 
+    // Статический экземпляр для синглтона.
+    static AFogManagerActor* Instance;
 };

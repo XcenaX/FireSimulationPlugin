@@ -4,6 +4,18 @@
 #include "BuildingGraph.h"
 #include <MaterialData.h>
 
+AFogManagerActor* AFogManagerActor::Instance = nullptr;
+
+AFogManagerActor* AFogManagerActor::GetInstance()
+{
+    if (!Instance)
+    {
+        Instance = NewObject<AFogManagerActor>();
+        Instance->AddToRoot(); // Предотвратить уничтожение сборщиком мусора
+    }
+    return Instance;
+}
+
 AFogManagerActor::AFogManagerActor(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
     PrimaryActorTick.bCanEverTick = true;
