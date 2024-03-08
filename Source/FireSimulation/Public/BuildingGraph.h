@@ -114,10 +114,10 @@ public: // “ут нужно добавить ссылку на актор комнаты (RoomMarker)
     FCalculatedParameters GetCalculatedParameters() const;
 
     UFUNCTION(BlueprintCallable, Category = "Room")
-    void AddToFireDynamicsHistory(const FFireDynamicsParameters& NewParams);
+    void UpdateFireDynamics(const FFireDynamicsParameters& NewParams);
 
     UFUNCTION(BlueprintCallable, Category = "Room")
-    TArray<FFireDynamicsParameters> GetFireDynamicsHistory() const;
+    FFireDynamicsParameters GetFireDynamics() const;
 
     UFUNCTION(BlueprintCallable, Category = "Room")
     FCalculatedParameters InitializeCalculatedParams();
@@ -127,8 +127,8 @@ protected:
     float linear_flame_speed_rate_;                          // Ћинейна€ скорость распространени€ пожара.
     float specific_fuel_burn_rate_;                          // ”дельна€ скорость выгорани€ горючей нагрузки.
     float smoke_forming_ability_;
-    FCalculatedParameters calculated_params_;               // –ассчитанные параметры, основанные на начальных параметрах.
-    TArray<FFireDynamicsParameters> fire_dynamics_history_; // »стори€ изменений динамических параметров пожара.
+    FCalculatedParameters calculated_params_;                // –ассчитанные параметры, основанные на начальных параметрах.
+    FFireDynamicsParameters fire_dynamics_;          // »стори€ изменений динамических параметров пожара.
 };
 
 USTRUCT(BlueprintType)

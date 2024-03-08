@@ -14,14 +14,14 @@ FCalculatedParameters URoomNode::GetCalculatedParameters() const
 	return calculated_params_;
 }
 
-void URoomNode::AddToFireDynamicsHistory(const FFireDynamicsParameters& NewParams)
+void URoomNode::UpdateFireDynamics(const FFireDynamicsParameters& NewParams)
 {
-	fire_dynamics_history_.Add(NewParams);
+	fire_dynamics_ = NewParams;
 }
 
-TArray<FFireDynamicsParameters> URoomNode::GetFireDynamicsHistory() const
+FFireDynamicsParameters URoomNode::GetFireDynamics() const
 {
-	return fire_dynamics_history_;
+	return fire_dynamics_;
 }
 
 FCalculatedParameters URoomNode::InitializeCalculatedParams()
@@ -133,7 +133,7 @@ FFireDynamicsParameters UBuildingGraph::CalculateFireDynamicsForRoom(URoomNode* 
 		{
 			int32 adjacentRoomId = Connection.RoomStartID;
 			URoomNode* AdjacentRoom = Rooms[adjacentRoomId];
-			FFireDynamicsParameters AdjacentRoomFireDynamicsParams = AdjacentRoom->GetFireDynamicsHistory().Last();
+			FFireDynamicsParameters AdjacentRoomFireDynamicsParams = AdjacentRoom->GetFireDynamics();
 			float ConnectionStrength = Connection.GetConnectionStrength();
 
 			Count++;
@@ -168,7 +168,7 @@ void UBuildingGraph::CalculateFireDynamicsForSecond(float Second, float TimeStep
 	for (auto& Room : Rooms)
 	{
 		FFireDynamicsParameters CurrentParams = CalculateFireDynamicsForRoom(Room.Value, Second);
-		Room.Value->AddToFireDynamicsHistory(CurrentParams);
+		Room.Value->UpdateFireDynamics(CurrentParams);
 	}
 }
 
@@ -252,10 +252,7 @@ void UBuildingGraph::MergeToSourceRoom(int32 TargetRoomID)
 		SourceRoom->RoomVolume = TotalVolume;
 	}
 
-	for (const FFireDynamicsParameters& FireParam : TargetRoom->GetFireDynamicsHistory())
-	{
-		SourceRoom->AddToFireDynamicsHistory(FireParam);
-	}
+	SourceRoom->UpdateFireDynamics(TargetRoom->GetFireDynamics());
 
 	Rooms.Remove(TargetRoomID);
 

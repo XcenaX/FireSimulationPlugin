@@ -23,7 +23,7 @@ void AFogManagerActor::BeginPlay()
 
     // TODO
     // Инициализировать граф, считать со сцены все маркеры комнат и дверей и заполнить его.
-    // graph.PrepareGraphToWork();    
+    // graph.PrepareGraphToWork();
 
     FEditorDelegates::EndPIE.AddUObject(this, &AFogManagerActor::OnEndPIE);
 }
@@ -45,8 +45,9 @@ void AFogManagerActor::Tick(float DeltaTime)
 
     // Проверяем, прошла ли секунда
     if (TimeAccumulator >= 1.0f)
-    {        
-        UpdateFog();        
+    {
+        TotalTime += 1.0f;
+        UpdateFog();
         TimeAccumulator -= 1.0f;
     }
 }
@@ -56,8 +57,7 @@ void AFogManagerActor::UpdateFog()
 {
     // LOG something
     // UE_LOG(LogTemp, Warning, TEXT("CheckList: %d; FireList: %d; NewList: %d"), CheckList.Num(), FireList.Num(), NewList.Num());
-    
-    // Логика обновления дыма
+    // graph->CalculateFireDynamicsForSecond(TotalTime);
 }
 
 

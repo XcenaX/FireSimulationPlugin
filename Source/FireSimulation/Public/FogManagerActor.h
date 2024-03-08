@@ -35,5 +35,6 @@ public:
 private:    
     UBuildingGraph* graph;
     float TimeAccumulator;
+    float TotalTime;
 
 };
