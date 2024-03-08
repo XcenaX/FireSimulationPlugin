@@ -24,6 +24,11 @@
 			"Name": "FireSimulationEditorModule",
 			"Type": "Editor",
 			"LoadingPhase": "PostEngineInit"
+		},
+		{
+			"Name": "FireSimulationTests",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
 		}
 	]
 }
