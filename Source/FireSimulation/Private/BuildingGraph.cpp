@@ -6,8 +6,29 @@ URoomNode::URoomNode()
 	Cp(0.0f), RoomVolume(0.0f), heat_of_combustion_(0.0f), linear_flame_speed_rate_(0.0f),
 	specific_fuel_burn_rate_(0.0f), smoke_forming_ability_(0.0f)
 {
+}
+
+void URoomNode::Initialize(int32 InRoomID, bool InIsGasSource, float InCombustionCompletenessCoefficient,
+	float InHeatAbsorptionCoefficient, float InStartTemperature, float InInitialGasDensity,
+	float InCp, float InRoomVolume, float InHeatOfCombustion, float InLinearFlameSpeedRate,
+	float InSpecificFuelBurnRate, float InSmokeFormingAbility)
+{
+	RoomID = InRoomID;
+	IsGasSource = InIsGasSource;
+	CombustionCompletenessCoefficient = InCombustionCompletenessCoefficient;
+	HeatAbsorptionCoefficient = InHeatAbsorptionCoefficient;
+	StartTemperature = InStartTemperature;
+	InitialGasDensity = InInitialGasDensity;
+	Cp = InCp;
+	RoomVolume = InRoomVolume;
+	heat_of_combustion_ = InHeatOfCombustion;
+	linear_flame_speed_rate_ = InLinearFlameSpeedRate;
+	specific_fuel_burn_rate_ = InSpecificFuelBurnRate;
+	smoke_forming_ability_ = InSmokeFormingAbility;
+
 	calculated_params_ = InitializeCalculatedParams();
 }
+
 
 FCalculatedParameters URoomNode::GetCalculatedParameters() const
 {

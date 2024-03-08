@@ -22,9 +22,27 @@ public:
     UBoxComponent* RoomBounds;
 
     FMaterialData CalculateAverageMaterialData();
-    float GetRoomArea();
+
+    float GetRoomVolume();
+
+    bool IsGasSource();
 
     // Custom properties
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Room")
-    int32 RoomID;
+    int32 RoomID = -1;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room")
+    float CombustionCompletenessCoefficient = 0.87;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room")
+    float HeatAbsorptionCoefficient = 0.95;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room")
+    float StartTemperature = 293;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room")
+    float InitialGasDensity = 1.21;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room")
+    float Cp = 1.03;
 };

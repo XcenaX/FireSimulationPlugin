@@ -75,7 +75,7 @@ FMaterialData ARoomMarker::CalculateAverageMaterialData()
     return AverageMaterialData;
 }
 
-float ARoomMarker::GetRoomArea() { // Возвращает площадь комнаты
+float ARoomMarker::GetRoomVolume() { // Возвращает площадь комнаты
     if (RoomBounds)
     {
         FVector BoxSize = RoomBounds->GetScaledBoxExtent();
@@ -89,4 +89,43 @@ float ARoomMarker::GetRoomArea() { // Возвращает площадь комнаты
     }
 
     return 0.0f;
+}
+
+bool ARoomMarker::IsGasSource()
+{
+    UWorld* World = GetWorld();
+    if (!World) return false;
+
+    for (TActorIterator<ARoomMarker> It(World); It; ++It)
+    {
+        ARoomMarker* Room = *It;
+        if (!Room || !Room->RoomBounds) continue;
+        
+        FVector RoomSize = Room->RoomBounds->GetScaledBoxExtent() * 2;
+        FVector RoomOrigin = Room->RoomBounds->GetComponentLocation() - RoomSize / 2;
+        FVector RoomCenter = RoomOrigin + RoomSize + RoomSize / 2;
+        FCollisionShape Box = FCollisionShape::MakeBox(RoomSize / 2);
+        
+        FCollisionQueryParams Params; 
+        Params.bTraceComplex = true;
+        Params.bReturnPhysicalMaterial = false;
+
+        TArray<FHitResult> HitResults;
+        World->SweepMultiByChannel(HitResults, RoomCenter, RoomCenter, FQuat::Identity, ECC_WorldStatic, Box, Params);
+
+        for (const FHitResult& Hit : HitResults)
+        {
+            if (AActor* HitActor = Hit.GetActor())
+            {
+                if (HitActor->FindComponentByClass<UFireSimulationComponent>())
+                {
+
+                    if (HitActor->FindComponentByClass<UFireSimulationComponent>()->IsBurning) {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return false;
 }

@@ -29,13 +29,15 @@ public:
     UFUNCTION(BlueprintCallable)
     void RestoreScene();
 
+    void InitializeGraph(UWorld* World);
+
     void UpdateFog();
     void SetVisibility(URoomNode room, float meters);
     void OnEndPIE(const bool bIsSimulating);
 
-
-private:    
     UBuildingGraph* graph;
+
+private:
     float TimeAccumulator;
     float TotalTime;
 
