@@ -1,5 +1,5 @@
 # FireSimulationPlugin
-```STILL IN DEVELOPMENT```\n
+```STILL IN DEVELOPMENT```  
 This plugin for Unreal Engine 4 enables the simulation of fire and smoke propagation within your scenes. 
 
 ## How to Use
