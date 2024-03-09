@@ -29,7 +29,7 @@ Follow these steps to integrate the Fire Simulation Plugin into your Unreal Engi
 5. **Configure Doors:**
    - Add a `DoorComponent` to every door in the scene.
    - Configure the component with `ConnectedRoom1` and `ConnectedRoom2` to specify which rooms the door connects.
-   - Optionally, set `IsOpen` to indicate if the door is open or closed.
+   - Optionally, set `IsOpen` to indicate if the door is open or closed. If the door is open, the smoke will come faster into the next room.
 
 ### Running the Simulation
 
