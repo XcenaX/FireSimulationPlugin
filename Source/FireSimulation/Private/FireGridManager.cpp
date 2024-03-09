@@ -9,6 +9,8 @@
 #include "Kismet/GameplayStatics.h"
 #include <GridActor.h>
 #include <Misc/FileHelper.h>
+#include <FogManagerActor.h>
+#include <DoorComponent.h>
 
 AFireGridManager* AFireGridManager::Instance = nullptr;
 
@@ -92,7 +94,7 @@ void AFireGridManager::PopulateGridWithActors(UWorld* World, AActor * GridActor)
     if (!BoxComponent) return;
 
     FVector GridSize = BoxComponent->GetScaledBoxExtent() * 2; // Получаем полные размеры сетки
-    FVector CellSize(GridSize.X / ElementsAmount, GridSize.Y / ElementsAmount, GridSize.Z / ElementsAmount);
+    
 
     // Очищаем и инициализируем сетку
     Grid.SetNum(ElementsAmount);
@@ -148,7 +150,7 @@ void AFireGridManager::PopulateGridWithActors(UWorld* World, AActor * GridActor)
                             break; // Прекращаем поиск после первого найденного актора
                         }
                     }
-                }
+                }                
 
                 // LOGS
                 if (Grid[x][y][z].OccupyingActor != nullptr)
@@ -293,6 +295,9 @@ void AFireGridManager::RemoveBurntActor(FGridCell& Cell) {
     }
 
     if (Cell.OccupyingActor) {
+        UDoorComponent* DoorComp = Cast<UDoorComponent>(Cell.OccupyingActor->GetComponentByClass(UDoorComponent::StaticClass()));
+        AFogManagerActor::GetInstance()->graph->MergeToSourceRoom(DoorComp->ConnectedRoom2->RoomID);
+
         Cell.OccupyingActor->SetActorHiddenInGame(true);
         Cell.OccupyingActor->SetActorEnableCollision(false);
         Cell.OccupyingActor->SetActorTickEnabled(false);

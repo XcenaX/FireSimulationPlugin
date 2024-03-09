@@ -25,7 +25,7 @@ public:
     // Called every frame
     virtual void Tick(float DeltaTime) override;
 
-    // После игры возвращает сцену к прежнему виду
+    // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
     UFUNCTION(BlueprintCallable)
     void RestoreScene();
 
@@ -35,12 +35,12 @@ public:
     void SetVisibility(URoomNode room, float meters);
     void OnEndPIE(const bool bIsSimulating);
 
-    UBuildingGraph* graph;
+    UBuildingGraph* graph; 
 
-private:
+private:    
     float TimeAccumulator;
     float TotalTime;
 
-    // Статический экземпляр для синглтона.
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
     static AFogManagerActor* Instance;
 };
