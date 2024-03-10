@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include <RoomMarker.h>
 #include "BuildingGraph.generated.h"
 
 UENUM(BlueprintType)
@@ -108,6 +109,8 @@ public: // Тут нужно добавить ссылку на актор комнаты (RoomMarker)
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Room")
     float RoomVolume;                                                   // Объем помещения
 
+    ARoomMarker RoomMarker;
+
     URoomNode();
 
     UFUNCTION(BlueprintCallable, Category = "Room")
@@ -127,6 +130,14 @@ public: // Тут нужно добавить ссылку на актор комнаты (RoomMarker)
 
     UFUNCTION(BlueprintCallable, Category = "Room")
     FCalculatedParameters InitializeCalculatedParams();
+
+    // Спавнит в комнате туман с заданной начальной видимостью в метрах
+    UFUNCTION(BlueprintCallable, Category = "Room")
+    void SpawnFog(float visibility);
+
+    // Обновляет видимость в метрах для тумана в комнате
+    UFUNCTION(BlueprintCallable, Category = "Room")
+    void UpdateFogVisibility(float visibility);
 
 protected:
     float heat_of_combustion_;                               // Теплота сгорания.

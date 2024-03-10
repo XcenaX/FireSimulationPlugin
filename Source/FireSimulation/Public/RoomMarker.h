@@ -45,4 +45,11 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room")
     float Cp = 1.03;
+
+    // Массив ParticleSystem тумана для комнаты. (Один Particle System тумана имеет высоту 20, 
+    // для комнаты с высотой Z нужно будет N партиклов 
+    // где N = Z / (20 + offset))
+    // offset расстояение между партиклами (по умолчанию = высоте партикла, тоесть 20)    
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Effects")
+    TArray<UParticleSystemComponent*> FogEmitters;
 };

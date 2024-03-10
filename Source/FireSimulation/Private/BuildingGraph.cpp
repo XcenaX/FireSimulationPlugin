@@ -1,4 +1,5 @@
 #include "BuildingGraph.h"
+#include "Particles/ParticleSystemComponent.h"
 
 URoomNode::URoomNode()
 	: RoomID(-1), IsGasSource(false), CombustionCompletenessCoefficient(0.0f),
@@ -58,6 +59,73 @@ FCalculatedParameters URoomNode::InitializeCalculatedParams()
 
 	return Params;
 }
+
+void URoomNode::SpawnFog(float visibility)
+{
+	FVector RoomCenter = RoomMarker.RoomBounds->GetComponentLocation();
+	FVector RoomExtent = RoomMarker.RoomBounds->GetScaledBoxExtent();
+
+	float EmitterHeight = 20.0f; // Высота между эмиттерами
+	float Offset = 30.0f;
+	int32 NumEmittersZ = FMath::FloorToInt((RoomExtent.Z * 2) / (EmitterHeight + Offset)); // Расчет количества эмиттеров по Z
+	int32 NumEmittersX = FMath::CeilToInt(RoomMarker.RoomBounds->GetScaledBoxExtent().X * 2 / 150);
+	int32 NumEmittersY = FMath::CeilToInt(RoomMarker.RoomBounds->GetScaledBoxExtent().Y * 2 / 150);
+
+	for (int32 x = 0; x < NumEmittersX; ++x)
+	{
+		for (int32 y = 0; y < NumEmittersY; ++y)
+		{
+			for (int32 z = 0; z < NumEmittersZ; ++z)
+			{
+				FVector EmitterLocation(
+					RoomCenter.X - RoomExtent.X + (x * 150) + 75, // +75 чтобы центрировать в своей ячейке
+					RoomCenter.Y - RoomExtent.Y + (y * 150) + 75,
+					RoomExtent.Z - (z * (EmitterHeight + Offset)) + EmitterHeight / 2 // Центрирование по Z в своем слое
+				);
+
+				UParticleSystemComponent* NewEmitter = NewObject<UParticleSystemComponent>(this);
+				NewEmitter->AttachToComponent(RoomMarker.RoomBounds, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+				NewEmitter->RegisterComponent();
+
+				NewEmitter->SetRelativeLocation(EmitterLocation);
+
+				UParticleSystem* ParticleSystemAsset = LoadObject<UParticleSystem>(nullptr, TEXT("/Plugin/FireSimulation/Fog_PS"));
+				if (ParticleSystemAsset)
+				{
+					NewEmitter->SetTemplate(ParticleSystemAsset);
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Не удалось загрузить систему частиц."));
+				}
+
+				NewEmitter->Activate();
+				UpdateFogVisibility(visibility);
+				RoomMarker.FogEmitters.Add(NewEmitter);
+			}
+		}
+	}
+}
+
+void URoomNode::UpdateFogVisibility(float Visibility)
+{
+	// Значения параметров (примеры, требуется настройка)
+	float BaseExtinction = 0.1f;
+	float k = 5.0f; // Коэффициент влияния видимости (надо эмпирический потестить это)
+
+	Visibility = FMath::Max(Visibility, 1.0f); // Видимость не может быть меньше 1 метра (можно изменить если надо)
+
+	float NewExtinction = BaseExtinction + k * (1 / Visibility);
+
+	for (UParticleSystemComponent* Emitter :RoomMarker.FogEmitters)
+	{
+		if (Emitter)
+		{
+			Emitter->SetFloatParameter(FName("Extinction"), NewExtinction);
+		}
+	}
+}
+
 
 void UBuildingGraph::PrepareGraphToWork()
 {
