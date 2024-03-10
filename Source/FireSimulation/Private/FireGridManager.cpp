@@ -93,8 +93,8 @@ void AFireGridManager::PopulateGridWithActors(UWorld* World, AActor * GridActor)
     UBoxComponent* BoxComponent = GridActor->FindComponentByClass<UBoxComponent>();
     if (!BoxComponent) return;
 
-    FVector GridSize = BoxComponent->GetScaledBoxExtent() * 2; // Получаем полные размеры сетки
-    
+    FVector GridSize = BoxComponent->GetScaledBoxExtent() * 2; // Получаем полные размеры 
+    FVector CellSize(GridSize.X / ElementsAmount, GridSize.Y / ElementsAmount, GridSize.Z / ElementsAmount);
 
     // Очищаем и инициализируем сетку
     Grid.SetNum(ElementsAmount);
