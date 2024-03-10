@@ -62,14 +62,14 @@ FCalculatedParameters URoomNode::InitializeCalculatedParams()
 
 void URoomNode::SpawnFog(float visibility)
 {
-	FVector RoomCenter = RoomMarker.RoomBounds->GetComponentLocation();
-	FVector RoomExtent = RoomMarker.RoomBounds->GetScaledBoxExtent();
+	FVector RoomCenter = RoomMarker->RoomBounds->GetComponentLocation();
+	FVector RoomExtent = RoomMarker->RoomBounds->GetScaledBoxExtent();
 
 	float EmitterHeight = 20.0f; // Высота между эмиттерами
 	float Offset = 30.0f;
 	int32 NumEmittersZ = FMath::FloorToInt((RoomExtent.Z * 2) / (EmitterHeight + Offset)); // Расчет количества эмиттеров по Z
-	int32 NumEmittersX = FMath::CeilToInt(RoomMarker.RoomBounds->GetScaledBoxExtent().X * 2 / 150);
-	int32 NumEmittersY = FMath::CeilToInt(RoomMarker.RoomBounds->GetScaledBoxExtent().Y * 2 / 150);
+	int32 NumEmittersX = FMath::CeilToInt(RoomMarker->RoomBounds->GetScaledBoxExtent().X * 2 / 150);
+	int32 NumEmittersY = FMath::CeilToInt(RoomMarker->RoomBounds->GetScaledBoxExtent().Y * 2 / 150);
 
 	for (int32 x = 0; x < NumEmittersX; ++x)
 	{
@@ -84,7 +84,7 @@ void URoomNode::SpawnFog(float visibility)
 				);
 
 				UParticleSystemComponent* NewEmitter = NewObject<UParticleSystemComponent>(this);
-				NewEmitter->AttachToComponent(RoomMarker.RoomBounds, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+				NewEmitter->AttachToComponent(RoomMarker->RoomBounds, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 				NewEmitter->RegisterComponent();
 
 				NewEmitter->SetRelativeLocation(EmitterLocation);
@@ -101,7 +101,7 @@ void URoomNode::SpawnFog(float visibility)
 
 				NewEmitter->Activate();
 				UpdateFogVisibility(visibility);
-				RoomMarker.FogEmitters.Add(NewEmitter);
+				RoomMarker->FogEmitters.Add(NewEmitter);
 			}
 		}
 	}
@@ -117,11 +117,22 @@ void URoomNode::UpdateFogVisibility(float Visibility)
 
 	float NewExtinction = BaseExtinction + k * (1 / Visibility);
 
-	for (UParticleSystemComponent* Emitter :RoomMarker.FogEmitters)
+	for (UParticleSystemComponent* Emitter :RoomMarker->FogEmitters)
 	{
 		if (Emitter)
 		{
 			Emitter->SetFloatParameter(FName("Extinction"), NewExtinction);
+		}
+	}
+}
+
+void URoomNode::RemoveFog()
+{
+	for (UParticleSystemComponent* Emitter : RoomMarker->FogEmitters)
+	{
+		if (Emitter)
+		{
+			Emitter->DestroyComponent();
 		}
 	}
 }
@@ -258,6 +269,16 @@ void UBuildingGraph::CalculateFireDynamicsForSecond(float Second, float TimeStep
 	{
 		FFireDynamicsParameters CurrentParams = CalculateFireDynamicsForRoom(Room.Value, Second);
 		Room.Value->UpdateFireDynamics(CurrentParams);
+		// Если в комнате есть дым надо проверить есть ли в ней Particle Sytem, если нет - создать, если да - обновить видимость
+		if (CurrentParams.Visibility != 30.0) {
+			if (Room.Value->RoomMarker->FogEmitters.Num() == 0) {
+				Room.Value->SpawnFog(CurrentParams.Visibility);
+			}
+			else {
+				Room.Value->UpdateFogVisibility(CurrentParams.Visibility);
+			}
+		}
+		
 	}
 }
 
@@ -396,5 +417,11 @@ void UBuildingGraph::UpdateGraphConnectionsAfterMergeToSourceRoom(int32 TargetRo
 	}
 
 	IncomingConnections.Remove(TargetRoomID);
+}
+
+void UBuildingGraph::ClearAllRooms() {
+	for (int i = 0; i < Rooms.Num(); i++) {
+		Rooms[i]->RemoveFog();
+	}
 }
 

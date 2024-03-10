@@ -109,7 +109,7 @@ public: // Тут нужно добавить ссылку на актор комнаты (RoomMarker)
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Room")
     float RoomVolume;                                                   // Объем помещения
 
-    ARoomMarker RoomMarker;
+    ARoomMarker* RoomMarker;
 
     URoomNode();
 
@@ -138,6 +138,10 @@ public: // Тут нужно добавить ссылку на актор комнаты (RoomMarker)
     // Обновляет видимость в метрах для тумана в комнате
     UFUNCTION(BlueprintCallable, Category = "Room")
     void UpdateFogVisibility(float visibility);
+
+    // Удаляет весь дым
+    UFUNCTION(BlueprintCallable, Category = "Room")
+    void RemoveFog();
 
 protected:
     float heat_of_combustion_;                               // Теплота сгорания.
@@ -214,6 +218,10 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Building Graph")
     void MergeToSourceRoom(int32 TargetRoomID);
+
+    // Убирает дым во всех комнатах
+    UFUNCTION(BlueprintCallable, Category = "Building Graph")
+    void ClearAllRooms();
 
 protected:
     UPROPERTY(VisibleAnywhere, Category = "Building Graph")

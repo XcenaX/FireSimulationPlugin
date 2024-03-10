@@ -32,14 +32,13 @@ public:
     void InitializeGraph(UWorld* World);
 
     void UpdateFog();
-    void SetVisibility(URoomNode room, float meters);
     void OnEndPIE(const bool bIsSimulating);
 
     UBuildingGraph* graph; 
 
 private:    
     float TimeAccumulator;
-    float TotalTime;
+    int32 TotalTime;
 
     // ����������� ��������� ��� ���������.
     static AFogManagerActor* Instance;

@@ -33,9 +33,9 @@ AFogManagerActor::AFogManagerActor(const FObjectInitializer& ObjectInitializer) 
 
 void AFogManagerActor::BeginPlay()
 {
-	Super::BeginPlay();
-
 	InitializeGraph(GetWorld());
+
+	Super::BeginPlay();
 
 	FEditorDelegates::EndPIE.AddUObject(this, &AFogManagerActor::OnEndPIE);
 }
@@ -68,6 +68,8 @@ void AFogManagerActor::InitializeGraph(UWorld* World)
 			Room->HeatAbsorptionCoefficient, Room->StartTemperature, Room->InitialGasDensity,
 			Room->Cp, Room->GetRoomVolume(), AverageMaterialData.LowestHeatOfCombustion_kJ_per_kg, AverageMaterialData.LinearFlameSpeed,
 			AverageMaterialData.BurningRate, AverageMaterialData.SmokeGeneration);
+
+		RoomNode->RoomMarker = Room;
 
 		graph->AddRoom(RoomNode);
 	}
@@ -105,7 +107,7 @@ void AFogManagerActor::Tick(float DeltaTime)
 	// ѕровер€ем, прошла ли секунда
 	if (TimeAccumulator >= 1.0f)
 	{
-		TotalTime += 1.0f;
+		TotalTime += 1;
 		UpdateFog();
 		TimeAccumulator -= 1.0f;
 	}
@@ -114,18 +116,10 @@ void AFogManagerActor::Tick(float DeltaTime)
 
 void AFogManagerActor::UpdateFog()
 {
-	// LOG something
-	// UE_LOG(LogTemp, Warning, TEXT("CheckList: %d; FireList: %d; NewList: %d"), CheckList.Num(), FireList.Num(), NewList.Num());
-	// graph->CalculateFireDynamicsForSecond(TotalTime);
-}
-
-
-void AFogManagerActor::SetVisibility(URoomNode room, float meters) // ћен€ет видимость в комнате
-{
-	// ” каждой комнаты должнна быть ссылка на ассет дыма. ƒл€ смены видимости в комнате надо как-то мен€ть этот ассет
+	graph->CalculateFireDynamicsForSecond(TotalTime);	
 }
 
 
 void AFogManagerActor::RestoreScene() { // ¬озвращает сцену к прежнему виду после завершени€ игры
-
+	graph->ClearAllRooms();
 }
