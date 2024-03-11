@@ -52,4 +52,8 @@ public:
     // offset расстояение между партиклами (по умолчанию = высоте партикла, тоесть 20)    
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Effects")
     TArray<UParticleSystemComponent*> FogEmitters;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Effects")
+    TArray<UMaterialInstanceDynamic*> DynamicMaterials;
+
 };

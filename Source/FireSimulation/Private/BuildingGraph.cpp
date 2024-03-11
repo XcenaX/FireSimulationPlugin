@@ -1,5 +1,7 @@
 #include "BuildingGraph.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "Materials/MaterialInstanceDynamic.h"
+
 
 URoomNode::URoomNode()
 	: RoomID(-1), IsGasSource(false), CombustionCompletenessCoefficient(0.0f),
@@ -111,7 +113,7 @@ void URoomNode::SpawnFog(float visibility)
 				FVector EmitterLocation(
 					RoomCenter.X - RoomExtent.X + (x * 150) + 75, // +75 чтобы центрировать в своей ячейке
 					RoomCenter.Y - RoomExtent.Y + (y * 150) + 75,
-					RoomExtent.Z - (z * (EmitterHeight + Offset)) + EmitterHeight / 2 // Центрирование по Z в своем слое
+					RoomCenter.Z - RoomExtent.Z + (z * (EmitterHeight + Offset)) + EmitterHeight / 2
 				);
 
 				FActorSpawnParameters SpawnParams;
@@ -133,6 +135,8 @@ void URoomNode::SpawnFog(float visibility)
 
 				UpdateFogVisibility(visibility);
 				RoomMarker->FogEmitters.Add(ParticleSystemComponent);
+				UMaterialInstanceDynamic* DynMaterial = ParticleSystemComponent->CreateDynamicMaterialInstance(0);				
+				RoomMarker->DynamicMaterials.Add(DynMaterial);
 			}
 		}
 	}
@@ -141,18 +145,18 @@ void URoomNode::SpawnFog(float visibility)
 void URoomNode::UpdateFogVisibility(float Visibility)
 {
 	// Значения параметров (примеры, требуется настройка)
-	float BaseExtinction = 0.1f;
-	float k = 5.0f; // Коэффициент влияния видимости (надо эмпирический потестить это)
+	float BaseExtinction = 0.01f;
+	float k = 1.0f; // Коэффициент влияния видимости (надо эмпирический потестить это)
 
 	Visibility = FMath::Max(Visibility, 1.0f); // Видимость не может быть меньше 1 метра (можно изменить если надо)
 
 	float NewExtinction = BaseExtinction + k * (1 / Visibility);
 
-	for (UParticleSystemComponent* Emitter : RoomMarker->FogEmitters)
+	for (UMaterialInstanceDynamic* Material : RoomMarker->DynamicMaterials)
 	{
-		if (Emitter)
+		if (Material)
 		{
-			Emitter->SetFloatParameter(FName("Extinction"), NewExtinction);
+			Material->SetScalarParameterValue(FName("Extincion"), NewExtinction);
 		}
 	}
 }
