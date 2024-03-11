@@ -12,8 +12,31 @@ URoomNode::URoomNode()
 void URoomNode::Initialize(int32 InRoomID = -1, bool InIsGasSource = false, float InCombustionCompletenessCoefficient = 0,
 	float InHeatAbsorptionCoefficient = 0, float InStartTemperature = 0, float InInitialGasDensity = 0,
 	float InCp = 0, float InRoomVolume = 0, float InHeatOfCombustion = 0, float InLinearFlameSpeedRate = 0,
+	float InSpecificFuelBurnRate = 0, float InSmokeFormingAbility = 0, UWorld* InWorld = nullptr)
+{
+	World = InWorld;
+	RoomID = InRoomID;
+	IsGasSource = InIsGasSource;
+	CombustionCompletenessCoefficient = InCombustionCompletenessCoefficient;
+	HeatAbsorptionCoefficient = InHeatAbsorptionCoefficient;
+	StartTemperature = InStartTemperature;
+	InitialGasDensity = InInitialGasDensity;
+	Cp = InCp;
+	RoomVolume = InRoomVolume;
+	heat_of_combustion_ = InHeatOfCombustion;
+	linear_flame_speed_rate_ = InLinearFlameSpeedRate;
+	specific_fuel_burn_rate_ = InSpecificFuelBurnRate;
+	smoke_forming_ability_ = InSmokeFormingAbility;
+
+	calculated_params_ = InitializeCalculatedParams();
+}
+
+void URoomNode::Initialize(int32 InRoomID = -1, bool InIsGasSource = false, float InCombustionCompletenessCoefficient = 0,
+	float InHeatAbsorptionCoefficient = 0, float InStartTemperature = 0, float InInitialGasDensity = 0,
+	float InCp = 0, float InRoomVolume = 0, float InHeatOfCombustion = 0, float InLinearFlameSpeedRate = 0,
 	float InSpecificFuelBurnRate = 0, float InSmokeFormingAbility = 0)
 {
+	World = nullptr;
 	RoomID = InRoomID;
 	IsGasSource = InIsGasSource;
 	CombustionCompletenessCoefficient = InCombustionCompletenessCoefficient;
@@ -69,6 +92,7 @@ void UGraphEdge::Initialize(int32 InRoomStartID = -1, int32 InRoomEndID = -1, fl
 
 void URoomNode::SpawnFog(float visibility)
 {
+	if (!World) return;
 	FVector RoomCenter = RoomMarker->RoomBounds->GetComponentLocation();
 	FVector RoomExtent = RoomMarker->RoomBounds->GetScaledBoxExtent();
 
@@ -90,25 +114,25 @@ void URoomNode::SpawnFog(float visibility)
 					RoomExtent.Z - (z * (EmitterHeight + Offset)) + EmitterHeight / 2 // Центрирование по Z в своем слое
 				);
 
-				UParticleSystemComponent* NewEmitter = NewObject<UParticleSystemComponent>(this);
-				NewEmitter->AttachToComponent(RoomMarker->RoomBounds, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-				NewEmitter->RegisterComponent();
+				FActorSpawnParameters SpawnParams;
+				FRotator Rotation(0);
+				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+				AActor* SpawnedActor = World->SpawnActor<AActor>(AActor::StaticClass(), EmitterLocation, Rotation, SpawnParams);
 
-				NewEmitter->SetRelativeLocation(EmitterLocation);
+				UParticleSystemComponent* ParticleSystemComponent = NewObject<UParticleSystemComponent>(SpawnedActor, UParticleSystemComponent::StaticClass());
+				UParticleSystem* ParticleSystemAsset = LoadObject<UParticleSystem>(nullptr, TEXT("/FireSimulation/Fog_PS"));
 
-				UParticleSystem* ParticleSystemAsset = LoadObject<UParticleSystem>(nullptr, TEXT("/Plugin/FireSimulation/Fog_PS"));
-				if (ParticleSystemAsset)
-				{
-					NewEmitter->SetTemplate(ParticleSystemAsset);
-				}
-				else
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Не удалось загрузить систему частиц."));
-				}
+				SpawnedActor->AddInstanceComponent(ParticleSystemComponent);
+				ParticleSystemComponent->SetTemplate(ParticleSystemAsset);
+				ParticleSystemComponent->RegisterComponent(); // Регистрация компонента 
+				ParticleSystemComponent->SetRelativeLocation(EmitterLocation);
 
-				NewEmitter->Activate();
+				ParticleSystemComponent->SetVisibility(true);
+				ParticleSystemComponent->Activate();
+				SpawnedActor->RegisterAllComponents();
+
 				UpdateFogVisibility(visibility);
-				RoomMarker->FogEmitters.Add(NewEmitter);
+				RoomMarker->FogEmitters.Add(ParticleSystemComponent);
 			}
 		}
 	}

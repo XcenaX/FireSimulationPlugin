@@ -77,12 +77,11 @@ void AFogManagerActor::InitializeGraph(UWorld* World)
 		URoomNode* RoomNode = NewObject<URoomNode>();
 
 		Room->RoomID = RoomCount;
-		UE_LOG(LogTemp, Warning, TEXT("Room %d: %s"), Room->RoomID, *Room->GetName());
-
+		
 		RoomNode->Initialize(RoomCount, Room->IsGasSource(), Room->CombustionCompletenessCoefficient,
 			Room->HeatAbsorptionCoefficient, Room->StartTemperature, Room->InitialGasDensity,
 			Room->Cp, Room->GetRoomVolume(), AverageMaterialData.LowestHeatOfCombustion_kJ_per_kg, AverageMaterialData.LinearFlameSpeed,
-			AverageMaterialData.BurningRate, AverageMaterialData.SmokeGeneration);
+			AverageMaterialData.BurningRate, AverageMaterialData.SmokeGeneration, GetWorld());
 
 		RoomNode->RoomMarker = Room;
 

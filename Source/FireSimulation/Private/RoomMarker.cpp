@@ -26,7 +26,7 @@ FMaterialData ARoomMarker::CalculateAverageMaterialData()
     FVector BoxCenter = RoomBounds->GetComponentLocation();
     FMaterialData AverageMaterialData;
     int ActorCount = 0;
-    UWorld* World = GEditor->GetEditorWorldContext().World();
+    UWorld* World = GetWorld();
 
 
     // »нициализируем средние значени€ нул€ми
@@ -80,12 +80,12 @@ float ARoomMarker::GetRoomVolume() { // ¬озвращает площадь комнаты
     {
         FVector BoxSize = RoomBounds->GetScaledBoxExtent();
 
-        float Length = BoxSize.X * 2;
-        float Width = BoxSize.Y * 2;
-        float Height = BoxSize.Z * 2;
+        float Length = BoxSize.X * 2 / 100;
+        float Width = BoxSize.Y * 2 / 100;
+        float Height = BoxSize.Z * 2 / 100;
 
         float SurfaceArea = 2 * (Length * Width + Width * Height + Height * Length);
-        return SurfaceArea / 100; // в метрах
+        return SurfaceArea;
     }
 
     return 0.0f;

@@ -111,9 +111,15 @@ public: // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ�
 
     ARoomMarker* RoomMarker;
 
+    UWorld* World;
+
     URoomNode();
 
-    UFUNCTION(BlueprintCallable, Category = "Room")
+    void Initialize(int32 InRoomID, bool InIsGasSource, float InCombustionCompletenessCoefficient,
+        float InHeatAbsorptionCoefficient, float InStartTemperature, float InInitialGasDensity,
+        float InCp, float InRoomVolume, float InHeatOfCombustion, float InLinearFlameSpeedRate,
+        float InSpecificFuelBurnRate, float InSmokeFormingAbility, UWorld* InWorld);
+
     void Initialize(int32 InRoomID, bool InIsGasSource, float InCombustionCompletenessCoefficient,
         float InHeatAbsorptionCoefficient, float InStartTemperature, float InInitialGasDensity,
         float InCp, float InRoomVolume, float InHeatOfCombustion, float InLinearFlameSpeedRate,
