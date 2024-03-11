@@ -250,7 +250,7 @@ public:
     const TMap<int32, URoomNode*>& GetRooms() const;
 
     UFUNCTION(BlueprintCallable, Category = "Building Graph")
-    void CalculateFireDynamicsForSecond(float TimeInSeconds, float TimeStep = 1.0f);
+    void CalculateFireDynamicsForSecond(int32 TimeInSeconds, float TimeStep = 1.0f);
 
     UFUNCTION(BlueprintCallable, Category = "Building Graph")
     bool MergeToSourceRoom(int32 TargetRoomID);

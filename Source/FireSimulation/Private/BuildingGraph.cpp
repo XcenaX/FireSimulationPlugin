@@ -153,9 +153,11 @@ void UBuildingGraph::PrepareGraphToWork()
 
 void UBuildingGraph::AddRoom(const URoomNode* Room)
 {
-	if (Room != nullptr && !Rooms.Contains(Room->RoomID))
+	if (Room)
 	{
-		Rooms.Add(Room->RoomID, const_cast<URoomNode*>(Room));
+		if (!Rooms.Contains(Room->RoomID)) {
+			Rooms.Add(Room->RoomID, const_cast<URoomNode*>(Room));
+		}
 	}
 	else
 	{
@@ -225,6 +227,7 @@ void UBuildingGraph::FindSourceRoomId()
 	else if (FoundSourceRooms.Num() == 1)
 	{
 		SourceRoomID = FoundSourceRooms[0];
+		UE_LOG(LogTemp, Warning, TEXT("Fire source found in room ID: %d"), SourceRoomID);
 	}
 	else {
 		UE_LOG(LogTemp, Warning, TEXT("No fire sources detected. There should be only one source of fire."));
@@ -289,7 +292,7 @@ FFireDynamicsParameters UBuildingGraph::CalculateFireDynamicsForRoom(URoomNode* 
 	return FireDynamicsParams;
 }
 
-void UBuildingGraph::CalculateFireDynamicsForSecond(float Second, float TimeStep)
+void UBuildingGraph::CalculateFireDynamicsForSecond(int32 Second, float TimeStep)
 {
 	if (SourceRoomID == -1)
 	{
@@ -301,6 +304,9 @@ void UBuildingGraph::CalculateFireDynamicsForSecond(float Second, float TimeStep
 	{
 		FFireDynamicsParameters CurrentParams = CalculateFireDynamicsForRoom(Room.Value, Second);
 		Room.Value->UpdateFireDynamics(CurrentParams);
+		
+		UE_LOG(LogTemp, Warning, TEXT("Second: %d; ROOM %d : visibility: %f; volume: %f; other: %f, %f, %f, %f"), Second, Room.Value->RoomID, (double)CurrentParams.Visibility, (double)Room.Value->RoomVolume, (double)CurrentParams.BurnedMass, (double)CurrentParams.GasDensity, (double)CurrentParams.GasTemperature, (double)CurrentParams.SmokeExtinctionCoefficient);
+
 		// Если в комнате есть дым надо проверить есть ли в ней Particle Sytem, если нет - создать, если да - обновить видимость
 		if (CurrentParams.Visibility != 30.0) {
 			if (Room.Value->RoomMarker->FogEmitters.Num() == 0) {

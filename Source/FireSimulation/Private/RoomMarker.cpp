@@ -85,7 +85,7 @@ float ARoomMarker::GetRoomVolume() { // ¬озвращает площадь комнаты
         float Height = BoxSize.Z * 2;
 
         float SurfaceArea = 2 * (Length * Width + Width * Height + Height * Length);
-        return SurfaceArea;
+        return SurfaceArea / 100; // в метрах
     }
 
     return 0.0f;
@@ -95,37 +95,30 @@ bool ARoomMarker::IsGasSource()
 {
     UWorld* World = GetWorld();
     if (!World) return false;
+    if (!RoomBounds) return false;
 
-    for (TActorIterator<ARoomMarker> It(World); It; ++It)
+    FVector RoomCenter = RoomBounds->GetComponentLocation();
+    FVector RoomSize = RoomBounds->GetScaledBoxExtent(); // –азмер границы в одну сторону от центра
+    FCollisionShape Box = FCollisionShape::MakeBox(RoomSize);
+
+    FCollisionQueryParams Params;
+    Params.bTraceComplex = true;
+    Params.bReturnPhysicalMaterial = false;
+
+    TArray<FHitResult> HitResults;
+    World->SweepMultiByChannel(HitResults, RoomCenter, RoomCenter, FQuat::Identity, ECC_WorldStatic, Box, Params);
+
+    for (const FHitResult& Hit : HitResults)
     {
-        ARoomMarker* Room = *It;
-        if (!Room || !Room->RoomBounds) continue;
-        
-        FVector RoomSize = Room->RoomBounds->GetScaledBoxExtent() * 2;
-        FVector RoomOrigin = Room->RoomBounds->GetComponentLocation() - RoomSize / 2;
-        FVector RoomCenter = RoomOrigin + RoomSize + RoomSize / 2;
-        FCollisionShape Box = FCollisionShape::MakeBox(RoomSize / 2);
-        
-        FCollisionQueryParams Params; 
-        Params.bTraceComplex = true;
-        Params.bReturnPhysicalMaterial = false;
+        AActor* HitActor = Hit.GetActor();
+        UE_LOG(LogTemp, Warning, TEXT("Room %d: %s"), RoomID, *HitActor->GetName());
 
-        TArray<FHitResult> HitResults;
-        World->SweepMultiByChannel(HitResults, RoomCenter, RoomCenter, FQuat::Identity, ECC_WorldStatic, Box, Params);
-
-        for (const FHitResult& Hit : HitResults)
+        UFireSimulationComponent* FireComp = HitActor ? HitActor->FindComponentByClass<UFireSimulationComponent>() : nullptr;
+        if (FireComp && FireComp->IsBurning)
         {
-            if (AActor* HitActor = Hit.GetActor())
-            {
-                if (HitActor->FindComponentByClass<UFireSimulationComponent>())
-                {
-
-                    if (HitActor->FindComponentByClass<UFireSimulationComponent>()->IsBurning) {
-                        return true;
-                    }
-                }
-            }
+            return true;
         }
     }
+    
     return false;
 }

@@ -64,15 +64,22 @@ void AFogManagerActor::InitializeGraph(UWorld* World)
 	for (TObjectIterator<UDoorComponent> It; It; ++It)
 	{
 		UDoorComponent* Door = *It;
-		Doors.Add(Door);
+		if (Door->GetWorld() == GetWorld() && IsValid(Door))
+		{
+			Doors.Add(Door);
+		}
 	}
 
+	int32 RoomCount = 1;
 	for (ARoomMarker* Room : Rooms) {
 		FMaterialData AverageMaterialData = Room->CalculateAverageMaterialData();
 
 		URoomNode* RoomNode = NewObject<URoomNode>();
 
-		RoomNode->Initialize(Room->RoomID, Room->IsGasSource(), Room->CombustionCompletenessCoefficient,
+		Room->RoomID = RoomCount;
+		UE_LOG(LogTemp, Warning, TEXT("Room %d: %s"), Room->RoomID, *Room->GetName());
+
+		RoomNode->Initialize(RoomCount, Room->IsGasSource(), Room->CombustionCompletenessCoefficient,
 			Room->HeatAbsorptionCoefficient, Room->StartTemperature, Room->InitialGasDensity,
 			Room->Cp, Room->GetRoomVolume(), AverageMaterialData.LowestHeatOfCombustion_kJ_per_kg, AverageMaterialData.LinearFlameSpeed,
 			AverageMaterialData.BurningRate, AverageMaterialData.SmokeGeneration);
@@ -80,6 +87,7 @@ void AFogManagerActor::InitializeGraph(UWorld* World)
 		RoomNode->RoomMarker = Room;
 
 		graph->AddRoom(RoomNode);
+		RoomCount++;
 	}
 
 	for (UDoorComponent* Door : Doors)
@@ -89,7 +97,11 @@ void AFogManagerActor::InitializeGraph(UWorld* World)
 			int32 StartRoomID = Door->ConnectedRoom1->RoomID;
 			int32 EndRoomID = Door->ConnectedRoom2->RoomID;
 
+			UE_LOG(LogTemp, Warning, TEXT("START_ROOM_ID: %d ; END_ROOM_ID: %d"), StartRoomID, EndRoomID);
+
 			EConnectionStatus ConnectionStatus = Door->bIsOpen ? EConnectionStatus::DoorOpen : EConnectionStatus::DoorClosed;
+
+			if (StartRoomID < 0 || EndRoomID < 0) continue;
 
 			graph->AddConnection(graph->GetRooms()[Door->ConnectedRoom1->RoomID], graph->GetRooms()[Door->ConnectedRoom2->RoomID], ConnectionStatus);
 		}
@@ -118,7 +130,7 @@ void AFogManagerActor::Tick(float DeltaTime)
 	// Проверяем, прошла ли секунда
 	if (TimeAccumulator >= 1.0f)
 	{
-		TotalTime += 1;
+		TotalTime++;
 		UpdateFog();
 		TimeAccumulator -= 1.0f;
 	}
@@ -127,7 +139,7 @@ void AFogManagerActor::Tick(float DeltaTime)
 
 void AFogManagerActor::UpdateFog()
 {
-	graph->CalculateFireDynamicsForSecond(TotalTime);	
+	graph->CalculateFireDynamicsForSecond(TotalTime, 1);
 }
 
 
