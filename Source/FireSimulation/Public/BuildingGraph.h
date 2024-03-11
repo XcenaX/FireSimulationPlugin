@@ -16,29 +16,29 @@ enum class EConnectionStatus : uint8
 USTRUCT(BlueprintType)
 struct FCalculatedParameters
 {
+public:
     GENERATED_BODY()
 
-public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Fire Dynamics")
-    float A; // �������������� ����� �������� ������
+    float A; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Fire Dynamics")
-    float N; // �������������� ����� �������� ������.
+    float N; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Fire Dynamics")
-    float GasReleasePerMeterBurn; // ����� ����, ������������� ��� �������� �� ������� �������.
+    float GasReleasePerMeterBurn; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Fire Dynamics")
-    float LimitGasDensity; // ������ ��������� ������� �����.
+    float LimitGasDensity; // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Fire Dynamics")
-    float LimitGasTemperature; // ������ ����������� ������� �����.
+    float LimitGasTemperature; // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Fire Dynamics")
-    float LimitSmokeExtinctionCoefficient; // ������ ������������ ��������� ����.
+    float LimitSmokeExtinctionCoefficient; // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ.
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Fire Dynamics")
-    float LimitVisibility; // ������ ��������� � �������� ������.
+    float LimitVisibility; // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.
 
     FCalculatedParameters()
         : A(0.f), N(0.f), GasReleasePerMeterBurn(0.f), LimitGasDensity(0.f),
@@ -50,64 +50,64 @@ public:
 USTRUCT(BlueprintType)
 struct FFireDynamicsParameters
 {
+public:
     GENERATED_BODY()
 
-public:
-    // ���������� ���������� �����
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Fire Dynamics")
     float BurnedMass;
 
-    // ��������� ������� ����� � ���������
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Fire Dynamics")
     float GasDensity;
 
-    // ����������� ������� ����� � ���������
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Fire Dynamics")
     float GasTemperature;
 
-    // ����������� ��������� ����
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Fire Dynamics")
     float SmokeExtinctionCoefficient;
 
-    // ��������� � ���������
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Fire Dynamics")
     float Visibility;
 
-    // ����������� �� ��������� ��� ������������� ��������
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     FFireDynamicsParameters()
         : BurnedMass(0.f), GasDensity(0.f), GasTemperature(0.f),
         SmokeExtinctionCoefficient(0.f), Visibility(0.f) {}
 };
 
 UCLASS(BlueprintType)
-class URoomNode : public UObject
+class FIRESIMULATION_API URoomNode : public UObject
 {
+public: // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (RoomMarker)
     GENERATED_BODY()
 
-public: // ��� ����� �������� ������ �� ����� ������� (RoomMarker)
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Room")
     int32 RoomID;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Room")
-    bool IsGasSource;                                                   // ����������� ������� ��������
+    bool IsGasSource;                                                   // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Room")
-    float CombustionCompletenessCoefficient;                            // ����������� ������� ��������
+    float CombustionCompletenessCoefficient;                            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Room")
-    float HeatAbsorptionCoefficient;                                    // ����������� ���������������
+    float HeatAbsorptionCoefficient;                                    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Room")
-    float StartTemperature;                                             // ��������� �����������
+    float StartTemperature;                                             // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Room")
-    float InitialGasDensity;                                            // ��������� ��������� ������� ����� � ���������
+    float InitialGasDensity;                                            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Room")
-    float Cp;                                                           // �������� ������������ ��� ���������� ��������
+    float Cp;                                                           // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Room")
-    float RoomVolume;                                                   // ����� ���������
+    float RoomVolume;                                                   // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
     ARoomMarker* RoomMarker;
 
@@ -131,54 +131,60 @@ public: // ��� ����� �������� ������ �� ����� ������� (RoomMarker)
     UFUNCTION(BlueprintCallable, Category = "Room")
     FCalculatedParameters InitializeCalculatedParams();
 
-    // ������� � ������� ����� � �������� ��������� ���������� � ������
+    // Спавнит в комнате туман с заданной начальной видимостью в метрах
     UFUNCTION(BlueprintCallable, Category = "Room")
     void SpawnFog(float visibility);
 
-    // ��������� ��������� � ������ ��� ������ � �������
+    // Обновляет видимость в метрах для тумана в комнате
     UFUNCTION(BlueprintCallable, Category = "Room")
     void UpdateFogVisibility(float visibility);
 
-    // ������� ���� ���
+    // Удаляет весь дым
     UFUNCTION(BlueprintCallable, Category = "Room")
     void RemoveFog();
 
 protected:
-    float heat_of_combustion_;                               // ������� ��������.
-    float linear_flame_speed_rate_;                          // �������� �������� ��������������� ������.
-    float specific_fuel_burn_rate_;                          // �������� �������� ��������� ������� ��������.
+    float heat_of_combustion_;                               // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+    float linear_flame_speed_rate_;                          // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.
+    float specific_fuel_burn_rate_;                          // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
     float smoke_forming_ability_;
-    FCalculatedParameters calculated_params_;                // ������������ ���������, ���������� �� ��������� ����������.
-    FFireDynamicsParameters fire_dynamics_;          // ������� ��������� ������������ ���������� ������.
+    FCalculatedParameters calculated_params_;                // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+    FFireDynamicsParameters fire_dynamics_;          // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.
 };
 
-USTRUCT(BlueprintType)
-struct FGraphEdge
+UCLASS(BlueprintType)
+class UGraphEdge : public UObject
 {
     GENERATED_BODY()
 
-public: // ��� ����� �������� ������ �� ����� ���������� ����� (DoorComponent)
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Door")
+public: // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ (DoorComponent)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="GraphEdge")
     int32 RoomStartID;
     
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Door")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="GraphEdge")
     int32 RoomEndID;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Door")
-    EConnectionStatus ConnectionStatus;
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GraphEdge")
+    float ConnectionStrength;
 
-    FGraphEdge() : RoomStartID(-1), RoomEndID(-1), ConnectionStatus(EConnectionStatus::DoorClosed) {}
+    UGraphEdge() : RoomStartID(-1), RoomEndID(-1), ConnectionStrength(-1) {}
 
-    float GetConnectionStrength() const
+    void Initialize(int32 InRoomStartID, int32 InRoomEndID, float InConnectionStrength);
+
+    UFUNCTION(BlueprintCallable, Category = "GraphEdge")
+    float SetConnectionStrengthFromStatus(EConnectionStatus ConnectionStatus)
     {
         switch (ConnectionStatus)
         {
             case EConnectionStatus::DoorClosed:
-                return 0.8f;
+                ConnectionStrength = 0.15f;
+                return 0.15f;
             case EConnectionStatus::DoorOpen:
-                return 0.6f;
+                ConnectionStrength = 0.3f;
+                return 0.3f;
             case EConnectionStatus::NoDoor:
-                return 0.4f;
+                ConnectionStrength = 0;
+                return 0;
             default:
                 return 0;
         }
@@ -186,21 +192,51 @@ public: // ��� ����� �������� ������ �� ����� ���������� ����� (DoorComponent)
 };
 
 USTRUCT(BlueprintType)
-struct FGraphEdgeArray
+struct FGraphEdgePtr
+{
+    GENERATED_BODY()
+    
+    UGraphEdge* Edge;
+
+    operator UGraphEdge*() const { return Edge; }
+};
+
+FORCEINLINE uint32 GetTypeHash(const UGraphEdge& Edge)
+{
+    return HashCombine(::GetTypeHash(Edge.RoomStartID), ::GetTypeHash(Edge.RoomEndID));
+}
+
+FORCEINLINE bool operator==(const UGraphEdge& A, const UGraphEdge& B)
+{
+    return A.RoomStartID == B.RoomStartID && A.RoomEndID == B.RoomEndID;
+}
+
+FORCEINLINE bool operator==(const FGraphEdgePtr& A, const FGraphEdgePtr& B)
+{
+    return *A.Edge == *B.Edge;
+}
+
+FORCEINLINE uint32 GetTypeHash(const FGraphEdgePtr& A)
+{
+    return ::GetTypeHash(*A.Edge);
+}
+
+USTRUCT(BlueprintType)
+struct FGraphEdgeSet
 {
     GENERATED_BODY()
 
 public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Building Graph")
-    TArray<FGraphEdge> Edges;
+    TSet<FGraphEdgePtr> Edges;
 };
 
-UCLASS()
-class UBuildingGraph : public UObject
+UCLASS(BlueprintType)
+class FIRESIMULATION_API UBuildingGraph : public UObject
 {
+public:
     GENERATED_BODY()
 
-public:
     UFUNCTION(BlueprintCallable, Category="Building Graph")
     void PrepareGraphToWork();
 
@@ -217,9 +253,9 @@ public:
     void CalculateFireDynamicsForSecond(float TimeInSeconds, float TimeStep = 1.0f);
 
     UFUNCTION(BlueprintCallable, Category = "Building Graph")
-    void MergeToSourceRoom(int32 TargetRoomID);
+    bool MergeToSourceRoom(int32 TargetRoomID);
 
-    // ������� ��� �� ���� ��������
+    // Убирает дым во всех комнатах
     UFUNCTION(BlueprintCallable, Category = "Building Graph")
     void ClearAllRooms();
 
@@ -228,25 +264,22 @@ protected:
     TMap<int32, URoomNode*> Rooms;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Building Graph")
-    TMap<int32, FGraphEdgeArray> OutgoingConnections;
+    TMap<int32, FGraphEdgeSet> OutgoingConnections;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Building Graph")
-    TMap<int32, FGraphEdgeArray> IncomingConnections;
+    TMap<int32, FGraphEdgeSet> IncomingConnections;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Building Graph")
     int32 SourceRoomID;
 
     UFUNCTION(BlueprintCallable, Category = "Building Graph")
-    int32 FindSourceRoomId();
+    void FindSourceRoomId();
 
     UFUNCTION(BlueprintCallable, Category = "Building Graph")
     FFireDynamicsParameters CalculateFireDynamicsForRoom(URoomNode* Room, float CurrentTime);
 
     UFUNCTION(BlueprintCallable, Category = "Building Graph")
-    void TopologicalSortUtil(int32 RoomID, TMap<int32, bool>& Visited, TArray<int32>& Stack);
-
-    UFUNCTION(BlueprintCallable, Category = "Building Graph")
-    void TopologicalSort();
+    bool TopologicalSort();
 
     UFUNCTION(BlueprintCallable, Category = "Building Graph")
     void UpdateGraphConnectionsAfterMergeToSourceRoom(int32 TargetRoomID);

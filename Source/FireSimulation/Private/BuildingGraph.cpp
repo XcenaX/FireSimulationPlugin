@@ -9,10 +9,10 @@ URoomNode::URoomNode()
 {
 }
 
-void URoomNode::Initialize(int32 InRoomID, bool InIsGasSource, float InCombustionCompletenessCoefficient,
-	float InHeatAbsorptionCoefficient, float InStartTemperature, float InInitialGasDensity,
-	float InCp, float InRoomVolume, float InHeatOfCombustion, float InLinearFlameSpeedRate,
-	float InSpecificFuelBurnRate, float InSmokeFormingAbility)
+void URoomNode::Initialize(int32 InRoomID = -1, bool InIsGasSource = false, float InCombustionCompletenessCoefficient = 0,
+	float InHeatAbsorptionCoefficient = 0, float InStartTemperature = 0, float InInitialGasDensity = 0,
+	float InCp = 0, float InRoomVolume = 0, float InHeatOfCombustion = 0, float InLinearFlameSpeedRate = 0,
+	float InSpecificFuelBurnRate = 0, float InSmokeFormingAbility = 0)
 {
 	RoomID = InRoomID;
 	IsGasSource = InIsGasSource;
@@ -60,14 +60,21 @@ FCalculatedParameters URoomNode::InitializeCalculatedParams()
 	return Params;
 }
 
+void UGraphEdge::Initialize(int32 InRoomStartID = -1, int32 InRoomEndID = -1, float InConnectionStrength = -1)
+{
+	RoomStartID = InRoomStartID;
+	RoomEndID = InRoomEndID;
+	ConnectionStrength = InConnectionStrength;
+}
+
 void URoomNode::SpawnFog(float visibility)
 {
 	FVector RoomCenter = RoomMarker->RoomBounds->GetComponentLocation();
 	FVector RoomExtent = RoomMarker->RoomBounds->GetScaledBoxExtent();
 
-	float EmitterHeight = 20.0f; // Высота между эмиттерами
+	float EmitterHeight = 20.0f; // Р’С‹СЃРѕС‚Р° РјРµР¶РґСѓ СЌРјРёС‚С‚РµСЂР°РјРё
 	float Offset = 30.0f;
-	int32 NumEmittersZ = FMath::FloorToInt((RoomExtent.Z * 2) / (EmitterHeight + Offset)); // Расчет количества эмиттеров по Z
+	int32 NumEmittersZ = FMath::FloorToInt((RoomExtent.Z * 2) / (EmitterHeight + Offset)); // Р Р°СЃС‡РµС‚ РєРѕР»РёС‡РµСЃС‚РІР° СЌРјРёС‚С‚РµСЂРѕРІ РїРѕ Z
 	int32 NumEmittersX = FMath::CeilToInt(RoomMarker->RoomBounds->GetScaledBoxExtent().X * 2 / 150);
 	int32 NumEmittersY = FMath::CeilToInt(RoomMarker->RoomBounds->GetScaledBoxExtent().Y * 2 / 150);
 
@@ -78,9 +85,9 @@ void URoomNode::SpawnFog(float visibility)
 			for (int32 z = 0; z < NumEmittersZ; ++z)
 			{
 				FVector EmitterLocation(
-					RoomCenter.X - RoomExtent.X + (x * 150) + 75, // +75 чтобы центрировать в своей ячейке
+					RoomCenter.X - RoomExtent.X + (x * 150) + 75, // +75 С‡С‚РѕР±С‹ С†РµРЅС‚СЂРёСЂРѕРІР°С‚СЊ РІ СЃРІРѕРµР№ СЏС‡РµР№РєРµ
 					RoomCenter.Y - RoomExtent.Y + (y * 150) + 75,
-					RoomExtent.Z - (z * (EmitterHeight + Offset)) + EmitterHeight / 2 // Центрирование по Z в своем слое
+					RoomExtent.Z - (z * (EmitterHeight + Offset)) + EmitterHeight / 2 // Р¦РµРЅС‚СЂРёСЂРѕРІР°РЅРёРµ РїРѕ Z РІ СЃРІРѕРµРј СЃР»РѕРµ
 				);
 
 				UParticleSystemComponent* NewEmitter = NewObject<UParticleSystemComponent>(this);
@@ -96,7 +103,7 @@ void URoomNode::SpawnFog(float visibility)
 				}
 				else
 				{
-					UE_LOG(LogTemp, Warning, TEXT("Не удалось загрузить систему частиц."));
+					UE_LOG(LogTemp, Warning, TEXT("РќРµ СѓРґР°Р»РѕСЃСЊ Р·Р°РіСЂСѓР·РёС‚СЊ СЃРёСЃС‚РµРјСѓ С‡Р°СЃС‚РёС†."));
 				}
 
 				NewEmitter->Activate();
@@ -109,15 +116,15 @@ void URoomNode::SpawnFog(float visibility)
 
 void URoomNode::UpdateFogVisibility(float Visibility)
 {
-	// Значения параметров (примеры, требуется настройка)
+	// Р—РЅР°С‡РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ (РїСЂРёРјРµСЂС‹, С‚СЂРµР±СѓРµС‚СЃСЏ РЅР°СЃС‚СЂРѕР№РєР°)
 	float BaseExtinction = 0.1f;
-	float k = 5.0f; // Коэффициент влияния видимости (надо эмпирический потестить это)
+	float k = 5.0f; // РљРѕСЌС„С„РёС†РёРµРЅС‚ РІР»РёСЏРЅРёСЏ РІРёРґРёРјРѕСЃС‚Рё (РЅР°РґРѕ СЌРјРїРёСЂРёС‡РµСЃРєРёР№ РїРѕС‚РµСЃС‚РёС‚СЊ СЌС‚Рѕ)
 
-	Visibility = FMath::Max(Visibility, 1.0f); // Видимость не может быть меньше 1 метра (можно изменить если надо)
+	Visibility = FMath::Max(Visibility, 1.0f); // Р’РёРґРёРјРѕСЃС‚СЊ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РјРµРЅСЊС€Рµ 1 РјРµС‚СЂР° (РјРѕР¶РЅРѕ РёР·РјРµРЅРёС‚СЊ РµСЃР»Рё РЅР°РґРѕ)
 
 	float NewExtinction = BaseExtinction + k * (1 / Visibility);
 
-	for (UParticleSystemComponent* Emitter :RoomMarker->FogEmitters)
+	for (UParticleSystemComponent* Emitter : RoomMarker->FogEmitters)
 	{
 		if (Emitter)
 		{
@@ -173,13 +180,21 @@ void UBuildingGraph::AddConnection(const URoomNode* StartRoom, const URoomNode* 
 		return;
 	}
 
-	FGraphEdge NewEdge;
-	NewEdge.RoomStartID = StartRoomID;
-	NewEdge.RoomEndID = EndRoomID;
-	NewEdge.ConnectionStatus = ConnectionStatus;
+	UGraphEdge* NewEdge = NewObject<UGraphEdge>();
+	if (!NewEdge)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to create a new UGraphEdge instance."));
+		return;
+	}
+	NewEdge->RoomStartID = StartRoomID;
+	NewEdge->RoomEndID = EndRoomID;
+	NewEdge->SetConnectionStrengthFromStatus(ConnectionStatus);
 
-	OutgoingConnections.FindOrAdd(StartRoomID).Edges.Add(NewEdge);
-	IncomingConnections.FindOrAdd(EndRoomID).Edges.Add(NewEdge);
+	FGraphEdgePtr NewEdgePtr;
+	NewEdgePtr.Edge = NewEdge;
+
+	OutgoingConnections.FindOrAdd(StartRoomID).Edges.Add(NewEdgePtr);
+	IncomingConnections.FindOrAdd(EndRoomID).Edges.Add(NewEdgePtr);
 }
 
 const TMap<int32, URoomNode*>& UBuildingGraph::GetRooms() const
@@ -187,17 +202,34 @@ const TMap<int32, URoomNode*>& UBuildingGraph::GetRooms() const
 	return Rooms;
 }
 
-int32 UBuildingGraph::FindSourceRoomId()
+void UBuildingGraph::FindSourceRoomId()
 {
+	TArray<int32> FoundSourceRooms;
 	for (const auto& RoomPair : Rooms)
 	{
 		if (RoomPair.Value->IsGasSource)
 		{
-			SourceRoomID = RoomPair.Key;
-			return RoomPair.Key;
+			FoundSourceRooms.Add(RoomPair.Key);
 		}
 	}
-	return -1;
+
+	if (FoundSourceRooms.Num() > 1)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Multiple fire sources detected. There should be only one source of fire."));
+		for (int32 RoomId : FoundSourceRooms)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Fire source found in room ID: %d"), RoomId);
+		}
+		SourceRoomID = -1;
+	}
+	else if (FoundSourceRooms.Num() == 1)
+	{
+		SourceRoomID = FoundSourceRooms[0];
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("No fire sources detected. There should be only one source of fire."));
+		SourceRoomID = -1;
+	}
 }
 
 FFireDynamicsParameters UBuildingGraph::CalculateFireDynamicsForRoom(URoomNode* Room, float CurrentTime)
@@ -229,12 +261,12 @@ FFireDynamicsParameters UBuildingGraph::CalculateFireDynamicsForRoom(URoomNode* 
 		FireDynamicsParams.SmokeExtinctionCoefficient = 0;
 		FireDynamicsParams.Visibility = 0;
 
-		for (const auto& Connection : IncomingConnections[Room->RoomID].Edges)
+		for (const UGraphEdge* Connection : IncomingConnections[Room->RoomID].Edges)
 		{
-			int32 adjacentRoomId = Connection.RoomStartID;
+			int32 adjacentRoomId = Connection->RoomStartID;
 			URoomNode* AdjacentRoom = Rooms[adjacentRoomId];
 			FFireDynamicsParameters AdjacentRoomFireDynamicsParams = AdjacentRoom->GetFireDynamics();
-			float ConnectionStrength = Connection.GetConnectionStrength();
+			float ConnectionStrength = Connection->ConnectionStrength;
 
 			Count++;
 			FireDynamicsParams.BurnedMass += AdjacentRoomFireDynamicsParams.BurnedMass;
@@ -269,154 +301,242 @@ void UBuildingGraph::CalculateFireDynamicsForSecond(float Second, float TimeStep
 	{
 		FFireDynamicsParameters CurrentParams = CalculateFireDynamicsForRoom(Room.Value, Second);
 		Room.Value->UpdateFireDynamics(CurrentParams);
-		// Если в комнате есть дым надо проверить есть ли в ней Particle Sytem, если нет - создать, если да - обновить видимость
+		// Р•СЃР»Рё РІ РєРѕРјРЅР°С‚Рµ РµСЃС‚СЊ РґС‹Рј РЅР°РґРѕ РїСЂРѕРІРµСЂРёС‚СЊ РµСЃС‚СЊ Р»Рё РІ РЅРµР№ Particle Sytem, РµСЃР»Рё РЅРµС‚ - СЃРѕР·РґР°С‚СЊ, РµСЃР»Рё РґР° - РѕР±РЅРѕРІРёС‚СЊ РІРёРґРёРјРѕСЃС‚СЊ
 		if (CurrentParams.Visibility != 30.0) {
 			if (Room.Value->RoomMarker->FogEmitters.Num() == 0) {
 				Room.Value->SpawnFog(CurrentParams.Visibility);
 			}
-			else {
-				Room.Value->UpdateFogVisibility(CurrentParams.Visibility);
-			}
 		}
-		
 	}
 }
 
-void UBuildingGraph::TopologicalSortUtil(int32 RoomID, TMap<int32, bool>& Visited, TArray<int32>& Stack)
+bool UBuildingGraph::TopologicalSort()
 {
-	Visited[RoomID] = true;
-
-	if (OutgoingConnections.Contains(RoomID))
-	{
-		for (auto& Edge : OutgoingConnections[RoomID].Edges)
-		{
-			int32 NextRoomID = Edge.RoomEndID;
-			if (!Visited[NextRoomID])
-			{
-				TopologicalSortUtil(NextRoomID, Visited, Stack);
-			}
-		}
-	}
-
-	Stack.Push(RoomID);
-}
-
-void UBuildingGraph::TopologicalSort()
-{
-	TMap<int32, bool> Visited;
-	TArray<int32> Stack;
+	TMap<int32, int32> InDegrees;
+	TQueue<int32> ZeroInDegreeNodes;
 	TArray<int32> SortedRoomIDs;
 
-	for (auto& RoomPair : Rooms)
-	{
-		Visited.Add(RoomPair.Key, false);
+	for (auto& RoomPair : Rooms) {
+		InDegrees.Add(RoomPair.Key, 0);
 	}
-
-	for (auto& RoomPair : Rooms)
-	{
-		if (!Visited[RoomPair.Key])
-		{
-			TopologicalSortUtil(RoomPair.Key, Visited, Stack);
+	for (auto& ConnectionSet : OutgoingConnections) {
+		for (UGraphEdge* Edge : ConnectionSet.Value.Edges) {
+			InDegrees[Edge->RoomEndID]++;
 		}
 	}
 
-	while (Stack.Num() > 0)
-	{
-		SortedRoomIDs.Push(Stack.Pop());
+	for (auto& DegreePair : InDegrees) {
+		if (DegreePair.Value == 0) {
+			ZeroInDegreeNodes.Enqueue(DegreePair.Key);
+		}
+	}
+
+	while (!ZeroInDegreeNodes.IsEmpty()) {
+		int32 CurrentNode;
+		ZeroInDegreeNodes.Dequeue(CurrentNode);
+		SortedRoomIDs.Add(CurrentNode);
+
+		if (OutgoingConnections.Contains(CurrentNode)) {
+			for (UGraphEdge* Edge : OutgoingConnections[CurrentNode].Edges) {
+				InDegrees[Edge->RoomEndID]--;
+				if (InDegrees[Edge->RoomEndID] == 0) {
+					ZeroInDegreeNodes.Enqueue(Edge->RoomEndID);
+				}
+			}
+		}
+	}
+
+	if (SortedRoomIDs.Num() != Rooms.Num()) {
+		return false;
 	}
 
 	TMap<int32, URoomNode*> NewSortedRooms;
-	for (int32 RoomID : SortedRoomIDs)
-	{
+	for (int32 RoomID : SortedRoomIDs) {
 		NewSortedRooms.Add(RoomID, Rooms[RoomID]);
 	}
 	Rooms = NewSortedRooms;
+
+	return true;
 }
 
-void UBuildingGraph::MergeToSourceRoom(int32 TargetRoomID)
+bool UBuildingGraph::MergeToSourceRoom(int32 TargetRoomID)
 {
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	if (!Rooms.Contains(SourceRoomID) || !Rooms.Contains(TargetRoomID))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("One of the rooms does not exist or the same room."));
-		return;
+		UE_LOG(LogTemp, Warning, TEXT("One of the rooms does not exist."));
+		return false;
 	}
 
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ
 	if (SourceRoomID == TargetRoomID)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Attempting to merge the same room."));
-		return;
+		return false;
+	}
+
+	bool directConnectionExists = false;
+	if (OutgoingConnections.Contains(SourceRoomID))
+	{
+		for (const UGraphEdge* Edge : OutgoingConnections[SourceRoomID].Edges)
+		{
+			if (Edge->RoomEndID == TargetRoomID)
+			{
+				directConnectionExists = true;
+				break;
+			}
+		}
+	}
+	if (!directConnectionExists)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No direct connection from fire source to target room."));
+		return false;
 	}
 
 	URoomNode* SourceRoom = Rooms[SourceRoomID];
 	URoomNode* TargetRoom = Rooms[TargetRoomID];
 
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	float TotalVolume = SourceRoom->RoomVolume + TargetRoom->RoomVolume;
 	if (TotalVolume > 0)
 	{
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		SourceRoom->InitialGasDensity = (SourceRoom->InitialGasDensity * SourceRoom->RoomVolume + TargetRoom->InitialGasDensity * TargetRoom->RoomVolume) / TotalVolume;
 		SourceRoom->StartTemperature = (SourceRoom->StartTemperature * SourceRoom->RoomVolume + TargetRoom->StartTemperature * TargetRoom->RoomVolume) / TotalVolume;
-		SourceRoom->CombustionCompletenessCoefficient = (SourceRoom->CombustionCompletenessCoefficient * SourceRoom->RoomVolume + TargetRoom->CombustionCompletenessCoefficient * TargetRoom->RoomVolume) / TotalVolume;
-		SourceRoom->HeatAbsorptionCoefficient = (SourceRoom->HeatAbsorptionCoefficient * SourceRoom->RoomVolume + TargetRoom->HeatAbsorptionCoefficient * TargetRoom->RoomVolume) / TotalVolume;
-		SourceRoom->Cp = (SourceRoom->Cp * SourceRoom->RoomVolume + TargetRoom->Cp * TargetRoom->RoomVolume) / TotalVolume;
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 		SourceRoom->RoomVolume = TotalVolume;
 	}
 
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	SourceRoom->UpdateFireDynamics(TargetRoom->GetFireDynamics());
-
 	Rooms.Remove(TargetRoomID);
 
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	UpdateGraphConnectionsAfterMergeToSourceRoom(TargetRoomID);
 
 	UE_LOG(LogTemp, Log, TEXT("Rooms merged: SourceRoomID: %d, TargetRoomID: %d"), SourceRoomID, TargetRoomID);
+
+	return true; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 }
+
+struct FEdgeKey
+{
+	int32 StartID;
+	int32 EndID;
+
+	FEdgeKey(int32 InStartID, int32 InEndID) : StartID(InStartID), EndID(InEndID) {}
+
+	bool operator==(const FEdgeKey& Other) const
+	{
+		return StartID == Other.StartID && EndID == Other.EndID;
+	}
+
+	friend uint32 GetTypeHash(const FEdgeKey& Key)
+	{
+		return HashCombine(::GetTypeHash(Key.StartID), ::GetTypeHash(Key.EndID));
+	}
+};
 
 void UBuildingGraph::UpdateGraphConnectionsAfterMergeToSourceRoom(int32 TargetRoomID)
 {
-	if (OutgoingConnections.Contains(TargetRoomID))
-	{
-		for (auto& Edge : OutgoingConnections[TargetRoomID].Edges)
-		{
-			if (Edge.RoomEndID != SourceRoomID)
-			{
-				AddConnection(Rooms[SourceRoomID], Rooms[Edge.RoomEndID], Edge.ConnectionStatus);
+	if (OutgoingConnections.Contains(SourceRoomID)) {
+		for (auto It = OutgoingConnections[SourceRoomID].Edges.CreateIterator(); It; ++It) {
+			if ((*It).Edge->RoomEndID == TargetRoomID) {
+				It.RemoveCurrent();
+				break;
+			}
+		}
+	}
+
+	if (IncomingConnections.Contains(TargetRoomID)) {
+		for (auto It = IncomingConnections[TargetRoomID].Edges.CreateIterator(); It; ++It) {
+			if ((*It).Edge->RoomStartID == SourceRoomID) {
+				It.RemoveCurrent();
+				break;
+			}
+		}
+	}
+
+	TMap<FEdgeKey, TArray<float>> EdgeStrengths;
+
+	if (OutgoingConnections.Contains(TargetRoomID)) {
+		FGraphEdgeSet& TargetEdges = OutgoingConnections[TargetRoomID];
+		for (UGraphEdge* Edge : TargetEdges.Edges) {
+			UGraphEdge* NewEdge = DuplicateObject(Edge, this);
+			NewEdge->RoomStartID = SourceRoomID;
+
+			FEdgeKey Key(SourceRoomID, NewEdge->RoomEndID);
+			EdgeStrengths.FindOrAdd(Key).Add(NewEdge->ConnectionStrength);
+
+			FGraphEdgePtr NewEdgePtr;
+			NewEdgePtr.Edge = NewEdge;
+
+			OutgoingConnections[SourceRoomID].Edges.Add(NewEdgePtr);
+			IncomingConnections[Edge->RoomEndID].Edges.Add(NewEdgePtr);
+
+			if (IncomingConnections.Contains(Edge->RoomEndID)) {
+				for (auto It = IncomingConnections[Edge->RoomEndID].Edges.CreateIterator(); It; ++It) {
+					if ((*It).Edge->RoomStartID == TargetRoomID) {
+						(*It).Edge->RoomStartID = SourceRoomID;
+					}
+				}
 			}
 		}
 		OutgoingConnections.Remove(TargetRoomID);
 	}
 
-	for (auto& Pair : IncomingConnections)
-	{
-		TArray<FGraphEdge>& Edges = Pair.Value.Edges;
-		for (int32 i = Edges.Num() - 1; i >= 0; --i)
-		{
-			if (Edges[i].RoomEndID == TargetRoomID)
-			{
-				if (Edges[i].RoomStartID == SourceRoomID)
-				{
-					Edges.RemoveAt(i);
-				}
-				else
-				{
-					Edges[i].RoomEndID = SourceRoomID;
-				}
+	if (IncomingConnections.Contains(TargetRoomID)) {
+		FGraphEdgeSet& TargetIncomingEdges = IncomingConnections[TargetRoomID];
+		for (UGraphEdge* Edge : TargetIncomingEdges.Edges) {
+			UGraphEdge* NewEdge = DuplicateObject(Edge, this);
+			NewEdge->RoomEndID = SourceRoomID;
+
+			FEdgeKey Key(Edge->RoomStartID, SourceRoomID);
+			EdgeStrengths.FindOrAdd(Key).Add(NewEdge->ConnectionStrength);
+
+			if (OutgoingConnections.Contains(Edge->RoomStartID)) {
+				FGraphEdgeSet& StartNodeOutgoing = OutgoingConnections[Edge->RoomStartID];
+				FGraphEdgePtr EdgePtr;
+				EdgePtr.Edge = Edge;
+				StartNodeOutgoing.Edges.Remove(EdgePtr);
 			}
+
+			FGraphEdgePtr NewEdgePtr;
+			NewEdgePtr.Edge = NewEdge;
+
+			OutgoingConnections[Edge->RoomStartID].Edges.Add(NewEdgePtr);
+
+			IncomingConnections[SourceRoomID].Edges.Add(NewEdgePtr);
 		}
+		IncomingConnections.Remove(TargetRoomID);
 	}
 
-	for (auto& Pair : OutgoingConnections)
-	{
-		TArray<FGraphEdge>& Edges = Pair.Value.Edges;
-		for (int32 i = Edges.Num() - 1; i >= 0; --i)
-		{
-			if (Edges[i].RoomStartID == TargetRoomID)
-			{
-				Edges[i].RoomStartID = SourceRoomID;
-			}
-		}
-	}
 
-	IncomingConnections.Remove(TargetRoomID);
+	for (auto& Elem : EdgeStrengths)
+	{
+		FEdgeKey Key = Elem.Key;
+		const TArray<float>& Strengths = Elem.Value;
+
+		float AvgStrength = 0;
+		for (float Strength : Strengths)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Test: Strength: %d"), Strength);
+			AvgStrength += Strength;
+		}
+		AvgStrength /= Strengths.Num();
+
+		UGraphEdge* NewEdge = NewObject<UGraphEdge>(this);
+		NewEdge->RoomStartID = Key.StartID;
+		NewEdge->RoomEndID = Key.EndID;
+		NewEdge->ConnectionStrength = AvgStrength;
+
+		FGraphEdgePtr NewEdgePtr;
+		NewEdgePtr.Edge = NewEdge;
+
+		OutgoingConnections.FindOrAdd(Key.StartID).Edges.Add(NewEdgePtr);
+		IncomingConnections.FindOrAdd(Key.EndID).Edges.Add(NewEdgePtr);
+	}
 }
 
 void UBuildingGraph::ClearAllRooms() {
@@ -424,4 +544,3 @@ void UBuildingGraph::ClearAllRooms() {
 		Rooms[i]->RemoveFog();
 	}
 }
-
