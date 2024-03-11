@@ -304,7 +304,12 @@ void UBuildingGraph::CalculateFireDynamicsForSecond(float Second, float TimeStep
 		// Если в комнате есть дым надо проверить есть ли в ней Particle Sytem, если нет - создать, если да - обновить видимость
 		if (CurrentParams.Visibility != 30.0) {
 			if (Room.Value->RoomMarker->FogEmitters.Num() == 0) {
+				UE_LOG(LogTemp, Warning, TEXT("SPAWN FOG"));
 				Room.Value->SpawnFog(CurrentParams.Visibility);
+			}
+			else {
+				UE_LOG(LogTemp, Warning, TEXT("UPDATE FOG"));
+				Room.Value->UpdateFogVisibility(CurrentParams.Visibility);
 			}
 		}
 	}
@@ -540,7 +545,12 @@ void UBuildingGraph::UpdateGraphConnectionsAfterMergeToSourceRoom(int32 TargetRo
 }
 
 void UBuildingGraph::ClearAllRooms() {
-	for (int i = 0; i < Rooms.Num(); i++) {
-		Rooms[i]->RemoveFog();
+	for (auto& RoomPair : Rooms)
+	{
+		URoomNode* Room = RoomPair.Value;
+		if (Room)
+		{
+			Room->RemoveFog();
+		}
 	}
 }

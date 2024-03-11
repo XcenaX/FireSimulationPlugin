@@ -295,9 +295,11 @@ void AFireGridManager::RemoveBurntActor(FGridCell& Cell) {
 		}
 	}
 
-	if (Cell.OccupyingActor) {
-		UDoorComponent* DoorComp = Cast<UDoorComponent>(Cell.OccupyingActor->GetComponentByClass(UDoorComponent::StaticClass()));
-		AFogManagerActor::GetInstance()->graph->MergeToSourceRoom(DoorComp->ConnectedRoom2->RoomID);
+    if (Cell.OccupyingActor) {
+        UDoorComponent* DoorComp = Cast<UDoorComponent>(Cell.OccupyingActor->GetComponentByClass(UDoorComponent::StaticClass()));
+        if (AFogManagerActor::GetInstance() && AFogManagerActor::GetInstance()->graph) {
+            AFogManagerActor::GetInstance()->graph->MergeToSourceRoom(DoorComp->ConnectedRoom2->RoomID);
+        }
 
 		Cell.OccupyingActor->SetActorHiddenInGame(true);
 		Cell.OccupyingActor->SetActorEnableCollision(false);

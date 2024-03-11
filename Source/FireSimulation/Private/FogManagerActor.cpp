@@ -33,6 +33,8 @@ AFogManagerActor::AFogManagerActor(const FObjectInitializer& ObjectInitializer) 
 
 void AFogManagerActor::BeginPlay()
 {
+	UE_LOG(LogTemp, Warning, TEXT("INITIALIZING GRAPH"));
+
 	InitializeGraph(GetWorld());
 
 	Super::BeginPlay();
@@ -42,6 +44,12 @@ void AFogManagerActor::BeginPlay()
 
 void AFogManagerActor::InitializeGraph(UWorld* World)
 {
+	if(!World)
+		UE_LOG(LogTemp, Warning, TEXT("NO WORLD"));
+
+	if(!graph)
+		UE_LOG(LogTemp, Warning, TEXT("NO GRAPH"));
+
 	if (!graph || !World)
 		return;
 
@@ -87,6 +95,9 @@ void AFogManagerActor::InitializeGraph(UWorld* World)
 		}
 	}
 	graph->PrepareGraphToWork();
+
+	UE_LOG(LogTemp, Warning, TEXT("GRAPH INITIALIZED"));
+
 }
 
 // ѕосле завершени€ игры в редакторе возвращаем все сгоревшие акторы на место и тушим пожар
