@@ -17,7 +17,7 @@ public:
 		return Rooms;
 	}
 
-	TMap<int32, FGraphEdgeSet>& TestGetIncomingConnections() 
+	TMap<int32, FGraphEdgeSet>& TestGetIncomingConnections()
 	{
 		return IncomingConnections;
 	}

@@ -135,7 +135,7 @@ void URoomNode::SpawnFog(float visibility)
 
 				UpdateFogVisibility(visibility);
 				RoomMarker->FogEmitters.Add(ParticleSystemComponent);
-				UMaterialInstanceDynamic* DynMaterial = ParticleSystemComponent->CreateDynamicMaterialInstance(0);				
+				UMaterialInstanceDynamic* DynMaterial = ParticleSystemComponent->CreateDynamicMaterialInstance(0);
 				RoomMarker->DynamicMaterials.Add(DynMaterial);
 			}
 		}
@@ -277,20 +277,14 @@ FFireDynamicsParameters UBuildingGraph::CalculateFireDynamicsForRoom(URoomNode* 
 
 	if (!bHasConnections)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("RoomID: %d"), Room->RoomID);
 		FireDynamicsParams.BurnedMass = CalcParams.A * FMath::Pow(CurrentTime, CalcParams.N);
 		FireDynamicsParams.GasDensity = CalcParams.LimitGasDensity + (Room->InitialGasDensity - CalcParams.LimitGasDensity) * FMath::Exp(-CalcParams.GasReleasePerMeterBurn * FireDynamicsParams.BurnedMass / Room->RoomVolume);
-		FireDynamicsParams.GasTemperature = Room->StartTemperature * Room->InitialGasDensity / FireDynamicsParams.GasDensity;
 		FireDynamicsParams.SmokeExtinctionCoefficient = CalcParams.LimitSmokeExtinctionCoefficient + (0 - CalcParams.LimitSmokeExtinctionCoefficient) * FMath::Exp(-CalcParams.GasReleasePerMeterBurn * FireDynamicsParams.BurnedMass / Room->RoomVolume);
-		FireDynamicsParams.Visibility = FMath::Min(30.0f, CalcParams.LimitVisibility / FireDynamicsParams.SmokeExtinctionCoefficient);
 	}
 	else
 	{
 		int32 Count = 0;
-		FireDynamicsParams.BurnedMass = 0;
-		FireDynamicsParams.GasDensity = 0;
-		FireDynamicsParams.GasTemperature = 0;
-		FireDynamicsParams.SmokeExtinctionCoefficient = 0;
-		FireDynamicsParams.Visibility = 0;
 
 		for (const UGraphEdge* Connection : IncomingConnections[Room->RoomID].Edges)
 		{
@@ -299,23 +293,21 @@ FFireDynamicsParameters UBuildingGraph::CalculateFireDynamicsForRoom(URoomNode* 
 			FFireDynamicsParameters AdjacentRoomFireDynamicsParams = AdjacentRoom->GetFireDynamics();
 			float ConnectionStrength = Connection->ConnectionStrength;
 
-			Count++;
-			FireDynamicsParams.BurnedMass += AdjacentRoomFireDynamicsParams.BurnedMass;
-			FireDynamicsParams.GasDensity += AdjacentRoomFireDynamicsParams.GasDensity;
-			FireDynamicsParams.GasTemperature += AdjacentRoomFireDynamicsParams.GasTemperature;
-			FireDynamicsParams.SmokeExtinctionCoefficient += AdjacentRoomFireDynamicsParams.SmokeExtinctionCoefficient;
-			FireDynamicsParams.Visibility += FMath::Min(30.0f, CalcParams.LimitVisibility / FireDynamicsParams.SmokeExtinctionCoefficient);
+			FireDynamicsParams.BurnedMass += CalcParams.A * FMath::Pow(CurrentTime, CalcParams.N);
+			FireDynamicsParams.GasDensity += AdjacentRoomFireDynamicsParams.GasDensity + (Room->InitialGasDensity - AdjacentRoomFireDynamicsParams.GasDensity) * FMath::Exp(-CalcParams.GasReleasePerMeterBurn * FireDynamicsParams.BurnedMass / Room->RoomVolume);
+			FireDynamicsParams.SmokeExtinctionCoefficient += AdjacentRoomFireDynamicsParams.SmokeExtinctionCoefficient + (0 - AdjacentRoomFireDynamicsParams.SmokeExtinctionCoefficient) * FMath::Exp(-CalcParams.GasReleasePerMeterBurn * FireDynamicsParams.BurnedMass / Room->RoomVolume);
 		}
 
 		if (Count > 0)
 		{
 			FireDynamicsParams.BurnedMass /= Count;
 			FireDynamicsParams.GasDensity /= Count;
-			FireDynamicsParams.GasTemperature /= Count;
 			FireDynamicsParams.SmokeExtinctionCoefficient /= Count;
-			FireDynamicsParams.Visibility /= Count;
 		}
 	}
+
+	FireDynamicsParams.GasTemperature += Room->StartTemperature * Room->InitialGasDensity / FireDynamicsParams.GasDensity;
+	FireDynamicsParams.Visibility += FMath::Min(30.0f, CalcParams.LimitVisibility / FireDynamicsParams.SmokeExtinctionCoefficient);
 
 	return FireDynamicsParams;
 }
@@ -332,20 +324,20 @@ void UBuildingGraph::CalculateFireDynamicsForSecond(int32 Second, float TimeStep
 	{
 		FFireDynamicsParameters CurrentParams = CalculateFireDynamicsForRoom(Room.Value, Second);
 		Room.Value->UpdateFireDynamics(CurrentParams);
-		
+
 		UE_LOG(LogTemp, Warning, TEXT("Second: %d; ROOM %d : visibility: %f; volume: %f; other: %f, %f, %f, %f"), Second, Room.Value->RoomID, (double)CurrentParams.Visibility, (double)Room.Value->RoomVolume, (double)CurrentParams.BurnedMass, (double)CurrentParams.GasDensity, (double)CurrentParams.GasTemperature, (double)CurrentParams.SmokeExtinctionCoefficient);
 
-		// Если в комнате есть дым надо проверить есть ли в ней Particle Sytem, если нет - создать, если да - обновить видимость
-		if (CurrentParams.Visibility != 30.0) {
-			if (Room.Value->RoomMarker->FogEmitters.Num() == 0) {
-				UE_LOG(LogTemp, Warning, TEXT("SPAWN FOG"));
-				Room.Value->SpawnFog(CurrentParams.Visibility);
-			}
-			else {
-				UE_LOG(LogTemp, Warning, TEXT("UPDATE FOG"));
-				Room.Value->UpdateFogVisibility(CurrentParams.Visibility);
-			}
-		}
+		//// Если в комнате есть дым надо проверить есть ли в ней Particle Sytem, если нет - создать, если да - обновить видимость
+		//if (CurrentParams.Visibility != 30.0) {
+		//	if (Room.Value->RoomMarker->FogEmitters.Num() == 0) {
+		//		UE_LOG(LogTemp, Warning, TEXT("SPAWN FOG"));
+		//		Room.Value->SpawnFog(CurrentParams.Visibility);
+		//	}
+		//	else {
+		//		UE_LOG(LogTemp, Warning, TEXT("UPDATE FOG"));
+		//		Room.Value->UpdateFogVisibility(CurrentParams.Visibility);
+		//	}
+		//}
 	}
 }
 
@@ -551,28 +543,31 @@ void UBuildingGraph::UpdateGraphConnectionsAfterMergeToSourceRoom(int32 TargetRo
 		IncomingConnections.Remove(TargetRoomID);
 	}
 
-
 	for (auto& Elem : EdgeStrengths)
 	{
 		FEdgeKey Key = Elem.Key;
 		const TArray<float>& Strengths = Elem.Value;
 
+		UGraphEdge* NewEdge = NewObject<UGraphEdge>(this);
+		NewEdge->RoomStartID = Key.StartID;
+		NewEdge->RoomEndID = Key.EndID;
+		FGraphEdgePtr NewEdgePtr;
+		NewEdgePtr.Edge = NewEdge;
+
 		float AvgStrength = 0;
 		for (float Strength : Strengths)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Test: Strength: %d"), Strength);
+			UE_LOG(LogTemp, Warning, TEXT("Test: Strength: %f"), Strength);
 			AvgStrength += Strength;
 		}
 		AvgStrength /= Strengths.Num();
 
-		UGraphEdge* NewEdge = NewObject<UGraphEdge>(this);
-		NewEdge->RoomStartID = Key.StartID;
-		NewEdge->RoomEndID = Key.EndID;
 		NewEdge->ConnectionStrength = AvgStrength;
 
-		FGraphEdgePtr NewEdgePtr;
-		NewEdgePtr.Edge = NewEdge;
+		UE_LOG(LogTemp, Warning, TEXT("Total Strength: %f"), NewEdge->ConnectionStrength);
 
+		OutgoingConnections.FindOrAdd(Key.StartID).Edges.Remove(NewEdgePtr);
+		IncomingConnections.FindOrAdd(Key.EndID).Edges.Remove(NewEdgePtr);
 		OutgoingConnections.FindOrAdd(Key.StartID).Edges.Add(NewEdgePtr);
 		IncomingConnections.FindOrAdd(Key.EndID).Edges.Add(NewEdgePtr);
 	}
