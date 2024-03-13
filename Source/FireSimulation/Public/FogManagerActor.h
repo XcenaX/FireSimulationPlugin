@@ -25,6 +25,17 @@ public:
     // Called every frame
     virtual void Tick(float DeltaTime) override;
 
+    FString EnumToString(EConnectionStatus Status)
+    {
+        const UEnum* EnumType = FindObject<UEnum>(ANY_PACKAGE, TEXT("EConnectionStatus"), true);
+        if (!EnumType)
+        {
+            return FString("Invalid");
+        }
+
+        return EnumType->GetNameStringByValue((int64)Status);
+    }
+
     // ����� ���� ���������� ����� � �������� ����
     UFUNCTION(BlueprintCallable)
     void RestoreScene();

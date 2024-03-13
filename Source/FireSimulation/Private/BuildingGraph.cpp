@@ -146,7 +146,7 @@ void URoomNode::UpdateFogVisibility(float Visibility)
 {
 	// Значения параметров (примеры, требуется настройка)
 	float BaseExtinction = 0.01f;
-	float k = 1.0f; // Коэффициент влияния видимости (надо эмпирический потестить это)
+	float k = 0.2f; // Коэффициент влияния видимости (надо эмпирический потестить это)
 
 	Visibility = FMath::Max(Visibility, 1.0f); // Видимость не может быть меньше 1 метра (можно изменить если надо)
 
@@ -327,16 +327,17 @@ void UBuildingGraph::CalculateFireDynamicsForSecond(int32 Second, float TimeStep
 		UE_LOG(LogTemp, Warning, TEXT("Second: %d; ROOM %d : visibility: %f; volume: %f; other: %f, %f, %f, %f"), Second, Room.Value->RoomID, (double)CurrentParams.Visibility, (double)Room.Value->RoomVolume, (double)CurrentParams.BurnedMass, (double)CurrentParams.GasDensity, (double)CurrentParams.GasTemperature, (double)CurrentParams.SmokeExtinctionCoefficient);
 
 		//// Если в комнате есть дым надо проверить есть ли в ней Particle Sytem, если нет - создать, если да - обновить видимость
-		//if (CurrentParams.Visibility != 30.0) {
-		//	if (Room.Value->RoomMarker->FogEmitters.Num() == 0) {
-		//		UE_LOG(LogTemp, Warning, TEXT("SPAWN FOG"));
-		//		Room.Value->SpawnFog(CurrentParams.Visibility);
-		//	}
-		//	else {
-		//		UE_LOG(LogTemp, Warning, TEXT("UPDATE FOG"));
-		//		Room.Value->UpdateFogVisibility(CurrentParams.Visibility);
-		//	}
-		//}
+		if (CurrentParams.Visibility != 30.0) {
+			if (!Room.Value->RoomMarker) continue;
+			if (Room.Value->RoomMarker->FogEmitters.Num() == 0) {
+				UE_LOG(LogTemp, Warning, TEXT("SPAWN FOG"));
+				Room.Value->SpawnFog(CurrentParams.Visibility);
+			}
+			else {
+				UE_LOG(LogTemp, Warning, TEXT("UPDATE FOG"));
+				Room.Value->UpdateFogVisibility(CurrentParams.Visibility);
+			}
+		}
 	}
 }
 

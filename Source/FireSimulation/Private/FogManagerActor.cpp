@@ -96,9 +96,9 @@ void AFogManagerActor::InitializeGraph(UWorld* World)
 			int32 StartRoomID = Door->ConnectedRoom1->RoomID;
 			int32 EndRoomID = Door->ConnectedRoom2->RoomID;
 
-			UE_LOG(LogTemp, Warning, TEXT("START_ROOM_ID: %d ; END_ROOM_ID: %d"), StartRoomID, EndRoomID);
-
 			EConnectionStatus ConnectionStatus = Door->bIsOpen ? EConnectionStatus::DoorOpen : EConnectionStatus::DoorClosed;
+
+			UE_LOG(LogTemp, Warning, TEXT("START_ROOM_ID: %d ; END_ROOM_ID: %d ; Status: %s"), StartRoomID, EndRoomID, *EnumToString(ConnectionStatus));
 
 			if (StartRoomID < 0 || EndRoomID < 0) continue;
 
@@ -127,11 +127,11 @@ void AFogManagerActor::Tick(float DeltaTime)
 	TimeAccumulator += DeltaTime;
 
 	// Проверяем, прошла ли секунда
-	if (TimeAccumulator >= 1.0f)
+	if (TimeAccumulator >= 0.2f)
 	{
 		TotalTime++;
 		UpdateFog();
-		TimeAccumulator -= 1.0f;
+		TimeAccumulator -= 0.2f;
 	}
 }
 

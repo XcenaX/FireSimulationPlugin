@@ -73,8 +73,7 @@ TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnT
                 [
                     CubesAmountTextBox.ToSharedRef()
                 ]
-                + SVerticalBox::Slot()
-                .AutoHeight()
+                + SVerticalBox::Slot()                
                 .Padding(5)
                 [
                     ThreadsTextBox.ToSharedRef()
@@ -83,19 +82,7 @@ TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnT
                 .AutoHeight()
                 .Padding(5)
                 [
-                    SNew(SHorizontalBox)
-                        + SHorizontalBox::Slot()
-                        .FillWidth(0.45)
-                        .Padding(FMargin(2.5f, 0.0f, 5.0f, 0.0f))
-                        [
-                            PickFireButton.ToSharedRef()
-                        ]
-                        + SHorizontalBox::Slot()
-                        .FillWidth(0.45)
-                        .Padding(FMargin(5.0f, 0.0f, 2.5f, 0.0f))
-                        [
-                            PickFogButton.ToSharedRef()
-                        ]
+                    PickFireButton.ToSharedRef()
                 ]
                 + SVerticalBox::Slot()
                 .AutoHeight()
