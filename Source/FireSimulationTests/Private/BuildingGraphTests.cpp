@@ -164,7 +164,7 @@ bool FMergeRoomsTest::RunTest(const FString& Parameters)
 	}
 
 	BuildingGraph->AddConnection(FireSourceRoom, rooms[0], EConnectionStatus::DoorOpen); // Очаг -> Комната 2
-	BuildingGraph->AddConnection(rooms[0], rooms[1], EConnectionStatus::DoorOpen); // Комната 2 -> Комната 3
+	BuildingGraph->AddConnection(rooms[1], rooms[0], EConnectionStatus::DoorOpen); // Комната 3 -> Комната 2
 	BuildingGraph->AddConnection(rooms[1], rooms[2], EConnectionStatus::DoorOpen); // Комната 3 -> Комната 4
 	BuildingGraph->AddConnection(FireSourceRoom, rooms[3], EConnectionStatus::DoorOpen); // Очаг -> Комната 5
 	BuildingGraph->AddConnection(rooms[3], rooms[4], EConnectionStatus::DoorOpen); // Комната 5 -> Комната 6 (нет прямой связи с очагом)
@@ -207,6 +207,7 @@ bool FMergeRoomsTest::RunTest(const FString& Parameters)
 	{
 		for (auto& Edge : Elem.Value.Edges)
 		{
+			//UE_LOG(LogTemp, Warning, TEXT("Test: 1: %d, 2: %d"), Edge.Edge->RoomStartID, Edge.Edge->RoomEndID);
 			TestFalse("There should be no connections leading to the merged room (Room 2)", Edge.Edge->RoomEndID == 2);
 		}
 	}
@@ -246,3 +247,34 @@ bool FMergeRoomsTest::RunTest(const FString& Parameters)
 	return true;
 }
 //   406
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FFireSimulationTest, "FireSimulation.FireSimulationTests.BuildingGraphTests.FireSimulation", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FFireSimulationTest::RunTest(const FString& Parameters)
+{
+	UBuildingGraphTestHelper* BuildingGraph = NewObject<UBuildingGraphTestHelper>();
+
+	// Инициализация комнат
+	URoomNode* FireSourceRoom = NewObject<URoomNode>(); // 1
+	FireSourceRoom->Initialize(1, true, 0.8f, 0.6f, 293.15f, 1.2f, 1000.0f, 50.0f, 50000.0f, 0.5f, 0.01f, 0.5f);
+	BuildingGraph->AddRoom(FireSourceRoom);
+
+	URoomNode* FireRoom2 = NewObject<URoomNode>(); // 2
+	FireRoom2->Initialize(2, false, 0.8f, 0.6f, 293.15f, 1.2f, 1000.0f, 50.0f, 50000.0f, 0.5f, 0.01f, 0.5f);
+	BuildingGraph->AddRoom(FireRoom2);
+
+	URoomNode* FireRoom3 = NewObject<URoomNode>(); // 3
+	FireRoom3->Initialize(3, false, 0.8f, 0.6f, 293.15f, 1.2f, 1000.0f, 50.0f, 50000.0f, 0.5f, 0.01f, 0.5f);
+	BuildingGraph->AddRoom(FireRoom3);
+
+	BuildingGraph->AddConnection(FireSourceRoom, FireRoom2, EConnectionStatus::DoorOpen);
+	BuildingGraph->AddConnection(FireSourceRoom, FireRoom3, EConnectionStatus::DoorOpen);
+
+	BuildingGraph->PrepareGraphToWork();
+
+	for (int32 i = 0; i < 500; i++) {
+		BuildingGraph->CalculateFireDynamicsForSecond(i);
+	}
+
+	return true;
+}

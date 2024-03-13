@@ -277,7 +277,6 @@ FFireDynamicsParameters UBuildingGraph::CalculateFireDynamicsForRoom(URoomNode* 
 
 	if (!bHasConnections)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("RoomID: %d"), Room->RoomID);
 		FireDynamicsParams.BurnedMass = CalcParams.A * FMath::Pow(CurrentTime, CalcParams.N);
 		FireDynamicsParams.GasDensity = CalcParams.LimitGasDensity + (Room->InitialGasDensity - CalcParams.LimitGasDensity) * FMath::Exp(-CalcParams.GasReleasePerMeterBurn * FireDynamicsParams.BurnedMass / Room->RoomVolume);
 		FireDynamicsParams.SmokeExtinctionCoefficient = CalcParams.LimitSmokeExtinctionCoefficient + (0 - CalcParams.LimitSmokeExtinctionCoefficient) * FMath::Exp(-CalcParams.GasReleasePerMeterBurn * FireDynamicsParams.BurnedMass / Room->RoomVolume);
@@ -427,28 +426,23 @@ bool UBuildingGraph::MergeToSourceRoom(int32 TargetRoomID)
 	URoomNode* SourceRoom = Rooms[SourceRoomID];
 	URoomNode* TargetRoom = Rooms[TargetRoomID];
 
-	// ��������� �������, ��������� ������ � ������ ���������
 	float TotalVolume = SourceRoom->RoomVolume + TargetRoom->RoomVolume;
 	if (TotalVolume > 0)
 	{
-		// ��������� ��������� �������� �������
 		SourceRoom->InitialGasDensity = (SourceRoom->InitialGasDensity * SourceRoom->RoomVolume + TargetRoom->InitialGasDensity * TargetRoom->RoomVolume) / TotalVolume;
 		SourceRoom->StartTemperature = (SourceRoom->StartTemperature * SourceRoom->RoomVolume + TargetRoom->StartTemperature * TargetRoom->RoomVolume) / TotalVolume;
-		// �������������� ��������� ����� ��������� �� ��������
 
 		SourceRoom->RoomVolume = TotalVolume;
 	}
 
-	// ��������� �������� ���� � ������� ������� ������� �� �����
 	SourceRoom->UpdateFireDynamics(TargetRoom->GetFireDynamics());
 	Rooms.Remove(TargetRoomID);
 
-	// ��������� ����� ����� �������
 	UpdateGraphConnectionsAfterMergeToSourceRoom(TargetRoomID);
 
 	UE_LOG(LogTemp, Log, TEXT("Rooms merged: SourceRoomID: %d, TargetRoomID: %d"), SourceRoomID, TargetRoomID);
 
-	return true; // ���������, ��� ������� ��������� �������
+	return true;
 }
 
 struct FEdgeKey
@@ -503,7 +497,10 @@ void UBuildingGraph::UpdateGraphConnectionsAfterMergeToSourceRoom(int32 TargetRo
 			FGraphEdgePtr NewEdgePtr;
 			NewEdgePtr.Edge = NewEdge;
 
-			OutgoingConnections[SourceRoomID].Edges.Add(NewEdgePtr);
+			if (!OutgoingConnections.Find(SourceRoomID)->Edges.Contains(NewEdgePtr))
+			{
+				OutgoingConnections[SourceRoomID].Edges.Add(NewEdgePtr);
+			}
 			IncomingConnections[Edge->RoomEndID].Edges.Add(NewEdgePtr);
 
 			if (IncomingConnections.Contains(Edge->RoomEndID)) {
@@ -519,28 +516,36 @@ void UBuildingGraph::UpdateGraphConnectionsAfterMergeToSourceRoom(int32 TargetRo
 
 	if (IncomingConnections.Contains(TargetRoomID)) {
 		FGraphEdgeSet& TargetIncomingEdges = IncomingConnections[TargetRoomID];
+
 		for (UGraphEdge* Edge : TargetIncomingEdges.Edges) {
 			UGraphEdge* NewEdge = DuplicateObject(Edge, this);
-			NewEdge->RoomEndID = SourceRoomID;
+			NewEdge->RoomStartID = SourceRoomID;
+			NewEdge->RoomEndID = Edge->RoomStartID;
 
-			FEdgeKey Key(Edge->RoomStartID, SourceRoomID);
+			FEdgeKey Key(SourceRoomID, Edge->RoomStartID);
 			EdgeStrengths.FindOrAdd(Key).Add(NewEdge->ConnectionStrength);
-
-			if (OutgoingConnections.Contains(Edge->RoomStartID)) {
-				FGraphEdgeSet& StartNodeOutgoing = OutgoingConnections[Edge->RoomStartID];
-				FGraphEdgePtr EdgePtr;
-				EdgePtr.Edge = Edge;
-				StartNodeOutgoing.Edges.Remove(EdgePtr);
-			}
 
 			FGraphEdgePtr NewEdgePtr;
 			NewEdgePtr.Edge = NewEdge;
 
-			OutgoingConnections[Edge->RoomStartID].Edges.Add(NewEdgePtr);
+			FGraphEdgePtr EdgePtr;
+			EdgePtr.Edge = Edge;
+			OutgoingConnections[Edge->RoomStartID].Edges.Remove(EdgePtr);
 
-			IncomingConnections[SourceRoomID].Edges.Add(NewEdgePtr);
+			if (!OutgoingConnections.Find(SourceRoomID)->Edges.Contains(NewEdgePtr))
+			{
+				OutgoingConnections[SourceRoomID].Edges.Add(NewEdgePtr);
+			}
+			IncomingConnections[Edge->RoomStartID].Edges.Add(NewEdgePtr);
 		}
 		IncomingConnections.Remove(TargetRoomID);
+	}
+
+	if (OutgoingConnections.Contains(SourceRoomID)) {
+		for (const FGraphEdgePtr& EdgePtr : OutgoingConnections[SourceRoomID].Edges) {
+			FEdgeKey Key(SourceRoomID, EdgePtr.Edge->RoomEndID);
+			EdgeStrengths.FindOrAdd(Key).Add(EdgePtr.Edge->ConnectionStrength);
+		}
 	}
 
 	for (auto& Elem : EdgeStrengths)
@@ -551,20 +556,18 @@ void UBuildingGraph::UpdateGraphConnectionsAfterMergeToSourceRoom(int32 TargetRo
 		UGraphEdge* NewEdge = NewObject<UGraphEdge>(this);
 		NewEdge->RoomStartID = Key.StartID;
 		NewEdge->RoomEndID = Key.EndID;
+
 		FGraphEdgePtr NewEdgePtr;
 		NewEdgePtr.Edge = NewEdge;
 
 		float AvgStrength = 0;
 		for (float Strength : Strengths)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Test: Strength: %f"), Strength);
 			AvgStrength += Strength;
 		}
 		AvgStrength /= Strengths.Num();
 
 		NewEdge->ConnectionStrength = AvgStrength;
-
-		UE_LOG(LogTemp, Warning, TEXT("Total Strength: %f"), NewEdge->ConnectionStrength);
 
 		OutgoingConnections.FindOrAdd(Key.StartID).Edges.Remove(NewEdgePtr);
 		IncomingConnections.FindOrAdd(Key.EndID).Edges.Remove(NewEdgePtr);
