@@ -73,15 +73,27 @@ void AFogManagerActor::InitializeGraph(UWorld* World)
 	int32 RoomCount = 1;
 	for (ARoomMarker* Room : Rooms) {
 		FMaterialData AverageMaterialData = Room->CalculateAverageMaterialData();
+		
+		TArray<AActor*> Actors = Room->GetActors();
+
+		for (auto Actor : Actors) {
+			ActorsLocation.Add(Actor, Room);
+		}
+
+		bool IsGasSource = Room->IsGasSource();
+
+		RoomsStatus.Add(Room, IsGasSource);
 
 		URoomNode* RoomNode = NewObject<URoomNode>();
 
 		Room->RoomID = RoomCount;
 		
-		RoomNode->Initialize(RoomCount, Room->IsGasSource(), Room->CombustionCompletenessCoefficient,
+		RoomNode->Initialize(RoomCount, IsGasSource, Room->CombustionCompletenessCoefficient,
 			Room->HeatAbsorptionCoefficient, Room->StartTemperature, Room->InitialGasDensity,
 			Room->Cp, Room->GetRoomVolume(), AverageMaterialData.LowestHeatOfCombustion_kJ_per_kg, AverageMaterialData.LinearFlameSpeed,
 			AverageMaterialData.BurningRate, AverageMaterialData.SmokeGeneration, GetWorld());
+
+		UE_LOG(LogTemp, Warning, TEXT("ROOM %d : CombustionCompletenessCoefficient: %f; HeatAbsorptionCoefficient: %f; StartTemperature: %f, InitialGasDensity: %f;  Cp: %f ; Volume: %f ; LowestHeatOfCombustion_kJ_per_kg: %f ; LinearFlameSpeed: %f ; BurningRate: %f ; Smoke: %f"), RoomCount, (double)Room->CombustionCompletenessCoefficient, (double)Room->HeatAbsorptionCoefficient, (double)Room->StartTemperature, (double)Room->InitialGasDensity, (double)Room->Cp, (double)Room->GetRoomVolume(), (double)AverageMaterialData.LowestHeatOfCombustion_kJ_per_kg, (double)AverageMaterialData.LinearFlameSpeed, (double)AverageMaterialData.BurningRate, (double)AverageMaterialData.SmokeGeneration)
 
 		RoomNode->RoomMarker = Room;
 
@@ -127,11 +139,11 @@ void AFogManagerActor::Tick(float DeltaTime)
 	TimeAccumulator += DeltaTime;
 
 	// Проверяем, прошла ли секунда
-	if (TimeAccumulator >= 0.2f)
+	if (TimeAccumulator >= 1.0f)
 	{
 		TotalTime++;
 		UpdateFog();
-		TimeAccumulator -= 0.2f;
+		TimeAccumulator -= 1.0f;
 	}
 }
 
@@ -144,4 +156,35 @@ void AFogManagerActor::UpdateFog()
 
 void AFogManagerActor::RestoreScene() { // Возвращает сцену к прежнему виду после завершения игры
 	graph->ClearAllRooms();
+}
+
+bool AFogManagerActor::GetRoomStatusForActor(AActor* Actor)
+{
+	ARoomMarker** RoomMarkerPtr = ActorsLocation.Find(Actor);
+	if (RoomMarkerPtr == nullptr)
+	{
+		return false;
+	}
+
+	ARoomMarker* RoomMarker = *RoomMarkerPtr;
+	const bool* StatusPtr = RoomsStatus.Find(RoomMarker);
+	if (StatusPtr == nullptr)
+	{
+		// Статус комнаты неизвестен
+		return false;
+	}
+
+	return *StatusPtr;
+}
+
+int32 AFogManagerActor::GetRoomIdForActor(AActor* Actor)
+{
+	ARoomMarker** RoomMarkerPtr = ActorsLocation.Find(Actor);
+	if (RoomMarkerPtr == nullptr)
+	{
+		return false;
+	}
+
+	ARoomMarker* RoomMarker = *RoomMarkerPtr;
+	return RoomMarker->RoomID;
 }

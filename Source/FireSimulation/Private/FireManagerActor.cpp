@@ -4,6 +4,7 @@
 #include <MaterialData.h>
 #include <Async/Async.h>
 #include <MaterialDataManager.h>
+#include <FogManagerActor.h>
 
 // Sets default values
 AFireManagerActor::AFireManagerActor()
@@ -43,13 +44,7 @@ void AFireManagerActor::Tick(float DeltaTime)
     // Проверяем, прошла ли секунда
     if (TimeAccumulator >= 1.0f)
     {
-        if (GetWorld()) {
-            UE_LOG(LogTemp, Warning, TEXT("FireManagerActor: GetWorld TRUE"));
-        } else{
-            UE_LOG(LogTemp, Warning, TEXT("FireManagerActor: GetWorld FALSE"));
-        }
-        UpdateFireSpread();
-        // Сбрасываем счетчик времени
+        UpdateFireSpread();      
         TimeAccumulator -= 1.0f;
     }    
 }
@@ -117,15 +112,17 @@ void AFireManagerActor::processCheckList(int32 StartIndex, int32 EndIndex, TArra
         }
 
         int32 FP = CalculateFP(GridManager->Grid, Cell.x, Cell.y, Cell.z);
-
+        UFireSimulationComponent* FireComp = nullptr;
         float LinearSpeed = 0.8f; // Default value
 
         if (Cell.OccupyingActor)
         {
-            UFireSimulationComponent* FireComp = Cast<UFireSimulationComponent>(Cell.OccupyingActor->GetComponentByClass(UFireSimulationComponent::StaticClass()));
+            FireComp = Cast<UFireSimulationComponent>(Cell.OccupyingActor->GetComponentByClass(UFireSimulationComponent::StaticClass()));
             if (FireComp)
             {
-                LinearSpeed = FMaterialDataManager::Get().GetMaterialData(*(FireComp->SelectedMaterial))->LinearFlameSpeed;
+                const FMaterialData* Material = FMaterialDataManager::Get().GetMaterialData(*(FireComp->SelectedMaterial));
+                if (!Material) continue;
+                LinearSpeed = Material->LinearFlameSpeed;
             }
         }
 
@@ -135,6 +132,12 @@ void AFireManagerActor::processCheckList(int32 StartIndex, int32 EndIndex, TArra
 
         if (FMath::RandRange(0.0f, 1.0f) < Probability)
         {
+            // Если Комната этого актора еще не загорелась то сделать Merge            
+            if (FireComp && !AFogManagerActor::GetInstance()->GetRoomStatusForActor(Cell.OccupyingActor) && !FireComp->IsWall) {
+                int32 RoomID = AFogManagerActor::GetInstance()->GetRoomIdForActor(Cell.OccupyingActor);
+                UE_LOG(LogTemp, Warning, TEXT("MERGE ROOM : %d"), RoomID);
+                AFogManagerActor::GetInstance()->graph->MergeToSourceRoom(RoomID);
+            }
             NewList.Add(Cell);
             CoordsToRemove.Add(FVector(Cell.x, Cell.y, Cell.z));
         }
@@ -183,7 +186,10 @@ void AFireManagerActor::processNewList(int32 StartIndex, int32 EndIndex, TArray<
         cell.Status = BURNING;
         FireList.Add(cell);
         CoordsToRemove.Add(FVector(cell.x, cell.y, cell.z));
-        GridManager->CreateFireActor(cell, GetWorld()); // Создает актор огня в этой ячейке
+        AsyncTask(ENamedThreads::GameThread, [this, cell]() {
+            GridManager->CreateFireActor(cell, GetWorld()); // Создает актор огня в этой ячейке
+        });
+        // GridManager->CreateFireActor(cell, GetWorld()); // Создает актор огня в этой ячейке
     }
 
 }
@@ -258,19 +264,23 @@ void AFireManagerActor::parallelProcessList(TArray<FGridCell>& List, TFunction<v
 }
 
 
-void AFireManagerActor::RemoveCellsByCoords(TArray<FGridCell>& List, TArray<FVector>& CoordsToRemove)
+void AFireManagerActor::RemoveCellsByCoords(TArray<FGridCell>& List, const TArray<FVector>& CoordsToRemove)
 {
     FScopeLock ScopeLock(&ListMutex); // Используем FScopeLock для безопасного доступа к данным в многопоточной среде
 
     for (int32 Index = List.Num() - 1; Index >= 0; --Index)
     {
-        FGridCell& Cell = List[Index];
-        FVector CellCoords(Cell.x, Cell.y, Cell.z);
+        const FGridCell& Cell = List[Index];
+        const FVector CellCoords(Cell.x, Cell.y, Cell.z);
 
-        if (CoordsToRemove.Contains(CellCoords))
+        // Используем Equals для сравнения с заданной точностью
+        for (const FVector& CoordToRemove : CoordsToRemove)
         {
-            List.RemoveAt(Index);
-            CoordsToRemove.Remove(CellCoords);
+            if (CellCoords.Equals(CoordToRemove, KINDA_SMALL_NUMBER)) // KINDA_SMALL_NUMBER - стандартная точность сравнения в Unreal Engine
+            {
+                List.RemoveAt(Index);
+                break; // Выходим из внутреннего цикла, так как нашли соответствующую ячейку для удаления
+            }
         }
     }
 }

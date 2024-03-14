@@ -54,9 +54,9 @@ void AFireGridManager::InitializeGrid(int32 CubesPerDimension, int32 NewThreads)
 	ActorCellsCount.Empty();
 }
 
-void AFireGridManager::DrawGrid(bool bVisible, UWorld* World, AActor* GridActor)
+void AFireGridManager::DrawGrid(bool bVisible, UWorld* World, AActor* NewGridActor)
 {
-	if (!GridActor || !World) return;
+	if (!NewGridActor || !World) return;
 
 	UBoxComponent* BoxComponent = Cast<UBoxComponent>(GridActor->GetComponentByClass(UBoxComponent::StaticClass()));
 	if (!BoxComponent) return;
@@ -86,9 +86,11 @@ void AFireGridManager::DrawGrid(bool bVisible, UWorld* World, AActor* GridActor)
 }
 
 
-void AFireGridManager::PopulateGridWithActors(UWorld* World, AActor* GridActor)
+void AFireGridManager::PopulateGridWithActors(UWorld* World, AActor* NewGridActor)
 {
-	if (!World || !GridActor || ElementsAmount <= 0) return;
+	if (!World || !NewGridActor || ElementsAmount <= 0) return;
+
+	GridActor = Cast<AGridActor>(NewGridActor);
 
 	UBoxComponent* BoxComponent = GridActor->FindComponentByClass<UBoxComponent>();
 	if (!BoxComponent) return;
@@ -110,9 +112,13 @@ void AFireGridManager::PopulateGridWithActors(UWorld* World, AActor* GridActor)
 
 	// Заполняем сетку акторами
 	FVector GridOrigin = BoxComponent->GetComponentLocation() - GridSize / 2; // Начальная точка сетки
+	
 	FCollisionQueryParams Params;
 	Params.bTraceComplex = true;
 	Params.bReturnPhysicalMaterial = false;
+
+	FCollisionQueryParams QueryParams;
+	QueryParams.bReturnPhysicalMaterial = false;
 
 	FString LogText;
 	for (int x = 0; x < ElementsAmount; ++x)
@@ -124,9 +130,11 @@ void AFireGridManager::PopulateGridWithActors(UWorld* World, AActor* GridActor)
 				FVector CellCenter = GridOrigin + FVector(x * CellSize.X, y * CellSize.Y, z * CellSize.Z) + CellSize / 2;
 				FCollisionShape Box = FCollisionShape::MakeBox(CellSize / 2);
 				TArray<FHitResult> HitResults;
-				World->SweepMultiByChannel(HitResults, CellCenter, CellCenter, FQuat::Identity, ECC_WorldStatic, Box, Params);
+				TArray<FOverlapResult> OverlapResults;
+				//World->SweepMultiByChannel(HitResults, CellCenter, CellCenter, FQuat::Identity, ECC_WorldStatic, Box, Params);
+				World->OverlapMultiByChannel(OverlapResults, CellCenter, FQuat::Identity, ECC_WorldStatic, Box, QueryParams);
 
-				for (const FHitResult& Hit : HitResults)
+				for (const FOverlapResult& Hit : OverlapResults)
 				{
 					if (AActor* HitActor = Hit.GetActor())
 					{
@@ -217,14 +225,7 @@ void AFireGridManager::CreateFireActor(FGridCell Cell, UWorld* World)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("VLAD! NO WORLD!"));
 		return;
-	}
-
-	AGridActor* GridActor = nullptr;
-	for (TActorIterator<AGridActor> It(World); It; ++It)
-	{
-		GridActor = *It;
-		break;
-	}
+	}	
 
 	// Вычисляем локацию ячейки
 	UBoxComponent* BoxComponent = GridActor->FindComponentByClass<UBoxComponent>();
@@ -296,11 +297,6 @@ void AFireGridManager::RemoveBurntActor(FGridCell& Cell) {
 	}
 
     if (Cell.OccupyingActor) {
-        UDoorComponent* DoorComp = Cast<UDoorComponent>(Cell.OccupyingActor->GetComponentByClass(UDoorComponent::StaticClass()));
-        if (AFogManagerActor::GetInstance() && AFogManagerActor::GetInstance()->graph) {
-            AFogManagerActor::GetInstance()->graph->MergeToSourceRoom(DoorComp->ConnectedRoom2->RoomID);
-        }
-
 		Cell.OccupyingActor->SetActorHiddenInGame(true);
 		Cell.OccupyingActor->SetActorEnableCollision(false);
 		Cell.OccupyingActor->SetActorTickEnabled(false);

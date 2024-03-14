@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Components/SphereComponent.h"
+#include "Components/BoxComponent.h"
 #include "GridActor.generated.h"
 
 UCLASS()
@@ -21,8 +21,4 @@ public:
     UBoxComponent* GridBounds;
 
     virtual void OnConstruction(const FTransform& Transform) override;
-
-#if WITH_EDITOR
-    virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-#endif
 };

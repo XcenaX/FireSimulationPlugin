@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include <GridActor.h>
 #include "FireGridManager.generated.h"
 
 #define EMPTY 0
@@ -64,6 +65,8 @@ public:
 
     // Трехмерный массив ячеек.
     TArray<TArray<TArray<FGridCell>>> Grid;
+
+    AGridActor* GridActor;
 
     // Количество элементов в сетке в одном измерении.
     float ElementsAmount;

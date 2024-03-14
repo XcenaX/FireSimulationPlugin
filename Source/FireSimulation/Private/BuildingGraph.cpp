@@ -146,9 +146,9 @@ void URoomNode::UpdateFogVisibility(float Visibility)
 {
 	// Значения параметров (примеры, требуется настройка)
 	float BaseExtinction = 0.01f;
-	float k = 0.2f; // Коэффициент влияния видимости (надо эмпирический потестить это)
+	float k = 0.1f; // Коэффициент влияния видимости (надо эмпирический потестить это)
 
-	Visibility = FMath::Max(Visibility, 1.0f); // Видимость не может быть меньше 1 метра (можно изменить если надо)
+	Visibility = FMath::Max(Visibility, 3.0f); // Видимость не может быть меньше 1 метра (можно изменить если надо)
 
 	float NewExtinction = BaseExtinction + k * (1 / Visibility);
 

@@ -27,6 +27,8 @@ public:
 
     bool IsGasSource();
 
+    TArray<AActor*> GetActors();
+
     // Custom properties
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Room")
     int32 RoomID = -1;

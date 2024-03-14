@@ -36,6 +36,9 @@ public:
         return EnumType->GetNameStringByValue((int64)Status);
     }
 
+    TMap<AActor*, ARoomMarker*> ActorsLocation; // Нужно для проверки перекинулся ли огонь в другую комнату
+    TMap<ARoomMarker*, bool> RoomsStatus; // Горит комната или нет
+
     // ����� ���� ���������� ����� � �������� ����
     UFUNCTION(BlueprintCallable)
     void RestoreScene();
@@ -44,6 +47,9 @@ public:
 
     void UpdateFog();
     void OnEndPIE(const bool bIsSimulating);
+
+    bool GetRoomStatusForActor(AActor* Actor);
+    int32 GetRoomIdForActor(AActor* Actor);
 
     UBuildingGraph* graph; 
 

@@ -21,13 +21,10 @@ void ARoomMarker::BeginPlay()
 
 FMaterialData ARoomMarker::CalculateAverageMaterialData()
 { // ¬ысчитывает средние значени€ параметров дл€ этой комнаты
-    TArray<AActor*> ActorsInRoom;
-    FVector BoxExtent = RoomBounds->GetScaledBoxExtent();
-    FVector BoxCenter = RoomBounds->GetComponentLocation();
+    
     FMaterialData AverageMaterialData;
     int ActorCount = 0;
-    UWorld* World = GetWorld();
-
+    UWorld* World = GetWorld();    
 
     // »нициализируем средние значени€ нул€ми
     AverageMaterialData.BurningRate = 0.0f;
@@ -39,15 +36,30 @@ FMaterialData ARoomMarker::CalculateAverageMaterialData()
     AverageMaterialData.OxygenConsumption_kg_per_kg = 0.0f;
     AverageMaterialData.SmokeGeneration = 0.0f;    
 
-    // ѕолучаем все акторы в мире
-    for (TActorIterator<AActor> It(World); It; ++It)
+    if (!World) return AverageMaterialData;
+    if (!RoomBounds) return AverageMaterialData;
+
+    FVector RoomCenter = RoomBounds->GetComponentLocation();
+    FVector RoomSize = RoomBounds->GetScaledBoxExtent(); // –азмер границы в одну сторону от центра
+    FCollisionShape Box = FCollisionShape::MakeBox(RoomSize);
+
+    FCollisionQueryParams Params;
+    Params.bTraceComplex = true;
+    Params.bReturnPhysicalMaterial = false;
+
+    TArray<FHitResult> HitResults;
+    World->SweepMultiByChannel(HitResults, RoomCenter, RoomCenter, FQuat::Identity, ECC_WorldStatic, Box, Params);
+
+    for (const FHitResult& Hit : HitResults)
     {
-        AActor* Actor = *It;
-        UFireSimulationComponent* FireComp = Actor->FindComponentByClass<UFireSimulationComponent>();
-        if (FireComp && RoomBounds->IsOverlappingActor(Actor))
+        AActor* HitActor = Hit.GetActor();
+        UE_LOG(LogTemp, Warning, TEXT("Room %d: %s"), RoomID, *HitActor->GetName());
+
+        UFireSimulationComponent* FireComp = HitActor ? HitActor->FindComponentByClass<UFireSimulationComponent>() : nullptr;
+        if (FireComp)
         {
             const FMaterialData* ActorMaterialData = FMaterialDataManager::Get().GetMaterialData(*FireComp->SelectedMaterial);
-            // јгрегаци€ значений
+            
             AverageMaterialData.LowestHeatOfCombustion_kJ_per_kg += ActorMaterialData->LowestHeatOfCombustion_kJ_per_kg;
             AverageMaterialData.BurningRate += ActorMaterialData->BurningRate;
             AverageMaterialData.CarbonDioxide_kg_per_kg += ActorMaterialData->CarbonDioxide_kg_per_kg;
@@ -56,9 +68,12 @@ FMaterialData ARoomMarker::CalculateAverageMaterialData()
             AverageMaterialData.LinearFlameSpeed += ActorMaterialData->LinearFlameSpeed;
             AverageMaterialData.OxygenConsumption_kg_per_kg += ActorMaterialData->OxygenConsumption_kg_per_kg;
             AverageMaterialData.SmokeGeneration += ActorMaterialData->SmokeGeneration;
-            ActorCount++;
+            ActorCount++;            
         }
     }
+
+    UE_LOG(LogTemp, Warning, TEXT("Room %d: %d"), RoomID, ActorCount);
+
 
     if (ActorCount > 0)
     {
@@ -121,4 +136,35 @@ bool ARoomMarker::IsGasSource()
     }
     
     return false;
+}
+
+TArray<AActor*> ARoomMarker::GetActors() {
+    UWorld* World = GetWorld();
+
+    TArray<AActor*> Actors;
+
+    if (!World || !RoomBounds) return Actors;
+
+    FVector RoomCenter = RoomBounds->GetComponentLocation();
+    FVector RoomSize = RoomBounds->GetScaledBoxExtent(); // –азмер границы в одну сторону от центра
+    FCollisionShape Box = FCollisionShape::MakeBox(RoomSize);
+
+    FCollisionQueryParams Params;
+    Params.bTraceComplex = true;
+    Params.bReturnPhysicalMaterial = false;
+
+    TArray<FHitResult> HitResults;
+    World->SweepMultiByChannel(HitResults, RoomCenter, RoomCenter, FQuat::Identity, ECC_WorldStatic, Box, Params);
+
+    for (const FHitResult& Hit : HitResults)
+    {
+        AActor* HitActor = Hit.GetActor();
+
+        UFireSimulationComponent* FireComp = HitActor ? HitActor->FindComponentByClass<UFireSimulationComponent>() : nullptr;
+        if (FireComp)
+        {
+            Actors.Add(HitActor);
+        }
+    }
+    return Actors;
 }
