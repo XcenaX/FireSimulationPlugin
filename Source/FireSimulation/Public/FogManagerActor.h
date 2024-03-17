@@ -36,8 +36,8 @@ public:
         return EnumType->GetNameStringByValue((int64)Status);
     }
 
-    TMap<AActor*, ARoomMarker*> ActorsLocation; // Нужно для проверки перекинулся ли огонь в другую комнату
-    TMap<ARoomMarker*, bool> RoomsStatus; // Горит комната или нет
+    TMap<FString, ARoomMarker*> ActorsLocation; // Нужно для проверки перекинулся ли огонь в другую комнату
+    TMap<int32, bool> RoomsStatus; // Горит комната или нет
 
     // ����� ���� ���������� ����� � �������� ����
     UFUNCTION(BlueprintCallable)
@@ -48,8 +48,9 @@ public:
     void UpdateFog();
     void OnEndPIE(const bool bIsSimulating);
 
-    bool GetRoomStatusForActor(AActor* Actor);
-    int32 GetRoomIdForActor(AActor* Actor);
+    bool GetRoomStatusForActor(FString Name);
+    void SetRoomStatus(int32 RoomID, bool Status);
+    int32 GetRoomIdForActor(FString Name);
 
     UBuildingGraph* graph; 
 

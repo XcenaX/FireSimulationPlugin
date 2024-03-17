@@ -34,6 +34,7 @@ void AFireGridManager::InitializeGrid(int32 CubesPerDimension, int32 NewThreads)
 	ElementsAmount = CubesPerDimension;
 	Threads = NewThreads;
 
+	Grid.Empty();
 	Grid.SetNum(CubesPerDimension);
 	for (int32 i = 0; i < CubesPerDimension; ++i)
 	{

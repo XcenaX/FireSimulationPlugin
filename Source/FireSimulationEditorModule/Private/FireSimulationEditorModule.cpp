@@ -148,12 +148,11 @@ FReply FFireSimulationEditorModule::OnInitializeGridClicked()
 
                 AFireGridManager* GridManager = AFireGridManager::GetInstance();
                 if (GridManager)
-                {                    
-                    if (CubesAmount > 30) {
-                        ShowNotification("Building a grid with so many cells can take up a lot of resources! Operation cancelled!");
+                {       
+                    if (CubesAmount > 40) {
+                        ShowNotification("Drawing a grid with so many cells can take up a lot of resources! Operation cancelled!");
                     }
                     else {
-                        GridManager->InitializeGrid(CubesAmount, Threads);
                         GridManager->DrawGrid(true, World, GridActor);
                     }
                 }
@@ -187,8 +186,6 @@ FReply FFireSimulationEditorModule::OnFillGridClicked()
     AFireGridManager* GridManager = AFireGridManager::GetInstance();
     if (GridManager && CubesAmount > 0)
     {
-        //#if WITH_EDITOR
-        //#include "UnrealEd.h"
         if (GEditor)
         {
             UWorld* World = GEditor->GetEditorWorldContext().World();
@@ -203,7 +200,6 @@ FReply FFireSimulationEditorModule::OnFillGridClicked()
             ShowNotification("Grid was successfully filled with Actors!");
 
         }
-        //#endif
     }   
     return FReply::Handled();
 }

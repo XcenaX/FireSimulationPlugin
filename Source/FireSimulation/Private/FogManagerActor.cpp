@@ -35,9 +35,9 @@ void AFogManagerActor::BeginPlay()
 {
 	UE_LOG(LogTemp, Warning, TEXT("INITIALIZING GRAPH"));
 
-	InitializeGraph(GetWorld());
-
 	Super::BeginPlay();
+
+	InitializeGraph(GetWorld());
 
 	FEditorDelegates::EndPIE.AddUObject(this, &AFogManagerActor::OnEndPIE);
 }
@@ -64,29 +64,25 @@ void AFogManagerActor::InitializeGraph(UWorld* World)
 	for (TObjectIterator<UDoorComponent> It; It; ++It)
 	{
 		UDoorComponent* Door = *It;
-		if (Door->GetWorld() == GetWorld() && IsValid(Door))
-		{
-			Doors.Add(Door);
-		}
+		Doors.Add(Door);		
 	}
 
 	int32 RoomCount = 1;
 	for (ARoomMarker* Room : Rooms) {
 		FMaterialData AverageMaterialData = Room->CalculateAverageMaterialData();
+		Room->RoomID = RoomCount;
 		
 		TArray<AActor*> Actors = Room->GetActors();
 
 		for (auto Actor : Actors) {
-			ActorsLocation.Add(Actor, Room);
+			ActorsLocation.Add(Actor->GetName(), Room);
 		}
 
 		bool IsGasSource = Room->IsGasSource();
 
-		RoomsStatus.Add(Room, IsGasSource);
+		RoomsStatus.Add(Room->RoomID, IsGasSource);
 
 		URoomNode* RoomNode = NewObject<URoomNode>();
-
-		Room->RoomID = RoomCount;
 		
 		RoomNode->Initialize(RoomCount, IsGasSource, Room->CombustionCompletenessCoefficient,
 			Room->HeatAbsorptionCoefficient, Room->StartTemperature, Room->InitialGasDensity,
@@ -108,11 +104,11 @@ void AFogManagerActor::InitializeGraph(UWorld* World)
 			int32 StartRoomID = Door->ConnectedRoom1->RoomID;
 			int32 EndRoomID = Door->ConnectedRoom2->RoomID;
 
+			if (StartRoomID < 0 || EndRoomID < 0) continue;
+
 			EConnectionStatus ConnectionStatus = Door->bIsOpen ? EConnectionStatus::DoorOpen : EConnectionStatus::DoorClosed;
 
 			UE_LOG(LogTemp, Warning, TEXT("START_ROOM_ID: %d ; END_ROOM_ID: %d ; Status: %s"), StartRoomID, EndRoomID, *EnumToString(ConnectionStatus));
-
-			if (StartRoomID < 0 || EndRoomID < 0) continue;
 
 			graph->AddConnection(graph->GetRooms()[Door->ConnectedRoom1->RoomID], graph->GetRooms()[Door->ConnectedRoom2->RoomID], ConnectionStatus);
 		}
@@ -158,16 +154,16 @@ void AFogManagerActor::RestoreScene() { // Возвращает сцену к прежнему виду посл
 	graph->ClearAllRooms();
 }
 
-bool AFogManagerActor::GetRoomStatusForActor(AActor* Actor)
+bool AFogManagerActor::GetRoomStatusForActor(FString Name)
 {
-	ARoomMarker** RoomMarkerPtr = ActorsLocation.Find(Actor);
+	ARoomMarker** RoomMarkerPtr = ActorsLocation.Find(Name);
 	if (RoomMarkerPtr == nullptr)
 	{
 		return false;
 	}
 
 	ARoomMarker* RoomMarker = *RoomMarkerPtr;
-	const bool* StatusPtr = RoomsStatus.Find(RoomMarker);
+	const bool* StatusPtr = RoomsStatus.Find(RoomMarker->RoomID);
 	if (StatusPtr == nullptr)
 	{
 		// Статус комнаты неизвестен
@@ -177,12 +173,25 @@ bool AFogManagerActor::GetRoomStatusForActor(AActor* Actor)
 	return *StatusPtr;
 }
 
-int32 AFogManagerActor::GetRoomIdForActor(AActor* Actor)
+void AFogManagerActor::SetRoomStatus(int32 RoomID, bool Status)
 {
-	ARoomMarker** RoomMarkerPtr = ActorsLocation.Find(Actor);
+	bool* StatusPtr = RoomsStatus.Find(RoomID);
+	if (StatusPtr != nullptr)
+	{
+		*StatusPtr = Status;
+	}
+	else
+	{
+		RoomsStatus.Add(RoomID, Status);
+	}
+}
+
+int32 AFogManagerActor::GetRoomIdForActor(FString Name)
+{
+	ARoomMarker** RoomMarkerPtr = ActorsLocation.Find(Name);
 	if (RoomMarkerPtr == nullptr)
 	{
-		return false;
+		return -1;
 	}
 
 	ARoomMarker* RoomMarker = *RoomMarkerPtr;

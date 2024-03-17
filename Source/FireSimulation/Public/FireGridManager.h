@@ -25,6 +25,16 @@ public:
     int32 time = 0; // время которое горит ячейка (секунд)
     float mass = 0; // масса кокретной ячейки (не объекта в целом) (кг)
     AActor* FireActor = nullptr;
+
+    bool operator==(const FGridCell& Other) const
+    {
+        return x == Other.x && y == Other.y && z == Other.z;
+    }
+
+    friend uint32 GetTypeHash(const FGridCell& Cell)
+    {
+        return HashCombine(HashCombine(GetTypeHash(Cell.x), GetTypeHash(Cell.y)), GetTypeHash(Cell.z));
+    }
 };
 
 /**

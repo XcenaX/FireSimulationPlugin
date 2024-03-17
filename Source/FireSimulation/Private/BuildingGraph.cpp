@@ -319,7 +319,7 @@ void UBuildingGraph::CalculateFireDynamicsForSecond(int32 Second, float TimeStep
 		return;
 	}
 
-	for (auto& Room : Rooms)
+	for (auto& Room : Rooms) // Вот тут почему то иногда падает #NULLPTR
 	{
 		FFireDynamicsParameters CurrentParams = CalculateFireDynamicsForRoom(Room.Value, Second);
 		Room.Value->UpdateFireDynamics(CurrentParams);
@@ -330,11 +330,9 @@ void UBuildingGraph::CalculateFireDynamicsForSecond(int32 Second, float TimeStep
 		if (CurrentParams.Visibility != 30.0) {
 			if (!Room.Value->RoomMarker) continue;
 			if (Room.Value->RoomMarker->FogEmitters.Num() == 0) {
-				UE_LOG(LogTemp, Warning, TEXT("SPAWN FOG"));
 				Room.Value->SpawnFog(CurrentParams.Visibility);
 			}
 			else {
-				UE_LOG(LogTemp, Warning, TEXT("UPDATE FOG"));
 				Room.Value->UpdateFogVisibility(CurrentParams.Visibility);
 			}
 		}

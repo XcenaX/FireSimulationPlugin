@@ -47,33 +47,35 @@ FMaterialData ARoomMarker::CalculateAverageMaterialData()
     Params.bTraceComplex = true;
     Params.bReturnPhysicalMaterial = false;
 
-    TArray<FHitResult> HitResults;
-    World->SweepMultiByChannel(HitResults, RoomCenter, RoomCenter, FQuat::Identity, ECC_WorldStatic, Box, Params);
+    FCollisionQueryParams QueryParams;
+    QueryParams.bReturnPhysicalMaterial = false;
 
-    for (const FHitResult& Hit : HitResults)
+    TArray<FHitResult> HitResults;
+    //World->SweepMultiByChannel(HitResults, RoomCenter, RoomCenter, FQuat::Identity, ECC_WorldStatic, Box, Params);
+    
+    TArray<FOverlapResult> OverlapResults;
+    World->OverlapMultiByChannel(OverlapResults, RoomCenter, FQuat::Identity, ECC_WorldStatic, Box, QueryParams);
+
+    for (const FOverlapResult& Hit : OverlapResults)
     {
         AActor* HitActor = Hit.GetActor();
-        UE_LOG(LogTemp, Warning, TEXT("Room %d: %s"), RoomID, *HitActor->GetName());
 
         UFireSimulationComponent* FireComp = HitActor ? HitActor->FindComponentByClass<UFireSimulationComponent>() : nullptr;
         if (FireComp)
         {
             const FMaterialData* ActorMaterialData = FMaterialDataManager::Get().GetMaterialData(*FireComp->SelectedMaterial);
             
-            AverageMaterialData.LowestHeatOfCombustion_kJ_per_kg += ActorMaterialData->LowestHeatOfCombustion_kJ_per_kg;
-            AverageMaterialData.BurningRate += ActorMaterialData->BurningRate;
-            AverageMaterialData.CarbonDioxide_kg_per_kg += ActorMaterialData->CarbonDioxide_kg_per_kg;
-            AverageMaterialData.CarbonMonoxide_kg_per_kg += ActorMaterialData->CarbonMonoxide_kg_per_kg;
-            AverageMaterialData.HydrogenChloride_kg_per_kg += ActorMaterialData->HydrogenChloride_kg_per_kg;
-            AverageMaterialData.LinearFlameSpeed += ActorMaterialData->LinearFlameSpeed;
-            AverageMaterialData.OxygenConsumption_kg_per_kg += ActorMaterialData->OxygenConsumption_kg_per_kg;
-            AverageMaterialData.SmokeGeneration += ActorMaterialData->SmokeGeneration;
+            AverageMaterialData.LowestHeatOfCombustion_kJ_per_kg += ActorMaterialData->LowestHeatOfCombustion_kJ_per_kg * FireComp->Mass;
+            AverageMaterialData.BurningRate += ActorMaterialData->BurningRate * FireComp->Mass;
+            AverageMaterialData.CarbonDioxide_kg_per_kg += ActorMaterialData->CarbonDioxide_kg_per_kg * FireComp->Mass;
+            AverageMaterialData.CarbonMonoxide_kg_per_kg += ActorMaterialData->CarbonMonoxide_kg_per_kg * FireComp->Mass;
+            AverageMaterialData.HydrogenChloride_kg_per_kg += ActorMaterialData->HydrogenChloride_kg_per_kg * FireComp->Mass;
+            AverageMaterialData.LinearFlameSpeed += ActorMaterialData->LinearFlameSpeed * FireComp->Mass;
+            AverageMaterialData.OxygenConsumption_kg_per_kg += ActorMaterialData->OxygenConsumption_kg_per_kg * FireComp->Mass;
+            AverageMaterialData.SmokeGeneration += ActorMaterialData->SmokeGeneration * FireComp->Mass;
             ActorCount++;            
         }
     }
-
-    UE_LOG(LogTemp, Warning, TEXT("Room %d: %d"), RoomID, ActorCount);
-
 
     if (ActorCount > 0)
     {
@@ -126,7 +128,6 @@ bool ARoomMarker::IsGasSource()
     for (const FHitResult& Hit : HitResults)
     {
         AActor* HitActor = Hit.GetActor();
-        UE_LOG(LogTemp, Warning, TEXT("Room %d: %s"), RoomID, *HitActor->GetName());
 
         UFireSimulationComponent* FireComp = HitActor ? HitActor->FindComponentByClass<UFireSimulationComponent>() : nullptr;
         if (FireComp && FireComp->IsBurning)
@@ -152,16 +153,21 @@ TArray<AActor*> ARoomMarker::GetActors() {
     FCollisionQueryParams Params;
     Params.bTraceComplex = true;
     Params.bReturnPhysicalMaterial = false;
+    
+	FCollisionQueryParams QueryParams;
+	QueryParams.bReturnPhysicalMaterial = false;
 
     TArray<FHitResult> HitResults;
-    World->SweepMultiByChannel(HitResults, RoomCenter, RoomCenter, FQuat::Identity, ECC_WorldStatic, Box, Params);
+    TArray<FOverlapResult> OverlapResults;
+//    World->SweepMultiByChannel(HitResults, RoomCenter, RoomCenter, FQuat::Identity, ECC_WorldStatic, Box, Params);
+    World->OverlapMultiByChannel(OverlapResults, RoomCenter, FQuat::Identity, ECC_WorldStatic, Box, QueryParams);
 
-    for (const FHitResult& Hit : HitResults)
+    for (const FOverlapResult& Hit : OverlapResults)
     {
         AActor* HitActor = Hit.GetActor();
 
         UFireSimulationComponent* FireComp = HitActor ? HitActor->FindComponentByClass<UFireSimulationComponent>() : nullptr;
-        if (FireComp)
+        if (FireComp && !FireComp->IsWall)
         {
             Actors.Add(HitActor);
         }
