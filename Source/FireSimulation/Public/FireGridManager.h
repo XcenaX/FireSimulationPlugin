@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include <GridActor.h>
+#include <FireSimulationComponent.h>
 #include "FireGridManager.generated.h"
 
 #define EMPTY 0
@@ -50,7 +51,7 @@ public:
 
     // Инициализация сетки на основе количества элементов в одном измерении.
     UFUNCTION(BlueprintCallable)
-    void InitializeGrid(int32 CubesPerDimension, int32 Threads);
+    void InitializeGrid(int32 CubesPerDimension, int32 Threads, int32 FireSize);
 
     // Визуализация сетки.
     UFUNCTION(BlueprintCallable)
@@ -72,9 +73,10 @@ public:
     static AFireGridManager* GetInstance();
 
     TArray<FGridCell> GetBurningCells();
+    FGridCell& GetCell(int32 x, int32 y, int32 z);
 
     // Трехмерный массив ячеек.
-    TArray<TArray<TArray<FGridCell>>> Grid;
+    TArray<FGridCell> Grid;
 
     AGridActor* GridActor;
 
@@ -82,12 +84,16 @@ public:
     float ElementsAmount;
     // Количество поток
     int Threads;
-    // Класс актора огня который будет создаваться на месте загоревшейся ячейки    
+    // Размер партикла огня
+    int FireParticleSize;
 
+
+    // Класс актора огня который будет создаваться на месте загоревшейся ячейки    
     UObject* SelectedParticleFire;
     UObject* SelectedParticleFog;
 
     TMap<AActor*, int> ActorCellsCount;
+    TMap<AActor*, UFireSimulationComponent*> ActorToFireCompMap;
 
 private:
     // Статический экземпляр для синглтона.

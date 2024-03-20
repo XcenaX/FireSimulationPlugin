@@ -19,14 +19,12 @@ private:
 
     TSharedPtr<SEditableTextBox> CubesAmountTextBox;
     TSharedPtr<SEditableTextBox> ThreadsTextBox;
+    TSharedPtr<SEditableTextBox> FireSizeTextBox;
     
     TSharedPtr<SButton> PickFireButton;
-    TSharedPtr<SButton> PickFogButton;
-
     
     TSharedRef<SDockTab> OnSpawnPluginTab(const FSpawnTabArgs& SpawnTabArgs);
 
-    /** Callback for when the 'Initialize Grid' button is clicked */
     FReply OnInitializeGridClicked();
     FReply OnClearGridClicked();
     FReply OnFillGridClicked();

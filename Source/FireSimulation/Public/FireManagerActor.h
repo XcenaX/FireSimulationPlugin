@@ -41,7 +41,7 @@ public:
 
     bool Contains(TArray<FGridCell> List, FGridCell Cell);
 
-    int CalculateFP(TArray<TArray<TArray<FGridCell>>> cells, int x, int y, int z);
+    int CalculateFP(int x, int y, int z);
 
     // Показывает скрытые акторы; Тушит весь огонь
     UFUNCTION(BlueprintCallable)
