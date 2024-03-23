@@ -29,5 +29,4 @@ private:
     FReply OnClearGridClicked();
     FReply OnFillGridClicked();
     FReply OnPickActorClassClicked();
-    FReply OnPickFogClassClicked();
 };

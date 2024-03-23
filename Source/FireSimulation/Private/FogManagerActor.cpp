@@ -138,7 +138,7 @@ void AFogManagerActor::Tick(float DeltaTime)
 	if (TimeAccumulator >= 1.0f)
 	{
 		TotalTime++;
-		//UpdateFog();
+		UpdateFog();
 		TimeAccumulator -= 1.0f;
 	}
 }

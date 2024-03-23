@@ -320,43 +320,6 @@ FReply FFireSimulationEditorModule::OnPickActorClassClicked()
     return FReply::Handled();
 }
 
-
-FReply FFireSimulationEditorModule::OnPickFogClassClicked()
-{
-    // Настройка конфигурации пикера ассетов
-    FAssetPickerConfig AssetPickerConfig;
-    AssetPickerConfig.Filter.ClassNames.Add(UParticleSystem::StaticClass()->GetFName());
-    AssetPickerConfig.OnAssetSelected = FOnAssetSelected::CreateLambda([this](const FAssetData& AssetData)
-        {
-            UObject* SelectedObject = AssetData.GetAsset();
-            AFireGridManager::GetInstance()->SelectedParticleFog = SelectedObject;
-
-            ShowNotification("Fog Visualisation was picked!");
-        });
-
-    // Создание виджета для пикера ассетов
-    FContentBrowserModule& ContentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
-    TSharedRef<SWidget> AssetPicker = SNew(SBox)
-        .WidthOverride(500.f)
-        .HeightOverride(400.f)
-        [
-            ContentBrowserModule.Get().CreateAssetPicker(AssetPickerConfig)
-        ];
-
-    // Создание и отображение диалогового окна
-    TSharedRef<SWindow> PickerWindow = SNew(SWindow)
-        .Title(FText::FromString("Pick Fog visualisation"))
-        .ClientSize(FVector2D(600, 500))
-        [
-            AssetPicker
-        ];
-
-    FSlateApplication::Get().AddModalWindow(PickerWindow, nullptr, false);
-
-
-    return FReply::Handled();
-}
-
 void FFireSimulationEditorModule::ShowNotification(FString message) {
     FNotificationInfo Info(FText::FromString(message));
     Info.ExpireDuration = 5.0f;

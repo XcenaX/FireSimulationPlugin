@@ -36,13 +36,14 @@ public:
     void processNewList(int32 StartIndex, int32 EndIndex, TArray<FVector>& CoordsToRemove);
     void processFireList(int32 StartIndex, int32 EndIndex, TArray<FVector>& CoordsToRemove);
 
-    void parallelProcessList(TArray<FGridCell>& List, TFunction<void(int32, int32, TArray<FVector>&)> ProcessFunction, TArray<FVector>& GlobalCoordsToRemove);
-    void RemoveCellsByCoords(TArray<FGridCell>& List, TArray<FVector>& CoordsToRemove);
+    void parallelProcessList(TArray<FGridCell*>& List, TFunction<void(int32, int32, TArray<FVector>&)> ProcessFunction, TArray<FVector>& GlobalCoordsToRemove);
+    void RemoveCellsByCoords(TArray<FGridCell*>& List, TArray<FVector>& CoordsToRemove);
 
-    bool Contains(TArray<FGridCell> List, FGridCell Cell);
+    bool Contains(TArray<FGridCell*> List, FGridCell Cell);
+    bool Contains(TArray<FGridCell*> List, FGridCell* Cell);
 
-    int CalculateFP(int x, int y, int z);
-
+    int CalculateFP(FGridCell* Cell);
+    
     // Показывает скрытые акторы; Тушит весь огонь
     UFUNCTION(BlueprintCallable)
     void RestoreScene();
@@ -51,10 +52,12 @@ public:
 
 
 private:
-    TArray<FGridCell> CheckList;
-    TArray<FGridCell> FireList;
-    TArray<FGridCell> NewList;
+    TArray<FGridCell*> CheckList;
+    TArray<FGridCell*> FireList;
+    TArray<FGridCell*> NewList;
+    TArray<FGridCell*> BurntList;
     int32 Threads;
+    bool JobDone = true; // Завершены ли расчеты распространения огня для текущей секунды
 
     FCriticalSection ListMutex;
 

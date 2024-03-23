@@ -26,6 +26,7 @@ public:
     int32 time = 0; // время которое горит ячейка (секунд)
     float mass = 0; // масса кокретной ячейки (не объекта в целом) (кг)
     AActor* FireActor = nullptr;
+    TArray<FGridCell*> Neighbours;
 
     bool operator==(const FGridCell& Other) const
     {
@@ -62,40 +63,38 @@ public:
     void PopulateGridWithActors(UWorld* World, AActor* GridActor);
 
     // Создает Актор огня в загоревшейся ячейке
-    UFUNCTION(BlueprintCallable)
-    void CreateFireActor(FGridCell Cell, UWorld * World);
+    //UFUNCTION(BlueprintCallable)
+    void CreateFireActor(FGridCell* Cell, UWorld * World);
 
     // Скрывает сгоревший обьект и удаляет огонь который на нем был
-    UFUNCTION(BlueprintCallable)
-    void RemoveBurntActor(FGridCell& Cell);
+    //UFUNCTION(BlueprintCallable)
+    void RemoveBurntActor(FGridCell* Cell);
+
+    void ClearGrid();
 
     // Получить экземпляр менеджера сетки.
     static AFireGridManager* GetInstance();
 
-    TArray<FGridCell> GetBurningCells();
+    TArray<FGridCell*> GetBurningCells();
     FGridCell& GetCell(int32 x, int32 y, int32 z);
 
-    // Трехмерный массив ячеек.
-    TArray<FGridCell> Grid;
-
-    AGridActor* GridActor;
-
-    // Количество элементов в сетке в одном измерении.
-    float ElementsAmount;
     // Количество поток
     int Threads;
+    // Количество элементов в сетке в одном измерении.
+    int ElementsAmount;
     // Размер партикла огня
     int FireParticleSize;
 
-
     // Класс актора огня который будет создаваться на месте загоревшейся ячейки    
     UObject* SelectedParticleFire;
-    UObject* SelectedParticleFog;
 
     TMap<AActor*, int> ActorCellsCount;
     TMap<AActor*, UFireSimulationComponent*> ActorToFireCompMap;
 
 private:
+    AGridActor* GridActor;
+    // Трехмерный массив ячеек.
+    TArray<FGridCell> Grid;
     // Статический экземпляр для синглтона.
     static AFireGridManager* Instance;
 };

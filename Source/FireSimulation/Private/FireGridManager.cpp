@@ -53,6 +53,39 @@ void AFireGridManager::InitializeGrid(int32 CubesPerDimension, int32 NewThreads,
 		}
 	}
 
+	for (int32 i = 0; i < ElementsAmount; i++)
+	{
+		for (int32 j = 0; j < ElementsAmount; j++)
+		{
+			for (int32 k = 0; k < ElementsAmount; k++) {
+				FGridCell& CurrentCell = GetCell(i, j, k);
+
+				for (int32 dx = -1; dx <= 1; dx++) {
+					for (int32 dy = -1; dy <= 1; dy++) {
+						for (int32 dz = -1; dz <= 1; dz++) {
+							// Пропускаем саму ячейку
+							if (dx == 0 && dy == 0 && dz == 0) continue;
+
+							int32 newX = i + dx;
+							int32 newY = j + dy;
+							int32 newZ = k + dz;
+
+							// Проверяем, что координаты находятся в пределах сетки
+							if (newX >= 0 && newX < ElementsAmount &&
+								newY >= 0 && newY < ElementsAmount &&
+								newZ >= 0 && newZ < ElementsAmount) {
+
+								FGridCell& NeighbourCell = GetCell(newX, newY, newZ);
+								CurrentCell.Neighbours.Add(&NeighbourCell);
+							}
+						}
+					}
+				}
+
+			}
+		}
+	}	
+
 	ActorCellsCount.Empty();
 }
 
@@ -87,6 +120,10 @@ void AFireGridManager::DrawGrid(bool bVisible, UWorld* World, AActor* NewGridAct
 	}
 }
 
+void AFireGridManager::ClearGrid() {
+	Grid.Empty();
+}
+
 FGridCell& AFireGridManager::GetCell(int32 x, int32 y, int32 z) {
 	int32 index = z + ElementsAmount * (y + ElementsAmount * x);
 	return Grid[index];
@@ -105,11 +142,7 @@ void AFireGridManager::PopulateGridWithActors(UWorld* World, AActor* NewGridActo
     FVector CellSize(GridSize.X / ElementsAmount, GridSize.Y / ElementsAmount, GridSize.Z / ElementsAmount);
 
 	// Заполняем сетку акторами
-	FVector GridOrigin = BoxComponent->GetComponentLocation() - GridSize / 2; // Начальная точка сетки
-	
-	FCollisionQueryParams Params;
-	Params.bTraceComplex = true;
-	Params.bReturnPhysicalMaterial = false;
+	FVector GridOrigin = BoxComponent->GetComponentLocation() - GridSize / 2; // Начальная точка сетки	
 
 	FCollisionQueryParams QueryParams;
 	QueryParams.bReturnPhysicalMaterial = false;
@@ -126,9 +159,7 @@ void AFireGridManager::PopulateGridWithActors(UWorld* World, AActor* NewGridActo
 				FGridCell& Cell = GetCell(x, y, z);
 				FVector CellCenter = GridOrigin + FVector(x * CellSize.X, y * CellSize.Y, z * CellSize.Z) + CellSize / 2;
 				FCollisionShape Box = FCollisionShape::MakeBox(CellSize / 2);
-				TArray<FHitResult> HitResults;
 				TArray<FOverlapResult> OverlapResults;
-				//World->SweepMultiByChannel(HitResults, CellCenter, CellCenter, FQuat::Identity, ECC_WorldStatic, Box, Params);
 				World->OverlapMultiByChannel(OverlapResults, CellCenter, FQuat::Identity, ECC_WorldStatic, Box, QueryParams);
 				
 				AActor* PickedActor = nullptr;
@@ -174,7 +205,7 @@ void AFireGridManager::PopulateGridWithActors(UWorld* World, AActor* NewGridActo
 				// LOGS
 				if (Cell.OccupyingActor)
 				{
-					LogText += "O";//Grid[x][y][z].OccupyingActor->GetName();
+					LogText += "O";
 				}
 				else
 				{
@@ -214,8 +245,8 @@ void AFireGridManager::PopulateGridWithActors(UWorld* World, AActor* NewGridActo
 	FFileHelper::SaveStringToFile(LogText, *FilePath);
 }
 
-TArray<FGridCell> AFireGridManager::GetBurningCells() {
-	TArray<FGridCell> BurningCells;
+TArray<FGridCell*> AFireGridManager::GetBurningCells() {
+	TArray<FGridCell*> BurningCells;
 	for (int i = 0; i < ElementsAmount; i++) {
 		for (int j = 0; j < ElementsAmount; j++) {
 			for (int k = 0; k < ElementsAmount; k++) {
@@ -223,7 +254,7 @@ TArray<FGridCell> AFireGridManager::GetBurningCells() {
 
 				FGridCell& Cell = GetCell(i, j, k);
 				if (Cell.Status == BURNING) {
-					BurningCells.Add(Cell);
+					BurningCells.Add(&Cell);
 				}
 			}
 		}
@@ -232,7 +263,7 @@ TArray<FGridCell> AFireGridManager::GetBurningCells() {
 }
 
 
-void AFireGridManager::CreateFireActor(FGridCell Cell, UWorld* World)
+void AFireGridManager::CreateFireActor(FGridCell* Cell, UWorld* World)
 {
 	if (!SelectedParticleFire || !World)
 	{
@@ -247,7 +278,7 @@ void AFireGridManager::CreateFireActor(FGridCell Cell, UWorld* World)
 	FVector CellSize(GridSize.X / ElementsAmount, GridSize.Y / ElementsAmount, GridSize.Z / ElementsAmount);
 	FVector GridOrigin = GridBoxComponent->GetComponentLocation() - GridSize / 2;
 
-	FVector CellCenter = GridOrigin + FVector(Cell.x * CellSize.X, Cell.y * CellSize.Y, Cell.z * CellSize.Z) + CellSize / 2;
+	FVector CellCenter = GridOrigin + FVector(Cell->x * CellSize.X, Cell->y * CellSize.Y, Cell->z * CellSize.Z) + CellSize / 2;
 
 	FCollisionQueryParams QueryParams;
 	QueryParams.bTraceComplex = true;
@@ -273,7 +304,6 @@ void AFireGridManager::CreateFireActor(FGridCell Cell, UWorld* World)
 			}
 		}
 	}
-	UE_LOG(LogTemp, Warning, TEXT("FIRE SIZE : %d"), FireParticleSize);
 	// Создаем актор огня
 	FActorSpawnParameters SpawnParams;
 	FRotator Rotation(0);
@@ -305,26 +335,26 @@ void AFireGridManager::CreateFireActor(FGridCell Cell, UWorld* World)
 	ParticleSystemComponent->Activate();
 	SpawnedActor->RegisterAllComponents();
 
-	Cell.FireActor = SpawnedActor;
+	Cell->FireActor = SpawnedActor;
 }
 
 
-void AFireGridManager::RemoveBurntActor(FGridCell& Cell) {
+void AFireGridManager::RemoveBurntActor(FGridCell* Cell) {
 	for (int i = 0; i < ElementsAmount; ++i) {
 		for (int j = 0; j < ElementsAmount; ++j) {
 			for (int k = 0; k < ElementsAmount; ++k) {
-				if (GetCell(i, j, k).OccupyingActor == Cell.OccupyingActor && Cell.FireActor) {
-					Cell.FireActor->Destroy();
-					Cell.FireActor = nullptr;
+				if (GetCell(i, j, k).OccupyingActor == Cell->OccupyingActor && Cell->FireActor) {
+					Cell->FireActor->Destroy();
+					Cell->FireActor = nullptr;
 				}
 			}
 		}
 	}
 
-    if (Cell.OccupyingActor) {
-		Cell.OccupyingActor->SetActorHiddenInGame(true);
-		Cell.OccupyingActor->SetActorEnableCollision(false);
-		Cell.OccupyingActor->SetActorTickEnabled(false);
-		Cell.OccupyingActor->MarkComponentsRenderStateDirty();
+    if (Cell->OccupyingActor) {
+		Cell->OccupyingActor->SetActorHiddenInGame(true);
+		Cell->OccupyingActor->SetActorEnableCollision(false);
+		Cell->OccupyingActor->SetActorTickEnabled(false);
+		Cell->OccupyingActor->MarkComponentsRenderStateDirty();
 	}
 }

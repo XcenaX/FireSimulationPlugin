@@ -25,7 +25,7 @@ void AFireManagerActor::BeginPlay()
 {
     Super::BeginPlay();
 
-    FogManager->InitializeGraph(GetWorld());    
+    //FogManager->InitializeGraph(GetWorld());    
 
     Threads = GridManager->Threads;
 
@@ -50,19 +50,22 @@ void AFireManagerActor::Tick(float DeltaTime)
     TimeAccumulator += DeltaTime;
 
     // Проверяем, прошла ли секунда
-    if (TimeAccumulator >= 1.0f)
+    if (TimeAccumulator >= 1.0f && JobDone)
     {
-        AsyncTask(ENamedThreads::GameThread, [this]() {
+        Async(EAsyncExecution::Thread, [this]()
+        {
             UpdateFireSpread();
         });
-        TimeAccumulator -= 1.0f;
+        // UpdateFireSpread();
+        
+        TimeAccumulator = 0.0f;
     }    
 }
 
 void AFireManagerActor::InitializeFireSpread()
 {    
     // Переносим изначально горящие акторы в список для дальнейшей обработки    
-    TArray<FGridCell> BurningCells = GridManager->GetBurningCells();
+    TArray<FGridCell*> BurningCells = GridManager->GetBurningCells();
     NewList.Empty(BurningCells.Num());
     for (int i = 0; i < BurningCells.Num(); i++) {
         NewList.Add(BurningCells[i]);
@@ -71,10 +74,9 @@ void AFireManagerActor::InitializeFireSpread()
 
 void AFireManagerActor::UpdateFireSpread()
 {
-    UE_LOG(LogTemp, Warning, TEXT("CheckList: %d; FireList: %d; NewList: %d"), CheckList.Num(), FireList.Num(), NewList.Num());
     if (CheckList.Num() > 0 || NewList.Num() > 0 || FireList.Num() > 0) {
-
-        double Start = FPlatformTime::Seconds();
+        JobDone = false;
+        //double Start = FPlatformTime::Seconds();
 
         if (CheckList.Num() > 500) {
             //parallelProcessList(CheckList, &AFireManagerActor::processCheckList, CheckListRemovalIndices);
@@ -88,11 +90,13 @@ void AFireManagerActor::UpdateFireSpread()
         }
         RemoveCellsByCoords(CheckList, CheckListRemovalIndices);
 
-        double End = FPlatformTime::Seconds();
+        /*double End = FPlatformTime::Seconds();
         double ElapsedSeconds = End - Start;
-        UE_LOG(LogTemp, Warning, TEXT("CheckList: %f сек"), ElapsedSeconds);
+        UE_LOG(LogTemp, Warning, TEXT("CheckList: %f сек"), ElapsedSeconds);*/
 
-        Start = FPlatformTime::Seconds();
+        UE_LOG(LogTemp, Warning, TEXT("CheckList: %d; FireList: %d; NewList: %d"), CheckList.Num(), FireList.Num(), NewList.Num());
+        
+        double Start = FPlatformTime::Seconds();
 
         if (NewList.Num() > 500) {
             //parallelProcessList(NewList, &AFireManagerActor::processNewList, NewListRemovalIndices);
@@ -106,11 +110,11 @@ void AFireManagerActor::UpdateFireSpread()
         }
         RemoveCellsByCoords(NewList, NewListRemovalIndices);
 
-        End = FPlatformTime::Seconds();
-        ElapsedSeconds = End - Start;
+        double  End = FPlatformTime::Seconds();
+        double ElapsedSeconds = End - Start;
         UE_LOG(LogTemp, Warning, TEXT("NewList: %f сек"), ElapsedSeconds);
 
-        Start = FPlatformTime::Seconds();
+        // Start = FPlatformTime::Seconds();
 
 
         if (FireList.Num() > 500) {
@@ -124,15 +128,26 @@ void AFireManagerActor::UpdateFireSpread()
         }
         RemoveCellsByCoords(FireList, FireListRemovalIndices);
 
-        End = FPlatformTime::Seconds();
+        JobDone = true;
+
+        /*End = FPlatformTime::Seconds();
         ElapsedSeconds = End - Start;
-        UE_LOG(LogTemp, Warning, TEXT("FireList: %f сек"), ElapsedSeconds);
+        UE_LOG(LogTemp, Warning, TEXT("FireList: %f сек"), ElapsedSeconds);*/
     }
 }
 
-bool AFireManagerActor::Contains(TArray<FGridCell> List, FGridCell Cell) {
-    for (FGridCell Item : List) {
+bool AFireManagerActor::Contains(TArray<FGridCell*> List, FGridCell* Cell) {
+    for (FGridCell* Item : List) {
         if (Item == Cell) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool AFireManagerActor::Contains(TArray<FGridCell*> List, FGridCell Cell) {
+    for (FGridCell* Item : List) {
+        if (Item->x == Cell.x && Item->y == Cell.y && Item->z == Cell.z) {
             return true;
         }
     }
@@ -143,18 +158,18 @@ void AFireManagerActor::processCheckList(int32 StartIndex, int32 EndIndex, TArra
     FScopeLock ScopeLock(&ListMutex);
     for (int32 i = StartIndex; i < EndIndex; ++i)
     {
-        FGridCell Cell = CheckList[i];
+        FGridCell* Cell = CheckList[i];
 
-        if (Cell.OccupyingActor == nullptr || Cell.Status > EMPTY) {
-            CoordsToRemove.Add(FVector(Cell.x, Cell.y, Cell.z));
+        if (Cell->OccupyingActor == nullptr || Cell->Status > EMPTY) {
+            CoordsToRemove.Add(FVector(Cell->x, Cell->y, Cell->z));
             continue;
         }
 
-        int32 FP = CalculateFP(Cell.x, Cell.y, Cell.z);
+        int32 FP = CalculateFP(Cell);
         
         float LinearSpeed = 0.8f; // Default value
 
-        UFireSimulationComponent* FireComp = GridManager->ActorToFireCompMap.FindRef(Cell.OccupyingActor);
+        UFireSimulationComponent* FireComp = GridManager->ActorToFireCompMap.FindRef(Cell->OccupyingActor);
         if (FireComp)
         {
             const FMaterialData* Material = FMaterialDataManager::Get().GetMaterialData(*(FireComp->SelectedMaterial));
@@ -169,7 +184,7 @@ void AFireManagerActor::processCheckList(int32 StartIndex, int32 EndIndex, TArra
         if (FMath::RandRange(0.0f, 1.0f) < Probability)
         {            
             NewList.Add(Cell);
-            CoordsToRemove.Add(FVector(Cell.x, Cell.y, Cell.z));
+            CoordsToRemove.Add(FVector(Cell->x, Cell->y, Cell->z));
         }
     }
 }
@@ -177,58 +192,37 @@ void AFireManagerActor::processCheckList(int32 StartIndex, int32 EndIndex, TArra
 void AFireManagerActor::processNewList(int32 StartIndex, int32 EndIndex, TArray<FVector>& CoordsToRemove) {
     FScopeLock ScopeLock(&ListMutex);
     for (int32 i = StartIndex; i < EndIndex; ++i) {
-        FGridCell cell = NewList[i];
+        FGridCell* cell = NewList[i];
         
-        if (cell.OccupyingActor == nullptr) {
-            CoordsToRemove.Add(FVector(cell.x, cell.y, cell.z));
+        if (cell->OccupyingActor == nullptr) {
+            CoordsToRemove.Add(FVector(cell->x, cell->y, cell->z));
             continue;
         }
 
-        UFireSimulationComponent* FireComp = GridManager->ActorToFireCompMap.FindRef(cell.OccupyingActor);
+        UFireSimulationComponent* FireComp = GridManager->ActorToFireCompMap.FindRef(cell->OccupyingActor);
 
-        int32 x = cell.x;
-        int32 y = cell.y;
-        int32 z = cell.z;
+        for (int32 j= 0; j < cell->Neighbours.Num(); j++) {
+            FGridCell* Neighbour = cell->Neighbours[j];
 
-        for (int32 dx = -1; dx <= 1; dx++) {
-            for (int32 dy = -1; dy <= 1; dy++) {
-                for (int32 dz = -1; dz <= 1; dz++) {
-                    // Пропускаем саму ячейку
-                    if (dx == 0 && dy == 0 && dz == 0) continue;
-
-                    int32 newX = x + dx;
-                    int32 newY = y + dy;
-                    int32 newZ = z + dz;
-
-                    // Проверяем, что координаты находятся в пределах сетки
-                    if (newX >= 0 && newX < GridManager->ElementsAmount &&
-                        newY >= 0 && newY < GridManager->ElementsAmount &&
-                        newZ >= 0 && newZ < GridManager->ElementsAmount) {
-
-                        FGridCell& Cell = GridManager->GetCell(newX, newY, newZ);
-                        
-                        if (Cell.Status == EMPTY && Cell.OccupyingActor && !Contains(CheckList, Cell)) {
-                            CheckList.Add(Cell);
-                        }
-                    }
-                }
+            if (Neighbour->Status == EMPTY && Neighbour->OccupyingActor && !Contains(CheckList, Neighbour)) {
+                CheckList.Add(Neighbour);
             }
         }
 
-        GridManager->GetCell(cell.x, cell.y, cell.z).Status = BURNING;
+        cell->Status = BURNING;
         FireList.Add(cell);
-        CoordsToRemove.Add(FVector(cell.x, cell.y, cell.z));
-        if (cell.FireActor == nullptr) {
+        CoordsToRemove.Add(FVector(cell->x, cell->y, cell->z));
+        if (cell->FireActor == nullptr) {
             AsyncTask(ENamedThreads::GameThread, [this, cell]() {
                 GridManager->CreateFireActor(cell, GetWorld()); // Создает актор огня в этой ячейке
             });
         }
 
         // Если Комната этого актора еще не загорелась то сделать Merge            
-        if (FireComp && !FogManager->GetRoomStatusForActor(cell.OccupyingActor->GetName()) && !FireComp->IsWall) {
-            int32 RoomID = FogManager->GetRoomIdForActor(cell.OccupyingActor->GetName());
+        if (FireComp && !FogManager->GetRoomStatusForActor(cell->OccupyingActor->GetName()) && !FireComp->IsWall) {
+            int32 RoomID = FogManager->GetRoomIdForActor(cell->OccupyingActor->GetName());
             if (RoomID >= 0) {
-                UE_LOG(LogTemp, Warning, TEXT("MERGE ROOM : %d ; Actor: %s"), RoomID, *cell.OccupyingActor->GetName());
+                UE_LOG(LogTemp, Warning, TEXT("MERGE ROOM : %d ; Actor: %s"), RoomID, *cell->OccupyingActor->GetName());
                 FogManager->SetRoomStatus(RoomID, true);
                 FogManager->graph->MergeToSourceRoom(RoomID);
             }
@@ -240,44 +234,42 @@ void AFireManagerActor::processNewList(int32 StartIndex, int32 EndIndex, TArray<
 void AFireManagerActor::processFireList(int32 StartIndex, int32 EndIndex, TArray<FVector>& CoordsToRemove) {
     FScopeLock ScopeLock(&ListMutex);
     for (int32 i = StartIndex; i < EndIndex; ++i) {
-        FGridCell cell = FireList[i];
+        FGridCell* cell = FireList[i];
 
-        if (cell.OccupyingActor == nullptr) {
+        if (cell->OccupyingActor == nullptr) {
             continue;            
         }
 
-        UFireSimulationComponent* FireComp = GridManager->ActorToFireCompMap.FindRef(cell.OccupyingActor);
+        UFireSimulationComponent* FireComp = GridManager->ActorToFireCompMap.FindRef(cell->OccupyingActor);
 
         if (FireComp->IsWall) {
             continue;
         }
 
-        if (cell.Status == BURNING) {
-            FireList[i].time += 1;
+        if (cell->Status == BURNING) {
+            cell->time += 1;
             const FMaterialData * SelectedMaterial = FMaterialDataManager::Get().GetMaterialData(*FireComp->SelectedMaterial);
 
             float A = 1.05 * SelectedMaterial->BurningRate * pow(SelectedMaterial->LinearFlameSpeed, 2);
-            float burntMass = A * pow(cell.time, 3);
+            float burntMass = A * pow(cell->time, 3);
             
             //UE_LOG(LogTemp, Warning, TEXT("Burning rate: %f; FlameSpeed: %f; BurnMass: %f / %f; Time: %d"), SelectedMaterial->BurningRate, SelectedMaterial->LinearFlameSpeed, burntMass, cell.mass, cell.time);
             
-            if (cell.mass <= burntMass && FireList[i].time > 2) {
-                GridManager->GetCell(cell.x, cell.y, cell.z).Status = BURNT;
-                FireList[i].Status = BURNT;
-                GridManager->ActorCellsCount[FireList[i].OccupyingActor]--;
-
-                //UE_LOG(LogTemp, Warning, TEXT("CELLS COUNT: %d;"), GridManager->ActorCellsCount[FireList[i].OccupyingActor]);
+            if (cell->mass <= burntMass && cell->time > 2) {
+                cell->Status = BURNT;
+                GridManager->ActorCellsCount[cell->OccupyingActor]--;
                 
-                if (GridManager->ActorCellsCount[cell.OccupyingActor] == 0) {
-                    GridManager->RemoveBurntActor(FireList[i]); // Обьект сгорел, удаляем этот актор и огонь на нем
+                if (GridManager->ActorCellsCount[cell->OccupyingActor] == 0) {
+                    GridManager->RemoveBurntActor(cell); // Обьект сгорел, удаляем этот актор и огонь на нем
                 }
-                CoordsToRemove.Add(FVector(cell.x, cell.y, cell.z));
+                BurntList.Add(cell);
+                CoordsToRemove.Add(FVector(cell->x, cell->y, cell->z));
             }
         }
     }
 }
 
-void AFireManagerActor::parallelProcessList(TArray<FGridCell>& List, TFunction<void(int32, int32, TArray<FVector>&)> ProcessFunction, TArray<FVector>& GlobalCoordsToRemove) {
+void AFireManagerActor::parallelProcessList(TArray<FGridCell*>& List, TFunction<void(int32, int32, TArray<FVector>&)> ProcessFunction, TArray<FVector>& GlobalCoordsToRemove) {
     int32 TotalSize = List.Num();
     int32 MaxElementsPerTask = FMath::CeilToInt((float)TotalSize / (float)Threads);
 
@@ -308,14 +300,14 @@ void AFireManagerActor::parallelProcessList(TArray<FGridCell>& List, TFunction<v
 }
 
 
-void AFireManagerActor::RemoveCellsByCoords(TArray<FGridCell>& List, TArray<FVector>& CoordsToRemove)
+void AFireManagerActor::RemoveCellsByCoords(TArray<FGridCell*>& List, TArray<FVector>& CoordsToRemove)
 {
     FScopeLock ScopeLock(&ListMutex);
 
     for (int32 Index = List.Num() - 1; Index >= 0; --Index)
     {
-        const FGridCell& Cell = List[Index];
-        const FVector CellCoords(Cell.x, Cell.y, Cell.z);
+        const FGridCell* Cell = List[Index];
+        const FVector CellCoords(Cell->x, Cell->y, Cell->z);
 
         for (const FVector& CoordToRemove : CoordsToRemove)
         {
@@ -330,34 +322,21 @@ void AFireManagerActor::RemoveCellsByCoords(TArray<FGridCell>& List, TArray<FVec
 }
 
 
-int AFireManagerActor::CalculateFP(int x, int y, int z) {
+int AFireManagerActor::CalculateFP(FGridCell* Cell) {
     int directNeighborCount = 0; // Для прямых соседей
     int diagonalNeighborCount = 0; // Для диагональных соседей
 
-    for (int dx = -1; dx <= 1; dx++) {
-        for (int dy = -1; dy <= 1; dy++) {
-            for (int dz = -1; dz <= 1; dz++) {
-                // Пропускаем саму ячейку
-                if (dx == 0 && dy == 0 && dz == 0) continue;
+    for (FGridCell* neighbor : Cell->Neighbours) {
+        if (neighbor && neighbor->Status == BURNING) {
+            bool isDirectNeighbor = (Cell->x == neighbor->x && Cell->y == neighbor->y) ||
+                (Cell->x == neighbor->x && Cell->z == neighbor->z) ||
+                (Cell->y == neighbor->y && Cell->z == neighbor->z);
 
-                int newX = x + dx;
-                int newY = y + dy;
-                int newZ = z + dz;
-
-                // Проверяем, что координаты находятся в пределах границ
-                if (newX >= 0 && newX < GridManager->ElementsAmount && newY >= 0 && newY < GridManager->ElementsAmount && newZ >= 0 && newZ < GridManager->ElementsAmount) {
-                    // Проверяем состояние соседней ячейки
-                    if (GridManager->GetCell(newX, newY, newZ).Status == BURNING) {
-                        // Если сосед по одной из осей (прямой сосед)
-                        if (dx == 0 || dy == 0 || dz == 0) {
-                            directNeighborCount++;
-                        }
-                        else {
-                            // Диагональный сосед
-                            diagonalNeighborCount++;
-                        }
-                    }
-                }
+            if (isDirectNeighbor) {
+                directNeighborCount++;
+            }
+            else {
+                diagonalNeighborCount++;
             }
         }
     }
@@ -367,26 +346,21 @@ int AFireManagerActor::CalculateFP(int x, int y, int z) {
 
 
 void AFireManagerActor::RestoreScene() { // Делает невидимые(сгоревшие) акторы видимымм. Удаляет все акторы огня.
-    int GridSizeX = GridManager->Grid.Num();
+    for (int32 i = 0; i < FireList.Num(); i++) {
+        FGridCell* Cell = FireList[i];
+        if (Cell->FireActor) {
+            bool destroyed = Cell->FireActor->Destroy();
+            Cell->FireActor = nullptr;
+        }
+    }
 
-    UE_LOG(LogTemp, Warning, TEXT("GRID SIZE: %d"), GridSizeX);
-
-    for (int i = 0; i < GridManager->ElementsAmount; ++i) {
-        for (int j = 0; j < GridManager->ElementsAmount; ++j) {
-            for (int k = 0; k < GridManager->ElementsAmount; ++k) {
-                FGridCell& Cell = GridManager->GetCell(i, j, k);
-                if (Cell.OccupyingActor) {                    
-                    Cell.OccupyingActor->SetActorHiddenInGame(false);
-                    Cell.OccupyingActor->SetActorEnableCollision(true);
-                    Cell.OccupyingActor->SetActorTickEnabled(true);
-                    Cell.OccupyingActor->MarkComponentsRenderStateDirty();
-                }
-                if (Cell.FireActor) {
-                    bool destroyed = Cell.FireActor->Destroy();
-                    Cell.FireActor = nullptr;
-                    UE_LOG(LogTemp, Warning, TEXT("FIRE ACTOR DESTROYED: %b"), destroyed);
-                }
-            }
+    for (int32 i = 0; i < BurntList.Num(); i++) {
+        FGridCell* Cell = BurntList[i];
+        if (Cell->OccupyingActor) {
+            Cell->OccupyingActor->SetActorHiddenInGame(false);
+            Cell->OccupyingActor->SetActorEnableCollision(true);
+            Cell->OccupyingActor->SetActorTickEnabled(true);
+            Cell->OccupyingActor->MarkComponentsRenderStateDirty();
         }
     }
 }
