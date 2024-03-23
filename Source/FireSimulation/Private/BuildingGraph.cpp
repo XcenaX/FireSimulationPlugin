@@ -585,3 +585,10 @@ void UBuildingGraph::ClearAllRooms() {
 		}
 	}
 }
+
+void UBuildingGraph::ClearGraph() {
+	Rooms.Empty();
+	OutgoingConnections.Empty();
+	IncomingConnections.Empty();
+	SourceRoomID = -1;
+}

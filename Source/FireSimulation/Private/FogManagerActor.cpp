@@ -124,22 +124,23 @@ void AFogManagerActor::OnEndPIE(const bool bIsSimulating)
 {
 	UE_LOG(LogTemp, Warning, TEXT("GAME ENDED"));
 	RestoreScene();
+	graph->ClearGraph();
 }
 
 
 void AFogManagerActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	
 	// Суммируем прошедшее время
 	TimeAccumulator += DeltaTime;
 
 	// Проверяем, прошла ли секунда
 	if (TimeAccumulator >= 1.0f)
 	{
-		TotalTime++;
-		UpdateFog();
-		TimeAccumulator -= 1.0f;
+		TotalTime++;		
+		UpdateFog();	
+		TimeAccumulator = 0.0f;
 	}
 }
 
