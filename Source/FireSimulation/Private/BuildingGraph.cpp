@@ -33,29 +33,6 @@ void URoomNode::Initialize(int32 InRoomID = -1, bool InIsGasSource = false, floa
 	calculated_params_ = InitializeCalculatedParams();
 }
 
-void URoomNode::Initialize(int32 InRoomID = -1, bool InIsGasSource = false, float InCombustionCompletenessCoefficient = 0,
-	float InHeatAbsorptionCoefficient = 0, float InStartTemperature = 0, float InInitialGasDensity = 0,
-	float InCp = 0, float InRoomVolume = 0, float InHeatOfCombustion = 0, float InLinearFlameSpeedRate = 0,
-	float InSpecificFuelBurnRate = 0, float InSmokeFormingAbility = 0)
-{
-	World = nullptr;
-	RoomID = InRoomID;
-	IsGasSource = InIsGasSource;
-	CombustionCompletenessCoefficient = InCombustionCompletenessCoefficient;
-	HeatAbsorptionCoefficient = InHeatAbsorptionCoefficient;
-	StartTemperature = InStartTemperature;
-	InitialGasDensity = InInitialGasDensity;
-	Cp = InCp;
-	RoomVolume = InRoomVolume;
-	heat_of_combustion_ = InHeatOfCombustion;
-	linear_flame_speed_rate_ = InLinearFlameSpeedRate;
-	specific_fuel_burn_rate_ = InSpecificFuelBurnRate;
-	smoke_forming_ability_ = InSmokeFormingAbility;
-
-	calculated_params_ = InitializeCalculatedParams();
-}
-
-
 FCalculatedParameters URoomNode::GetCalculatedParameters() const
 {
 	return calculated_params_;
@@ -319,7 +296,7 @@ void UBuildingGraph::CalculateFireDynamicsForSecond(int32 Second, float TimeStep
 		return;
 	}
 
-	for (auto& Room : Rooms) // Вот тут почему то иногда падает #NULLPTR
+	for (auto& Room : Rooms)
 	{
 		FFireDynamicsParameters CurrentParams = CalculateFireDynamicsForRoom(Room.Value, Second);
 		Room.Value->UpdateFireDynamics(CurrentParams);
@@ -390,14 +367,12 @@ bool UBuildingGraph::TopologicalSort()
 
 bool UBuildingGraph::MergeToSourceRoom(int32 TargetRoomID)
 {
-	// ���������, ���������� �� �������
 	if (!Rooms.Contains(SourceRoomID) || !Rooms.Contains(TargetRoomID))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("One of the rooms does not exist."));
 		return false;
 	}
 
-	// ���������, �� �������� �� �� ����� ������� ���� � �����
 	if (SourceRoomID == TargetRoomID)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Attempting to merge the same room."));
@@ -573,22 +548,4 @@ void UBuildingGraph::UpdateGraphConnectionsAfterMergeToSourceRoom(int32 TargetRo
 		OutgoingConnections.FindOrAdd(Key.StartID).Edges.Add(NewEdgePtr);
 		IncomingConnections.FindOrAdd(Key.EndID).Edges.Add(NewEdgePtr);
 	}
-}
-
-void UBuildingGraph::ClearAllRooms() {
-	for (auto& RoomPair : Rooms)
-	{
-		URoomNode* Room = RoomPair.Value;
-		if (Room)
-		{
-			Room->RemoveFog();
-		}
-	}
-}
-
-void UBuildingGraph::ClearGraph() {
-	Rooms.Empty();
-	OutgoingConnections.Empty();
-	IncomingConnections.Empty();
-	SourceRoomID = -1;
 }

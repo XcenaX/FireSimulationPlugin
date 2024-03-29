@@ -9,8 +9,6 @@
 #include "Kismet/GameplayStatics.h"
 #include <GridActor.h>
 #include <Misc/FileHelper.h>
-#include <FogManagerActor.h>
-#include <DoorComponent.h>
 #include <MaterialDataManager.h>
 
 AFireGridManager* AFireGridManager::Instance = nullptr;

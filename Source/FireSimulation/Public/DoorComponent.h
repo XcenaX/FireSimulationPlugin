@@ -29,4 +29,7 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Door")
     bool bIsOpen;
+
+    UFUNCTION(BlueprintCallable, Category = "Door")
+    void ToggleDoorState();
 };

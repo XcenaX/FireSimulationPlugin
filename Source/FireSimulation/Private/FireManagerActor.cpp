@@ -1,11 +1,10 @@
 #include "FireManagerActor.h"
 #include "FireGridManager.h"
-#include "FogManagerActor.h"
+#include "SmokeManager.h"
 #include "FireSimulationComponent.h"
 #include <MaterialData.h>
 #include <Async/Async.h>
 #include <MaterialDataManager.h>
-#include <FogManagerActor.h>
 #include "Misc/DateTime.h"
 #include "HAL/PlatformTime.h"
 
@@ -15,9 +14,7 @@ AFireManagerActor::AFireManagerActor()
     // Set this actor to call Tick() every frame. You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = true;
 
-    FogManager = AFogManagerActor::GetInstance();
     GridManager = AFireGridManager::GetInstance();
-
 }
 
 // Called when the game starts or when spawned
@@ -25,7 +22,8 @@ void AFireManagerActor::BeginPlay()
 {
     Super::BeginPlay();
 
-    //FogManager->InitializeGraph(GetWorld());    
+    SmokeManager = NewObject<USmokeManager>(this, FName(TEXT("SmokeManager")));
+    SmokeManager->Initialize(GetWorld());
 
     Threads = GridManager->Threads;
 
@@ -75,13 +73,17 @@ void AFireManagerActor::Tick(float DeltaTime)
     TimeAccumulator += DeltaTime;
 
     // Проверяем, прошла ли секунда
-    if (TimeAccumulator >= 1.0f && JobDone)
+    if (TimeAccumulator >= 1.0f)
     {
-        Async(EAsyncExecution::Thread, [this]()
+        SmokeManager->UpdateSmoke();
+        SmokeManager->TotalTime++;
+        if (JobDone)
         {
-            UpdateFireSpread();
-        });
-        // UpdateFireSpread();
+            Async(EAsyncExecution::Thread, [this]()
+                {
+                    UpdateFireSpread();
+                });
+        }
         
         TimeAccumulator = 0.0f;
     }    
@@ -159,7 +161,7 @@ void AFireManagerActor::UpdateFireSpread()
         End = FPlatformTime::Seconds();
         ElapsedSeconds = End - Start;
         //UE_LOG(LogTemp, Warning, TEXT("FireList: %f сек"), ElapsedSeconds);
-        TotalTime += ElapsedSeconds + 1.54;
+        TotalTime += ElapsedSeconds;
 
         UE_LOG(LogTemp, Warning, TEXT("Total Time: %f сек"), TotalTime);
     }
@@ -270,12 +272,12 @@ void AFireManagerActor::processNewList(int32 StartIndex, int32 EndIndex, TArray<
         }
 
         // Если Комната этого актора еще не загорелась то сделать Merge            
-        if (FireComp && !FogManager->GetRoomStatusForActor(cell->OccupyingActor->GetName()) && !FireComp->IsWall) {
-            int32 RoomID = FogManager->GetRoomIdForActor(cell->OccupyingActor->GetName());
+        if (FireComp && !SmokeManager->GetRoomStatusForActor(cell->OccupyingActor->GetName()) && !FireComp->IsWall) {
+            int32 RoomID = SmokeManager->GetRoomIdForActor(cell->OccupyingActor->GetName());
             if (RoomID >= 0) {
                 UE_LOG(LogTemp, Warning, TEXT("MERGE ROOM : %d ; Actor: %s"), RoomID, *cell->OccupyingActor->GetName());
-                FogManager->SetRoomStatus(RoomID, true);
-                FogManager->graph->MergeToSourceRoom(RoomID);
+                SmokeManager->SetRoomStatus(RoomID, true);
+                SmokeManager->graph->MergeToSourceRoom(RoomID);
             }
         }
     }

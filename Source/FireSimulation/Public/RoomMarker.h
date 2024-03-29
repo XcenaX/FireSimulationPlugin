@@ -25,6 +25,8 @@ public:
 
     float GetRoomVolume();
 
+    bool IsGasSource(TArray<AActor*> Actors);
+
     bool IsGasSource();
 
     TArray<AActor*> GetActors();

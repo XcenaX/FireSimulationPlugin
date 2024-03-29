@@ -50,7 +50,7 @@ bool FUniqueFireSourceTest::RunTest(const FString& Parameters)
 	UBuildingGraphTestHelper* BuildingGraph = NewObject<UBuildingGraphTestHelper>();
 
 	URoomNode* FirstRoom = NewObject<URoomNode>();
-	FirstRoom->Initialize(1, true, 0.8f, 0.6f, 293.15f, 1.2f, 1000.0f, 50.0f, 50000.0f, 0.5f, 0.01f, 0.5f);
+	FirstRoom->Initialize(1, true, 0.8f, 0.6f, 293.15f, 1.2f, 1000.0f, 50.0f, 50000.0f, 0.5f, 0.01f, 0.5f, nullptr);
 	BuildingGraph->AddRoom(FirstRoom);
 
 	// Проверка, что первая комната добавлена и является источником огня
@@ -58,7 +58,7 @@ bool FUniqueFireSourceTest::RunTest(const FString& Parameters)
 
 	// Создание второй комнаты с источником огня
 	URoomNode* SecondRoom = NewObject<URoomNode>();
-	SecondRoom->Initialize(2, true, 0.8f, 0.6f, 293.15f, 1.2f, 1000.0f, 50.0f, 50000.0f, 0.5f, 0.01f, 0.5f);
+	SecondRoom->Initialize(2, true, 0.8f, 0.6f, 293.15f, 1.2f, 1000.0f, 50.0f, 50000.0f, 0.5f, 0.01f, 0.5f, nullptr);
 	BuildingGraph->AddRoom(SecondRoom);
 
 	BuildingGraph->TestFindSourceRoomId();
@@ -78,19 +78,19 @@ bool FTopologicalSortBranchingTest::RunTest(const FString& Parameters)
 	UBuildingGraphTestHelper* BuildingGraph = NewObject<UBuildingGraphTestHelper>();
 
 	URoomNode* RoomC = NewObject<URoomNode>();
-	RoomC->Initialize(3, false, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f);
+	RoomC->Initialize(3, false, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, nullptr);
 	BuildingGraph->AddRoom(RoomC);
 
 	URoomNode* RoomA = NewObject<URoomNode>();
-	RoomA->Initialize(1, false, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f);
+	RoomA->Initialize(1, false, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, nullptr);
 	BuildingGraph->AddRoom(RoomA);
 
 	URoomNode* RoomB = NewObject<URoomNode>();
-	RoomB->Initialize(2, false, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f);
+	RoomB->Initialize(2, false, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, nullptr);
 	BuildingGraph->AddRoom(RoomB);
 
 	URoomNode* RoomD = NewObject<URoomNode>();
-	RoomD->Initialize(4, false, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f);
+	RoomD->Initialize(4, false, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, nullptr);
 	BuildingGraph->AddRoom(RoomD);
 
 	BuildingGraph->AddConnection(RoomA, RoomB, EConnectionStatus::DoorOpen);
@@ -124,11 +124,11 @@ bool FTopologicalSortCycleTest::RunTest(const FString& Parameters)
 
 	// Добавление комнат
 	URoomNode* RoomA = NewObject<URoomNode>();
-	RoomA->Initialize(1, false, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f);
+	RoomA->Initialize(1, false, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, nullptr);
 	BuildingGraph->AddRoom(RoomA);
 
 	URoomNode* RoomB = NewObject<URoomNode>();
-	RoomB->Initialize(2, false, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f);
+	RoomB->Initialize(2, false, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, nullptr);
 	BuildingGraph->AddRoom(RoomB);
 
 	// Создание цикла: A -> B -> A
@@ -152,13 +152,13 @@ bool FMergeRoomsTest::RunTest(const FString& Parameters)
 
 	// Инициализация комнат
 	URoomNode* FireSourceRoom = NewObject<URoomNode>(); // Очаг
-	FireSourceRoom->Initialize(1, true, 0.8f, 0.6f, 293.15f, 1.2f, 1000.0f, 50.0f, 50000.0f, 0.5f, 0.01f, 0.5f);
+	FireSourceRoom->Initialize(1, true, 0.8f, 0.6f, 293.15f, 1.2f, 1000.0f, 50.0f, 50000.0f, 0.5f, 0.01f, 0.5f, nullptr);
 	BuildingGraph->AddRoom(FireSourceRoom);
 
 	TArray<URoomNode*> rooms;
 	for (int i = 2; i <= 6; ++i) {
 		URoomNode* Room = NewObject<URoomNode>();
-		Room->Initialize(i, false, 0.9f, 0.7f, 295.15f, 1.3f, 1050.0f, 60.0f * i, 55000.0f, 0.6f, 0.02f, 0.6f);
+		Room->Initialize(i, false, 0.9f, 0.7f, 295.15f, 1.3f, 1050.0f, 60.0f * i, 55000.0f, 0.6f, 0.02f, 0.6f, nullptr);
 		BuildingGraph->AddRoom(Room);
 		rooms.Add(Room);
 	}
@@ -256,15 +256,15 @@ bool FFireSimulationTest::RunTest(const FString& Parameters)
 
 	// Инициализация комнат
 	URoomNode* FireSourceRoom = NewObject<URoomNode>(); // 1
-	FireSourceRoom->Initialize(1, true, 0.8f, 0.6f, 293.15f, 1.2f, 1000.0f, 50.0f, 50000.0f, 0.5f, 0.01f, 0.5f);
+	FireSourceRoom->Initialize(1, true, 0.8f, 0.6f, 293.15f, 1.2f, 1000.0f, 50.0f, 50000.0f, 0.5f, 0.01f, 0.5f, nullptr);
 	BuildingGraph->AddRoom(FireSourceRoom);
 
 	URoomNode* FireRoom2 = NewObject<URoomNode>(); // 2
-	FireRoom2->Initialize(2, false, 0.8f, 0.6f, 293.15f, 1.2f, 1000.0f, 50.0f, 50000.0f, 0.5f, 0.01f, 0.5f);
+	FireRoom2->Initialize(2, false, 0.8f, 0.6f, 293.15f, 1.2f, 1000.0f, 50.0f, 50000.0f, 0.5f, 0.01f, 0.5f, nullptr);
 	BuildingGraph->AddRoom(FireRoom2);
 
 	URoomNode* FireRoom3 = NewObject<URoomNode>(); // 3
-	FireRoom3->Initialize(3, false, 0.8f, 0.6f, 293.15f, 1.2f, 1000.0f, 50.0f, 50000.0f, 0.5f, 0.01f, 0.5f);
+	FireRoom3->Initialize(3, false, 0.8f, 0.6f, 293.15f, 1.2f, 1000.0f, 50.0f, 50000.0f, 0.5f, 0.01f, 0.5f, nullptr);
 	BuildingGraph->AddRoom(FireRoom3);
 
 	BuildingGraph->AddConnection(FireSourceRoom, FireRoom2, EConnectionStatus::DoorOpen);

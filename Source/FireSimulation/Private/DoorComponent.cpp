@@ -11,3 +11,10 @@ void UDoorComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 {
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
+
+void UDoorComponent::ToggleDoorState()
+{
+    bIsOpen = !bIsOpen;
+
+    //OnDoorStateChanged.Broadcast(bIsOpen);
+}

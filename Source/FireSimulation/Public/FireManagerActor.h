@@ -3,8 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "HAL/CriticalSection.h"
-#include <RoomMarker.h>
-#include <FogManagerActor.h>
+#include <SmokeManager.h>
 #include "FireManagerActor.generated.h"
 
 UCLASS()
@@ -76,7 +75,7 @@ private:
     TArray<FVector> FireListRemovalIndices;
 
     AFireGridManager* GridManager;
-    AFogManagerActor* FogManager;
+    USmokeManager* SmokeManager;
 
     float TimeAccumulator;
 
