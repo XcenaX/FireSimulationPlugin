@@ -24,13 +24,21 @@ public:
     // Called every frame
     virtual void Tick(float DeltaTime) override;
 
-    // Основная функция для инициализации распространения огня
-    UFUNCTION(BlueprintCallable, Category = "Fire Management")
     void InitializeFireSpread();
 
-    // Функция обновления распространения огня
+    // Функция обновления распространения огня вручную. Эта функция высчитывает распространение один раз. Может пригодится если нужно быстро проверить пожар
     UFUNCTION(BlueprintCallable, Category = "Fire Management")
     void UpdateFireSpread();
+
+    void InitializeGrid(int32 CellSize, int32 Threads, int32 FireDistance);
+
+    // Функция запуска распространения огня, пожар распространяется каждую секунду
+    UFUNCTION(BlueprintCallable, Category = "Fire Management")
+    void StartFireThread(int32 CellSize, int32 NewThreads, int32 FireDistance);
+
+    // Функция остановки распространения огня
+    UFUNCTION(BlueprintCallable, Category = "Fire Management")
+    void StopFireThread();
 
     void processCheckList(int32 StartIndex, int32 EndIndex, TArray<FVector>& CoordsToRemove);
     void processNewList(int32 StartIndex, int32 EndIndex, TArray<FVector>& CoordsToRemove);
@@ -58,6 +66,8 @@ private:
     TArray<FGridCell*> BurntList;
     int32 Threads;
     bool JobDone = true; // Завершены ли расчеты распространения огня для текущей секунды
+
+    bool Stop = false;
 
     FCriticalSection ListMutex;
 

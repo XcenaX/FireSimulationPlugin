@@ -34,6 +34,31 @@ void AFireManagerActor::BeginPlay()
     FEditorDelegates::EndPIE.AddUObject(this, &AFireManagerActor::OnEndPIE);
 }
 
+void AFireManagerActor::StartFireThread(int32 CellSize, int32 NewThreads, int32 FireDistance) {
+
+    Threads = GridManager->Threads;
+
+    InitializeGrid(CellSize, NewThreads, FireDistance);
+
+    Async(EAsyncExecution::Thread, [this]() {
+        while (!Stop) {
+            double Start = FPlatformTime::Seconds();
+
+            UpdateFireSpread();
+            
+            double End = FPlatformTime::Seconds();
+            double ElapsedSeconds = End - Start;
+
+            double TimeToSleep = 1.0f - ElapsedSeconds;
+            if (TimeToSleep > 0) {
+                FPlatformProcess::Sleep(TimeToSleep);
+            }
+        }
+    });
+
+    FEditorDelegates::EndPIE.AddUObject(this, &AFireManagerActor::OnEndPIE);
+}
+
 // После завершения игры в редакторе возвращаем все сгоревшие акторы на место и тушим пожар
 void AFireManagerActor::OnEndPIE(const bool bIsSimulating)
 {
@@ -76,7 +101,8 @@ void AFireManagerActor::UpdateFireSpread()
 {
     if (CheckList.Num() > 0 || NewList.Num() > 0 || FireList.Num() > 0) {
         JobDone = false;
-        //double Start = FPlatformTime::Seconds();
+        double TotalTime = 0;
+        double Start = FPlatformTime::Seconds();
 
         if (CheckList.Num() > 500) {
             //parallelProcessList(CheckList, &AFireManagerActor::processCheckList, CheckListRemovalIndices);
@@ -90,13 +116,13 @@ void AFireManagerActor::UpdateFireSpread()
         }
         RemoveCellsByCoords(CheckList, CheckListRemovalIndices);
 
-        /*double End = FPlatformTime::Seconds();
-        double ElapsedSeconds = End - Start;
-        UE_LOG(LogTemp, Warning, TEXT("CheckList: %f сек"), ElapsedSeconds);*/
-
         UE_LOG(LogTemp, Warning, TEXT("CheckList: %d; FireList: %d; NewList: %d"), CheckList.Num(), FireList.Num(), NewList.Num());
+        double End = FPlatformTime::Seconds();
+        double ElapsedSeconds = End - Start;
+        //UE_LOG(LogTemp, Warning, TEXT("CheckList: %f сек"), ElapsedSeconds);
+        TotalTime += ElapsedSeconds;
         
-        double Start = FPlatformTime::Seconds();
+        Start = FPlatformTime::Seconds();
 
         if (NewList.Num() > 500) {
             //parallelProcessList(NewList, &AFireManagerActor::processNewList, NewListRemovalIndices);
@@ -110,12 +136,12 @@ void AFireManagerActor::UpdateFireSpread()
         }
         RemoveCellsByCoords(NewList, NewListRemovalIndices);
 
-        double  End = FPlatformTime::Seconds();
-        double ElapsedSeconds = End - Start;
-        UE_LOG(LogTemp, Warning, TEXT("NewList: %f сек"), ElapsedSeconds);
+        End = FPlatformTime::Seconds();
+        ElapsedSeconds = End - Start;
+        //UE_LOG(LogTemp, Warning, TEXT("NewList: %f сек"), ElapsedSeconds);
+        TotalTime += ElapsedSeconds;
 
-        // Start = FPlatformTime::Seconds();
-
+        Start = FPlatformTime::Seconds();
 
         if (FireList.Num() > 500) {
             //parallelProcessList(FireList, &AFireManagerActor::processFireList, FireListRemovalIndices);
@@ -130,10 +156,30 @@ void AFireManagerActor::UpdateFireSpread()
 
         JobDone = true;
 
-        /*End = FPlatformTime::Seconds();
+        End = FPlatformTime::Seconds();
         ElapsedSeconds = End - Start;
-        UE_LOG(LogTemp, Warning, TEXT("FireList: %f сек"), ElapsedSeconds);*/
+        //UE_LOG(LogTemp, Warning, TEXT("FireList: %f сек"), ElapsedSeconds);
+        TotalTime += ElapsedSeconds + 1.54;
+
+        UE_LOG(LogTemp, Warning, TEXT("Total Time: %f сек"), TotalTime);
     }
+}
+
+void AFireManagerActor::InitializeGrid(int32 CellSize, int32 NewThreads, int32 FireDistance)
+{
+    Threads = NewThreads;
+    
+    UWorld* World = GetWorld();
+    AGridActor* GridActor = nullptr;
+    for (TActorIterator<AGridActor> It(World); It; ++It)
+    {
+        GridActor = *It;
+        break;
+    }
+    
+    GridManager->InitializeGrid(GridActor, CellSize, Threads, FireDistance);
+    GridManager->PopulateGridWithActors(World, GridActor);
+    InitializeFireSpread();
 }
 
 bool AFireManagerActor::Contains(TArray<FGridCell*> List, FGridCell* Cell) {
@@ -152,6 +198,11 @@ bool AFireManagerActor::Contains(TArray<FGridCell*> List, FGridCell Cell) {
         }
     }
     return false;
+}
+
+void AFireManagerActor::StopFireThread()
+{
+    Stop = true;
 }
 
 void AFireManagerActor::processCheckList(int32 StartIndex, int32 EndIndex, TArray<FVector>& CoordsToRemove) {
@@ -325,15 +376,25 @@ void AFireManagerActor::RemoveCellsByCoords(TArray<FGridCell*>& List, TArray<FVe
 int AFireManagerActor::CalculateFP(FGridCell* Cell) {
     int directNeighborCount = 0; // Для прямых соседей
     int diagonalNeighborCount = 0; // Для диагональных соседей
+    int bottomNeighborCount = 0; // Для соседей снизу
 
     for (FGridCell* neighbor : Cell->Neighbours) {
         if (neighbor && neighbor->Status == BURNING) {
-            bool isDirectNeighbor = (Cell->x == neighbor->x && Cell->y == neighbor->y) ||
-                (Cell->x == neighbor->x && Cell->z == neighbor->z) ||
-                (Cell->y == neighbor->y && Cell->z == neighbor->z);
+            // Проверяем, является ли сосед прямым
+            bool isDirectNeighbor = (Cell->x == neighbor->x && Cell->y == neighbor->y && Cell->z == neighbor->z + 1) ||
+                (Cell->x == neighbor->x && Cell->z == neighbor->z && Cell->y == neighbor->y + 1) ||
+                (Cell->y == neighbor->y && Cell->z == neighbor->z && Cell->x == neighbor->x + 1);
+
+            // Проверяем, находится ли сосед снизу
+            bool isBottomNeighbor = (neighbor->z == Cell->z - 1) &&
+                (abs(Cell->x - neighbor->x) <= 1) &&
+                (abs(Cell->y - neighbor->y) <= 1);
 
             if (isDirectNeighbor) {
                 directNeighborCount++;
+            }
+            else if (isBottomNeighbor) {
+                bottomNeighborCount++;
             }
             else {
                 diagonalNeighborCount++;
@@ -341,8 +402,9 @@ int AFireManagerActor::CalculateFP(FGridCell* Cell) {
         }
     }
 
-    return 2 * directNeighborCount + diagonalNeighborCount;
+    return (2 * directNeighborCount) + diagonalNeighborCount + (8 * bottomNeighborCount);
 }
+
 
 
 void AFireManagerActor::RestoreScene() { // Делает невидимые(сгоревшие) акторы видимымм. Удаляет все акторы огня.

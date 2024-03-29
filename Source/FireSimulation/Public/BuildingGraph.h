@@ -247,7 +247,7 @@ public:
     void PrepareGraphToWork();
 
     UFUNCTION(BlueprintCallable, Category="Building Graph")
-    void AddRoom(const URoomNode* Room);
+    void AddRoom(URoomNode* Room);
 
     UFUNCTION(BlueprintCallable, Category="Building Graph")
     void AddConnection(const URoomNode* StartRoom, const URoomNode* EndRoom, EConnectionStatus ConnectionStatus);

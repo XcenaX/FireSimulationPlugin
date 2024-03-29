@@ -179,12 +179,12 @@ void UBuildingGraph::PrepareGraphToWork()
 	TopologicalSort();
 }
 
-void UBuildingGraph::AddRoom(const URoomNode* Room)
+void UBuildingGraph::AddRoom(URoomNode* Room)
 {
 	if (Room)
 	{
 		if (!Rooms.Contains(Room->RoomID)) {
-			Rooms.Add(Room->RoomID, const_cast<URoomNode*>(Room));
+			Rooms.Add(Room->RoomID, Room);
 		}
 	}
 	else

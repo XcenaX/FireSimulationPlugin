@@ -82,7 +82,7 @@ TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnT
 
     CubesAmountTextBox = SNew(SEditableTextBox)
         .Padding(FMargin(5.0f, 0.0f, 2.5f, 0.0f))
-        .HintText(LOCTEXT("CellSizeHint", "Enter amount of cubes in 1 dimension..."));
+        .HintText(LOCTEXT("CellSizeHint", "Enter size of cell..."));
     ThreadsTextBox = SNew(SEditableTextBox)
         .Padding(FMargin(5.0f, 0.0f, 2.5f, 0.0f))
         .HintText(LOCTEXT("ThreadsHint", "Enter amount of threads to use in fire simulation..."));
@@ -131,6 +131,15 @@ TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnT
                 .Padding(5)
                 [
                     PickFireButton.ToSharedRef()
+                ]                
+                + SVerticalBox::Slot()
+                .AutoHeight()
+                .Padding(5)
+                [
+                    SNew(SButton)
+                        .Text(LOCTEXT("FillActorsButtonText", "Fill Grid with actors"))
+                        .ContentPadding(FMargin(10.0f))
+                        .OnClicked(FOnClicked::CreateRaw(this, &FFireSimulationEditorModule::OnFillGridClicked))
                 ]
                 + SVerticalBox::Slot()
                 .AutoHeight()
@@ -155,15 +164,6 @@ TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnT
                                 .ContentPadding(FMargin(10.0f))
                                 .OnClicked(FOnClicked::CreateRaw(this, &FFireSimulationEditorModule::OnClearGridClicked))
                         ]
-                ]
-                + SVerticalBox::Slot()
-                .AutoHeight()
-                .Padding(5)
-                [
-                    SNew(SButton)
-                        .Text(LOCTEXT("FillActorsButtonText", "Fill Grid with actors"))
-                        .ContentPadding(FMargin(10.0f))
-                        .OnClicked(FOnClicked::CreateRaw(this, &FFireSimulationEditorModule::OnFillGridClicked))
                 ]
         ];
 
@@ -194,12 +194,7 @@ FReply FFireSimulationEditorModule::OnInitializeGridClicked()
                 AFireGridManager* GridManager = AFireGridManager::GetInstance();
                 if (GridManager)
                 {       
-                    if (CubesAmount > 40) {
-                        ShowNotification("Drawing a grid with so many cells can take up a lot of resources! Operation cancelled!");
-                    }
-                    else {
-                        GridManager->DrawGrid(true, World, GridActor);
-                    }
+                    GridManager->DrawGrid(true, World, GridActor);                    
                 }
             }
         }
@@ -243,7 +238,7 @@ FReply FFireSimulationEditorModule::OnFillGridClicked()
                 GridActor = *It;
                 break;
             }
-            GridManager->InitializeGrid(CubesAmount, Threads, FireSize);
+            GridManager->InitializeGrid(GridActor, CubesAmount, Threads, FireSize);
             GridManager->PopulateGridWithActors(World, GridActor);
             ShowNotification("Grid was successfully filled with Actors!");
 

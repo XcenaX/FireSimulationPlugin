@@ -30,18 +30,32 @@ AFireGridManager* AFireGridManager::GetInstance()
 	return Instance;
 }
 
-void AFireGridManager::InitializeGrid(int32 CubesPerDimension, int32 NewThreads, int32 FireSize)
+void AFireGridManager::InitializeGrid(AGridActor* NewGridActor, int32 NewCellSize, int32 NewThreads, int32 FireSize)
 {
-	ElementsAmount = CubesPerDimension;
 	Threads = NewThreads;
 	FireParticleSize = FireSize;
+	CellSize = NewCellSize;
+
+	GridActor = NewGridActor;
+
+	// Получаем размеры границ сетки
+	FVector GridSize = GridActor->GridBounds->GetScaledBoxExtent() * 2; // GetScaledBoxExtent возвращает половину размеров, умножаем на 2 для получения полных размеров
+
+	// Вычисляем количество ячеек в каждом измерении
+	int32 CellsX = FMath::CeilToInt(GridSize.X / CellSize);
+	int32 CellsY = FMath::CeilToInt(GridSize.Y / CellSize);
+	int32 CellsZ = FMath::CeilToInt(GridSize.Z / CellSize);
+
+	ElementsAmountX = CellsX;
+	ElementsAmountY = CellsY;
+	ElementsAmountZ = CellsZ;
 
 	Grid.Empty();
-	for (int32 i = 0; i < ElementsAmount; i++)
+	for (int32 i = 0; i < CellsX; i++)
 	{
-		for (int32 j = 0; j < ElementsAmount; j++)
+		for (int32 j = 0; j < CellsY; j++)
 		{
-			for (int32 k = 0; k < ElementsAmount; k++) {
+			for (int32 k = 0; k < CellsZ; k++) {
 				FGridCell Cell;
 
 				Cell.x = i;
@@ -49,31 +63,29 @@ void AFireGridManager::InitializeGrid(int32 CubesPerDimension, int32 NewThreads,
 				Cell.z = k;
 
 				Grid.Add(Cell);
-			}			
+			}
 		}
 	}
 
-	for (int32 i = 0; i < ElementsAmount; i++)
+	for (int32 i = 0; i < CellsX; i++)
 	{
-		for (int32 j = 0; j < ElementsAmount; j++)
+		for (int32 j = 0; j < CellsY; j++)
 		{
-			for (int32 k = 0; k < ElementsAmount; k++) {
+			for (int32 k = 0; k < CellsZ; k++) {
 				FGridCell& CurrentCell = GetCell(i, j, k);
 
 				for (int32 dx = -1; dx <= 1; dx++) {
 					for (int32 dy = -1; dy <= 1; dy++) {
 						for (int32 dz = -1; dz <= 1; dz++) {
-							// Пропускаем саму ячейку
 							if (dx == 0 && dy == 0 && dz == 0) continue;
 
 							int32 newX = i + dx;
 							int32 newY = j + dy;
 							int32 newZ = k + dz;
 
-							// Проверяем, что координаты находятся в пределах сетки
-							if (newX >= 0 && newX < ElementsAmount &&
-								newY >= 0 && newY < ElementsAmount &&
-								newZ >= 0 && newZ < ElementsAmount) {
+							if (newX >= 0 && newX < CellsX &&
+								newY >= 0 && newY < CellsY &&
+								newZ >= 0 && newZ < CellsZ) {
 
 								FGridCell& NeighbourCell = GetCell(newX, newY, newZ);
 								CurrentCell.Neighbours.Add(&NeighbourCell);
@@ -84,14 +96,18 @@ void AFireGridManager::InitializeGrid(int32 CubesPerDimension, int32 NewThreads,
 
 			}
 		}
-	}	
+	}
 
 	ActorCellsCount.Empty();
 }
 
-void AFireGridManager::DrawGrid(bool bVisible, UWorld* World, AActor* NewGridActor)
+
+void AFireGridManager::DrawGrid(bool bVisible, UWorld* NewWorld, AActor* NewGridActor)
 {
-	if (!NewGridActor || !World) return;
+	if (!NewGridActor || !NewWorld) return;
+
+	World = NewWorld;
+	GridActor = Cast<AGridActor>(NewGridActor);
 
 	UBoxComponent* BoxComponent = Cast<UBoxComponent>(GridActor->GetComponentByClass(UBoxComponent::StaticClass()));
 	if (!BoxComponent) return;
@@ -100,46 +116,52 @@ void AFireGridManager::DrawGrid(bool bVisible, UWorld* World, AActor* NewGridAct
 	FVector BoxExtent = BoxComponent->GetScaledBoxExtent();
 
 	// Рассчитываем размер ячейки для каждого измерения
-	float CellSizeX = (BoxExtent.X * 2) / ElementsAmount;
-	float CellSizeY = (BoxExtent.Y * 2) / ElementsAmount;
-	float CellSizeZ = (BoxExtent.Z * 2) / ElementsAmount;
+	float CellSizeX = (BoxExtent.X * 2) / ElementsAmountX;
+	float CellSizeY = (BoxExtent.Y * 2) / ElementsAmountY;
+	float CellSizeZ = (BoxExtent.Z * 2) / ElementsAmountZ;
 
 	FlushPersistentDebugLines(World);
 
-	// Рисование сетки
-	for (int x = 0; x < ElementsAmount; ++x)
+	// Рисование только внешних ячеек сетки
+	for (int x = 0; x < ElementsAmountX; ++x)
 	{
-		for (int y = 0; y < ElementsAmount; ++y)
+		for (int y = 0; y < ElementsAmountY; ++y)
 		{
-			for (int z = 0; z < ElementsAmount; ++z)
+			for (int z = 0; z < ElementsAmountZ; ++z)
 			{
-				FVector CellOrigin = Origin + FVector(x * CellSizeX, y * CellSizeY, z * CellSizeZ) - BoxExtent + FVector(CellSizeX / 2, CellSizeY / 2, CellSizeZ / 2);
-				DrawDebugBox(World, CellOrigin, FVector(CellSizeX / 2, CellSizeY / 2, CellSizeZ / 2), FColor::Blue, true, -1.f, 0, 1);
+				// Проверяем, является ли ячейка внешней
+				if (x == 0 || x == ElementsAmountX - 1 || y == 0 || y == ElementsAmountY - 1 || z == 0 || z == ElementsAmountZ - 1)
+				{
+					FVector CellOrigin = Origin + FVector(x * CellSizeX, y * CellSizeY, z * CellSizeZ) - BoxExtent + FVector(CellSizeX / 2, CellSizeY / 2, CellSizeZ / 2);
+					DrawDebugBox(World, CellOrigin, FVector(CellSizeX / 2, CellSizeY / 2, CellSizeZ / 2), FColor::Blue, bVisible, -1.f, 0, 1);
+				}
 			}
 		}
 	}
 }
+
 
 void AFireGridManager::ClearGrid() {
 	Grid.Empty();
 }
 
 FGridCell& AFireGridManager::GetCell(int32 x, int32 y, int32 z) {
-	int32 index = z + ElementsAmount * (y + ElementsAmount * x);
+	int32 index = z + ElementsAmountZ * (y + ElementsAmountY * x);
 	return Grid[index];
 }
 
-void AFireGridManager::PopulateGridWithActors(UWorld* World, AActor* NewGridActor)
+void AFireGridManager::PopulateGridWithActors(UWorld* NewWorld, AActor* NewGridActor)
 {
-	if (!World || !NewGridActor || ElementsAmount <= 0) return;
+	if (!NewWorld || !NewGridActor || ElementsAmountX <= 0 || ElementsAmountY <= 0 || ElementsAmountZ <= 0) return;
 
+	World = NewWorld;
 	GridActor = Cast<AGridActor>(NewGridActor);
 
 	UBoxComponent* BoxComponent = GridActor->FindComponentByClass<UBoxComponent>();
 	if (!BoxComponent) return;
 
     FVector GridSize = BoxComponent->GetScaledBoxExtent() * 2; // Получаем полные размеры 
-    FVector CellSize(GridSize.X / ElementsAmount, GridSize.Y / ElementsAmount, GridSize.Z / ElementsAmount);
+    FVector CellSizeVector(GridSize.X / ElementsAmountX, GridSize.Y / ElementsAmountY, GridSize.Z / ElementsAmountZ);
 
 	// Заполняем сетку акторами
 	FVector GridOrigin = BoxComponent->GetComponentLocation() - GridSize / 2; // Начальная точка сетки	
@@ -147,18 +169,15 @@ void AFireGridManager::PopulateGridWithActors(UWorld* World, AActor* NewGridActo
 	FCollisionQueryParams QueryParams;
 	QueryParams.bReturnPhysicalMaterial = false;
 
-	FString LogText;
-	for (int32 x = 0; x < ElementsAmount; x++)
+	for (int32 x = 0; x < ElementsAmountX; x++)
 	{
-		for (int32 y = 0; y < ElementsAmount; y++)
+		for (int32 y = 0; y < ElementsAmountY; y++)
 		{
-			for (int32 z = 0; z < ElementsAmount; z++)
-			{
-				if (z + ElementsAmount * (y + ElementsAmount * x) >= pow(ElementsAmount, 3)) continue;
-				
+			for (int32 z = 0; z < ElementsAmountZ; z++)
+			{				
 				FGridCell& Cell = GetCell(x, y, z);
-				FVector CellCenter = GridOrigin + FVector(x * CellSize.X, y * CellSize.Y, z * CellSize.Z) + CellSize / 2;
-				FCollisionShape Box = FCollisionShape::MakeBox(CellSize / 2);
+				FVector CellCenter = GridOrigin + FVector(x * CellSizeVector.X, y * CellSizeVector.Y, z * CellSizeVector.Z) + CellSizeVector / 2;
+				FCollisionShape Box = FCollisionShape::MakeBox(CellSizeVector / 2);
 				TArray<FOverlapResult> OverlapResults;
 				World->OverlapMultiByChannel(OverlapResults, CellCenter, FQuat::Identity, ECC_WorldStatic, Box, QueryParams);
 				
@@ -200,35 +219,18 @@ void AFireGridManager::PopulateGridWithActors(UWorld* World, AActor* NewGridActo
 					{
 						ActorCellsCount.Add(PickedActor, 1);
 					}
-				}				
-
-				// LOGS
-				if (Cell.OccupyingActor)
-				{
-					LogText += "O";
-				}
-				else
-				{
-					LogText += "*";
-				}
-
-				if (z < ElementsAmount - 1)
-				{
-					LogText += ", ";
-				}
-			}
-			LogText += "\n";
+				}					
+			}	
 		}
-		LogText += "-\n";
 	}
 
-	for (int x = 0; x < ElementsAmount; x++)
+	for (int x = 0; x < ElementsAmountX; x++)
 	{
-		for (int y = 0; y < ElementsAmount; y++)
+		for (int y = 0; y < ElementsAmountY; y++)
 		{
-			for (int z = 0; z < ElementsAmount; z++)
+			for (int z = 0; z < ElementsAmountZ; z++)
 			{
-				if (z + ElementsAmount * (y + ElementsAmount * x) >= pow(ElementsAmount, 3)) continue;
+				if (z + ElementsAmountY * (y + ElementsAmountX * x) >= (ElementsAmountX * ElementsAmountY * ElementsAmountZ)) continue;
 
 				FGridCell& Cell = GetCell(x, y, z);
 				if (Cell.OccupyingActor) {
@@ -238,20 +240,13 @@ void AFireGridManager::PopulateGridWithActors(UWorld* World, AActor* NewGridActo
 			}
 		}
 	}
-
-
-	// LOGS
-	FString FilePath = FPaths::ProjectDir() / TEXT("GridLog.txt");
-	FFileHelper::SaveStringToFile(LogText, *FilePath);
 }
 
 TArray<FGridCell*> AFireGridManager::GetBurningCells() {
 	TArray<FGridCell*> BurningCells;
-	for (int i = 0; i < ElementsAmount; i++) {
-		for (int j = 0; j < ElementsAmount; j++) {
-			for (int k = 0; k < ElementsAmount; k++) {
-				if (k + ElementsAmount * (j + ElementsAmount * i) >= pow(ElementsAmount, 3)) continue;
-
+	for (int i = 0; i < ElementsAmountX; i++) {
+		for (int j = 0; j < ElementsAmountY; j++) {
+			for (int k = 0; k < ElementsAmountZ; k++) {				
 				FGridCell& Cell = GetCell(i, j, k);
 				if (Cell.Status == BURNING) {
 					BurningCells.Add(&Cell);
@@ -263,22 +258,24 @@ TArray<FGridCell*> AFireGridManager::GetBurningCells() {
 }
 
 
-void AFireGridManager::CreateFireActor(FGridCell* Cell, UWorld* World)
+void AFireGridManager::CreateFireActor(FGridCell* Cell, UWorld* NewWorld)
 {
-	if (!SelectedParticleFire || !World)
+	if (!SelectedParticleFire || !NewWorld)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("VLAD! NO WORLD!"));
 		return;
 	}
 
+	World = NewWorld;
+
 	// Вычисляем локацию ячейки
 	UBoxComponent* GridBoxComponent = GridActor->FindComponentByClass<UBoxComponent>();
 
 	FVector GridSize = GridBoxComponent->GetScaledBoxExtent() * 2;
-	FVector CellSize(GridSize.X / ElementsAmount, GridSize.Y / ElementsAmount, GridSize.Z / ElementsAmount);
+	FVector CellSizeVector(GridSize.X / ElementsAmountX, GridSize.Y / ElementsAmountY, GridSize.Z / ElementsAmountZ);
 	FVector GridOrigin = GridBoxComponent->GetComponentLocation() - GridSize / 2;
 
-	FVector CellCenter = GridOrigin + FVector(Cell->x * CellSize.X, Cell->y * CellSize.Y, Cell->z * CellSize.Z) + CellSize / 2;
+	FVector CellCenter = GridOrigin + FVector(Cell->x * CellSizeVector.X, Cell->y * CellSizeVector.Y, Cell->z * CellSizeVector.Z) + CellSizeVector / 2;
 
 	FCollisionQueryParams QueryParams;
 	QueryParams.bTraceComplex = true;
@@ -340,9 +337,9 @@ void AFireGridManager::CreateFireActor(FGridCell* Cell, UWorld* World)
 
 
 void AFireGridManager::RemoveBurntActor(FGridCell* Cell) {
-	for (int i = 0; i < ElementsAmount; ++i) {
-		for (int j = 0; j < ElementsAmount; ++j) {
-			for (int k = 0; k < ElementsAmount; ++k) {
+	for (int i = 0; i < ElementsAmountX; ++i) {
+		for (int j = 0; j < ElementsAmountY; ++j) {
+			for (int k = 0; k < ElementsAmountZ; ++k) {
 				if (GetCell(i, j, k).OccupyingActor == Cell->OccupyingActor && Cell->FireActor) {
 					Cell->FireActor->Destroy();
 					Cell->FireActor = nullptr;

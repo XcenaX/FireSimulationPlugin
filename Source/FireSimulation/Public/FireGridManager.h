@@ -52,8 +52,8 @@ public:
 
     // Инициализация сетки на основе количества элементов в одном измерении.
     UFUNCTION(BlueprintCallable)
-    void InitializeGrid(int32 CubesPerDimension, int32 Threads, int32 FireSize);
-
+    void InitializeGrid(AGridActor* GridActor, int32 CubesPerDimension, int32 Threads, int32 FireSize);
+ 
     // Визуализация сетки.
     UFUNCTION(BlueprintCallable)
     void DrawGrid(bool bVisible, UWorld* World, AActor* GridActor);
@@ -80,8 +80,12 @@ public:
 
     // Количество поток
     int Threads;
-    // Количество элементов в сетке в одном измерении.
-    int ElementsAmount;
+    // Размер одного элемента в сетке.
+    int CellSize;
+    // Размеры сетки.
+    int ElementsAmountX;
+    int ElementsAmountY;
+    int ElementsAmountZ;
     // Размер партикла огня
     int FireParticleSize;
 
@@ -92,6 +96,7 @@ public:
     TMap<AActor*, UFireSimulationComponent*> ActorToFireCompMap;
 
 private:
+    UWorld* World;
     AGridActor* GridActor;
     // Трехмерный массив ячеек.
     TArray<FGridCell> Grid;
