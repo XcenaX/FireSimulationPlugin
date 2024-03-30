@@ -124,6 +124,12 @@ public:
 	FFireDynamicsParameters GetFireDynamics() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Room")
+	FFireDynamicsParameters GetFireDynamicsImprint() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Room")
+	int32 GetTimeImprint() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Room")
 	FCalculatedParameters InitializeCalculatedParams();
 
 	// Спавнит в комнате туман с заданной начальной видимостью в метрах
@@ -137,6 +143,9 @@ public:
 	// Удаляет весь дым
 	UFUNCTION(BlueprintCallable, Category = "Room")
 	void RemoveFog();
+
+	UFUNCTION(BlueprintCallable, Category = "Room")
+	void MakeImprint(int32 Time);
 
 protected:
 	float heat_of_combustion_;
@@ -245,6 +254,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Building Graph")
 	const TMap<int32, URoomNode*>& GetRooms() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Building Graph")
+	const TMap<int32, FGraphEdgeSet>& GetOutgoingConnections() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Building Graph")
+	const TMap<int32, FGraphEdgeSet>& GetIncomingConnections() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Building Graph")
 	void CalculateFireDynamicsForSecond(int32 TimeInSeconds, float TimeStep = 1.0f);

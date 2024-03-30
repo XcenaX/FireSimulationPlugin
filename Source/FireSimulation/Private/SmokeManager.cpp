@@ -35,6 +35,7 @@ void USmokeManager::Initialize(UWorld* World) {
 	for (TObjectIterator<UDoorComponent> It; It; ++It)
 	{
 		UDoorComponent* Door = *It;
+		Door->OnDoorStateChangedDelegate.AddDynamic(this, &USmokeManager::OnDoorStateChanged);
 		Doors.Add(Door);
 	}
 
@@ -137,4 +138,41 @@ int32 USmokeManager::GetRoomIdForActor(FString Name)
 
 	ARoomMarker* RoomMarker = *RoomMarkerPtr;
 	return RoomMarker->RoomID;
+}
+
+void USmokeManager::OnDoorStateChanged(UDoorComponent* Door, bool bIsOpen)
+{
+	ARoomMarker* Room1 = Door->ConnectedRoom1;
+	ARoomMarker* Room2 = Door->ConnectedRoom2;
+
+	if (Room1 == nullptr || Room2 == nullptr) return;
+
+	UGraphEdge* OutgoingEdge = nullptr;
+	for (UGraphEdge* Edge : graph->GetOutgoingConnections().Find(Room1->RoomID)->Edges)
+	{
+		if (Edge && Edge->RoomStartID == Room1->RoomID && Edge->RoomEndID == Room2->RoomID)
+			OutgoingEdge = Edge;
+	}
+	if (!OutgoingEdge) return;
+
+	UGraphEdge* IncomingEdge = nullptr;
+	for (UGraphEdge* Edge : graph->GetIncomingConnections().Find(Room2->RoomID)->Edges)
+	{
+		if (Edge && Edge->RoomStartID == Room1->RoomID && Edge->RoomEndID == Room2->RoomID)
+			IncomingEdge = Edge;
+	}
+	if (!IncomingEdge) return;
+
+	if (bIsOpen)
+	{
+		OutgoingEdge->SetConnectionStrengthFromStatus(EConnectionStatus::DoorOpen);
+		IncomingEdge->SetConnectionStrengthFromStatus(EConnectionStatus::DoorOpen);
+	}
+	else
+	{
+		OutgoingEdge->SetConnectionStrengthFromStatus(EConnectionStatus::DoorClosed);
+		IncomingEdge->SetConnectionStrengthFromStatus(EConnectionStatus::DoorClosed);
+	}
+	URoomNode* Room = graph->GetRooms()[Room2->RoomID];
+	Room->MakeImprint(TotalTime);
 }

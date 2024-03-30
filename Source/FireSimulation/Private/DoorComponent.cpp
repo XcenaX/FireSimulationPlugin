@@ -16,5 +16,5 @@ void UDoorComponent::ToggleDoorState()
 {
     bIsOpen = !bIsOpen;
 
-    //OnDoorStateChanged.Broadcast(bIsOpen);
+    OnDoorStateChangedDelegate.Broadcast(this, bIsOpen);
 }

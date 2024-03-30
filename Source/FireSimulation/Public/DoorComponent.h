@@ -6,6 +6,8 @@
 #include "Components/BoxComponent.h"
 #include "DoorComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDoorStateChangedSignature, UDoorComponent*, Door, bool, bIsOpen);
+
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class FIRESIMULATION_API UDoorComponent : public USceneComponent
 {
@@ -29,6 +31,9 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Door")
     bool bIsOpen;
+
+    UPROPERTY(BlueprintAssignable)
+    FOnDoorStateChangedSignature OnDoorStateChangedDelegate;
 
     UFUNCTION(BlueprintCallable, Category = "Door")
     void ToggleDoorState();

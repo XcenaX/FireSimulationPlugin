@@ -28,16 +28,18 @@ public:
         return EnumType->GetNameStringByValue((int64)Status);
     }
 
-    TMap<FString, ARoomMarker*> ActorsLocation; // Нужно для проверки перекинулся ли огонь в другую комнату
-    TMap<int32, bool> RoomsStatus; // Горит комната или нет
-
     void UpdateSmoke();
 
     bool GetRoomStatusForActor(FString Name);
     void SetRoomStatus(int32 RoomID, bool Status);
     int32 GetRoomIdForActor(FString Name);
 
+    void OnDoorStateChanged(UDoorComponent* Door, bool bIsOpen);
+
     UBuildingGraph* graph; 
+
+    TMap<FString, ARoomMarker*> ActorsLocation;
+    TMap<int32, bool> RoomsStatus;
 
     int32 TotalTime;
 
