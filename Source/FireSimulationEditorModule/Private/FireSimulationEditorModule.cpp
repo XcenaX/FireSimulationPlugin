@@ -76,9 +76,9 @@ TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnT
     );
 
     FText FireParticleText = LOCTEXT("PickActorClassButtonText", "Pick Fire Visualisation");
-    if (Asset){
+    /*if (Asset){
         FireParticleText = FText::FromName(Asset->GetFName());
-    }
+    }*/
 
     CubesAmountTextBox = SNew(SEditableTextBox)
         .Padding(FMargin(5.0f, 0.0f, 2.5f, 0.0f))
