@@ -11,10 +11,8 @@
 // Sets default values
 AFireManagerActor::AFireManagerActor()
 {
-	// Set this actor to call Tick() every frame. You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
-	GridManager = AFireGridManager::GetInstance();
+    // Set this actor to call Tick() every frame. You can turn this off to improve performance if you don't need it.
+    PrimaryActorTick.bCanEverTick = true;
 }
 
 // Called when the game starts or when spawned
@@ -23,22 +21,64 @@ void AFireManagerActor::BeginPlay()
 	Super::BeginPlay();
 
 	SmokeManager = NewObject<USmokeManager>(this);
-
 	if (SmokeManager)
 		SmokeManager->Initialize(GetWorld());
 
-	Threads = GridManager->Threads;
+    FString AssetPath;
+    UObject* Asset = nullptr;
+    if (GConfig->GetString(
+        TEXT("FireSimulationSettings"),
+        TEXT("FireParticle"),
+        AssetPath,
+        GEditorPerProjectIni
+    ))
+    {
+        Asset = LoadObject<UParticleSystem>(nullptr, *AssetPath);        
+    }
+
+    FString LoadedCellSize = "";
+    GConfig->GetString(
+        TEXT("FireSimulationSettings"),
+        TEXT("CubesAmount"),
+        LoadedCellSize,
+        GEditorPerProjectIni
+    );
+
+    FString LoadedThreads = "";
+    GConfig->GetString(
+        TEXT("FireSimulationSettings"),
+        TEXT("Threads"),
+        LoadedThreads,
+        GEditorPerProjectIni
+    );
+
+    FString LoadedFireSize = "";
+    GConfig->GetString(
+        TEXT("FireSimulationSettings"),
+        TEXT("FireSize"),
+        LoadedFireSize,
+        GEditorPerProjectIni
+    );
+
+    int32 CellSize = FCString::Atoi(*LoadedCellSize);
+    int32 NewThreads = FCString::Atoi(*LoadedThreads);
+    int32 FireSize = FCString::Atoi(*LoadedFireSize);
+
+    GridManager = NewObject<UFireGridManager>(this, FName(TEXT("GridManager")));
+    InitializeGrid(CellSize, Threads, FireSize, Asset);
+
+    Threads = NewThreads;
 
 	InitializeFireSpread();
 
 	FEditorDelegates::EndPIE.AddUObject(this, &AFireManagerActor::OnEndPIE);
 }
 
-void AFireManagerActor::StartFireThread(int32 CellSize, int32 NewThreads, int32 FireDistance) {
+void AFireManagerActor::StartFireThread(int32 CellSize, int32 NewThreads, int32 FireDistance, UObject* FireParticle) {
 
 	Threads = GridManager->Threads;
 
-	InitializeGrid(CellSize, NewThreads, FireDistance);
+    InitializeGrid(CellSize, NewThreads, FireDistance, FireParticle);
 
 	Async(EAsyncExecution::Thread, [this]() {
 		while (!Stop) {
@@ -62,8 +102,24 @@ void AFireManagerActor::StartFireThread(int32 CellSize, int32 NewThreads, int32 
 // После завершения игры в редакторе возвращаем все сгоревшие акторы на место и тушим пожар
 void AFireManagerActor::OnEndPIE(const bool bIsSimulating)
 {
-	UE_LOG(LogTemp, Warning, TEXT("GAME ENDED"));
-	RestoreScene();
+    UE_LOG(LogTemp, Warning, TEXT("GAME ENDED"));
+    
+    RestoreScene();
+
+    CheckList.Empty();
+    NewList.Empty();
+    FireList.Empty();
+
+    if (GridManager) {
+        GridManager->ClearGrid();
+    }
+
+    if (SmokeManager && SmokeManager->graph) {
+        SmokeManager->graph->ClearGraph();
+        SmokeManager->Cleanup();
+        SmokeManager->graph = nullptr;
+        SmokeManager = nullptr;
+    }
 }
 
 // Called every frame
@@ -105,10 +161,10 @@ void AFireManagerActor::InitializeFireSpread()
 
 void AFireManagerActor::UpdateFireSpread()
 {
-	if (CheckList.Num() > 0 || NewList.Num() > 0 || FireList.Num() > 0) {
-		JobDone = false;
-		double TotalTime = 0;
-		double Start = FPlatformTime::Seconds();
+    JobDone = false;
+    if (CheckList.Num() > 0 || NewList.Num() > 0 || FireList.Num() > 0) {
+        double TotalTime = 0;
+        double Start = FPlatformTime::Seconds();
 
 		if (CheckList.Num() > 500) {
 			//parallelProcessList(CheckList, &AFireManagerActor::processCheckList, CheckListRemovalIndices);
@@ -160,32 +216,26 @@ void AFireManagerActor::UpdateFireSpread()
 		}
 		RemoveCellsByCoords(FireList, FireListRemovalIndices);
 
-		JobDone = true;
-
-		End = FPlatformTime::Seconds();
-		ElapsedSeconds = End - Start;
-		//UE_LOG(LogTemp, Warning, TEXT("FireList: %f сек"), ElapsedSeconds);
-		TotalTime += ElapsedSeconds;
-
-		UE_LOG(LogTemp, Warning, TEXT("Total Time: %f сек"), TotalTime);
-	}
+        UE_LOG(LogTemp, Warning, TEXT("Total Time: %f сек"), TotalTime);
+    }
+    JobDone = true;
 }
 
-void AFireManagerActor::InitializeGrid(int32 CellSize, int32 NewThreads, int32 FireDistance)
+void AFireManagerActor::InitializeGrid(int32 CellSize, int32 NewThreads, int32 FireDistance, UObject* FireParticle)
 {
-	Threads = NewThreads;
-
-	UWorld* World = GetWorld();
-	AGridActor* GridActor = nullptr;
-	for (TActorIterator<AGridActor> It(World); It; ++It)
-	{
-		GridActor = *It;
-		break;
-	}
-
-	GridManager->InitializeGrid(GridActor, CellSize, Threads, FireDistance);
-	GridManager->PopulateGridWithActors(World, GridActor);
-	InitializeFireSpread();
+    Threads = NewThreads;
+    
+    UWorld* World = GetWorld();
+    AGridActor* GridActor = nullptr;
+    for (TActorIterator<AGridActor> It(World); It; ++It)
+    {
+        GridActor = *It;
+        break;
+    }
+    
+    GridManager->InitializeGrid(World, GridActor, CellSize, Threads, FireDistance, FireParticle);
+    GridManager->PopulateGridWithActors();
+    InitializeFireSpread();
 }
 
 bool AFireManagerActor::Contains(TArray<FGridCell*> List, FGridCell* Cell) {
@@ -356,7 +406,6 @@ void AFireManagerActor::parallelProcessList(TArray<FGridCell*>& List, TFunction<
 	}
 }
 
-
 void AFireManagerActor::RemoveCellsByCoords(TArray<FGridCell*>& List, TArray<FVector>& CoordsToRemove)
 {
 	FScopeLock ScopeLock(&ListMutex);
@@ -377,7 +426,6 @@ void AFireManagerActor::RemoveCellsByCoords(TArray<FGridCell*>& List, TArray<FVe
 	}
 	CoordsToRemove.Empty();
 }
-
 
 int AFireManagerActor::CalculateFP(FGridCell* Cell) {
 	int directNeighborCount = 0; // Для прямых соседей
@@ -411,8 +459,6 @@ int AFireManagerActor::CalculateFP(FGridCell* Cell) {
 	return (2 * directNeighborCount) + diagonalNeighborCount + (8 * bottomNeighborCount);
 }
 
-
-
 void AFireManagerActor::RestoreScene() { // Делает невидимые(сгоревшие) акторы видимымм. Удаляет все акторы огня.
 	for (int32 i = 0; i < FireList.Num(); i++) {
 		FGridCell* Cell = FireList[i];
@@ -422,13 +468,14 @@ void AFireManagerActor::RestoreScene() { // Делает невидимые(сг
 		}
 	}
 
-	for (int32 i = 0; i < BurntList.Num(); i++) {
-		FGridCell* Cell = BurntList[i];
-		if (Cell->OccupyingActor) {
-			Cell->OccupyingActor->SetActorHiddenInGame(false);
-			Cell->OccupyingActor->SetActorEnableCollision(true);
-			Cell->OccupyingActor->SetActorTickEnabled(true);
-			Cell->OccupyingActor->MarkComponentsRenderStateDirty();
-		}
-	}
+    for (int32 i = 0; i < BurntList.Num(); i++) {
+        FGridCell* Cell = BurntList[i];
+        if (Cell->OccupyingActor) {
+            Cell->OccupyingActor->SetActorHiddenInGame(false);
+            Cell->OccupyingActor->SetActorEnableCollision(true);
+            Cell->OccupyingActor->SetActorTickEnabled(true);
+            Cell->OccupyingActor->MarkComponentsRenderStateDirty();
+        }
+    }
+
 }

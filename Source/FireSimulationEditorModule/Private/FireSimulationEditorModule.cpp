@@ -5,7 +5,6 @@
 #include "Widgets/Text/STextBlock.h"
 #include "Widgets/Input/SButton.h"
 #include "Widgets/Input/SEditableTextBox.h"
-#include "FireGridManager.h"
 #include "UnrealEd.h"
 #include "EngineUtils.h"
 #include "GridActor.h"
@@ -25,9 +24,9 @@ static const FName FireSimulationTabName("FireSimulation");
 
 void FFireSimulationEditorModule::StartupModule()
 {
-    FGlobalTabmanager::Get()->RegisterNomadTabSpawner(FireSimulationTabName, FOnSpawnTab::CreateRaw(this, &FFireSimulationEditorModule::OnSpawnPluginTab))
+    /*FGlobalTabmanager::Get()->RegisterNomadTabSpawner(FireSimulationTabName, FOnSpawnTab::CreateRaw(this, &FFireSimulationEditorModule::OnSpawnPluginTab))
         .SetDisplayName(LOCTEXT("FFireSimulationTabTitle", "Fire Simulation"))
-        .SetMenuType(ETabSpawnerMenuType::Enabled);
+        .SetMenuType(ETabSpawnerMenuType::Enabled);*/
 }
 
 void FFireSimulationEditorModule::ShutdownModule()
@@ -37,10 +36,10 @@ void FFireSimulationEditorModule::ShutdownModule()
 
 TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnTabArgs& SpawnTabArgs)
 {
-    AFireGridManager* GridManager = AFireGridManager::GetInstance();
-
+ 
     // Загрузка введенных пользоваталем данных
     FString AssetPath;
+    UObject* Asset = nullptr;
     if (GConfig->GetString(
         TEXT("FireSimulationSettings"),
         TEXT("FireParticle"),
@@ -48,12 +47,8 @@ TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnT
         GEditorPerProjectIni
     ))
     {
-        UObject* Asset = LoadObject<UParticleSystem>(nullptr, *AssetPath);
-        
-        if (Asset)
-        {
-            GridManager->SelectedParticleFire = Asset;
-        }
+        Asset = LoadObject<UParticleSystem>(nullptr, *AssetPath);
+               
     }
 
     FString LoadedCubesAmount;
@@ -80,6 +75,11 @@ TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnT
         GEditorPerProjectIni
     );
 
+    FText FireParticleText = LOCTEXT("PickActorClassButtonText", "Pick Fire Visualisation");
+    if (Asset){
+        FireParticleText = FText::FromName(Asset->GetFName());
+    }
+
     CubesAmountTextBox = SNew(SEditableTextBox)
         .Padding(FMargin(5.0f, 0.0f, 2.5f, 0.0f))
         .HintText(LOCTEXT("CellSizeHint", "Enter size of cell..."));
@@ -91,9 +91,7 @@ TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnT
         .HintText(LOCTEXT("FireSizeHint", "Enter size of your Fire Particle System for 1 dimension (example: 10 means Particle will have size of box 10 x 10 x 10 )..."));
     PickFireButton = SNew(SButton)
         .VAlign(VAlign_Center)
-        .Text(GridManager->SelectedParticleFire
-            ? FText::FromName(GridManager->SelectedParticleFire->GetFName())
-            : LOCTEXT("PickActorClassButtonText", "Pick Fire Visualisation"))
+        .Text(FireParticleText)
         .ContentPadding(FMargin(10.0f))
         .OnClicked(FOnClicked::CreateRaw(this, &FFireSimulationEditorModule::OnPickActorClassClicked));
     
@@ -137,7 +135,7 @@ TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnT
                 .Padding(5)
                 [
                     SNew(SButton)
-                        .Text(LOCTEXT("FillActorsButtonText", "Fill Grid with actors"))
+                        .Text(LOCTEXT("FillActorsButtonText", "Confirm changes"))
                         .ContentPadding(FMargin(10.0f))
                         .OnClicked(FOnClicked::CreateRaw(this, &FFireSimulationEditorModule::OnFillGridClicked))
                 ]
@@ -176,9 +174,9 @@ FReply FFireSimulationEditorModule::OnInitializeGridClicked()
     if (CubesAmountTextBox.IsValid())
     {
         FString CubesAmountText = CubesAmountTextBox->GetText().ToString();
-        int32 CubesAmount = FCString::Atoi(*CubesAmountText);     
+        int32 CellSize = FCString::Atoi(*CubesAmountText);     
 
-        if (CubesAmount > 0)
+        if (CellSize > 0)
         {
             // Поиск актора GridActor в мире
             if (GEditor)
@@ -190,16 +188,12 @@ FReply FFireSimulationEditorModule::OnInitializeGridClicked()
                     GridActor = *It;
                     break;
                 }
-
-                AFireGridManager* GridManager = AFireGridManager::GetInstance();
-                if (GridManager)
-                {       
-                    GridManager->DrawGrid(true, World, GridActor);                    
-                }
+                      
+                DrawGrid(true, World, GridActor, CellSize);                                   
             }
         }
         else {
-            ShowNotification("Enter cubes amount per dimension to draw Grid!");
+            ShowNotification("Enter cell size to draw Grid!");
         }
     }
     return FReply::Handled();
@@ -218,7 +212,7 @@ FReply FFireSimulationEditorModule::OnClearGridClicked()
 FReply FFireSimulationEditorModule::OnFillGridClicked()
 {    
     FString CubesAmountText = CubesAmountTextBox->GetText().ToString();
-    int32 CubesAmount = FCString::Atoi(*CubesAmountText);
+    int32 CellSize = FCString::Atoi(*CubesAmountText);
 
     FString ThreadsText = ThreadsTextBox->GetText().ToString();
     int32 Threads = FCString::Atoi(*ThreadsText);
@@ -226,8 +220,7 @@ FReply FFireSimulationEditorModule::OnFillGridClicked()
     FString FireSizeText = FireSizeTextBox->GetText().ToString();
     int32 FireSize = FCString::Atoi(*FireSizeText);
 
-    AFireGridManager* GridManager = AFireGridManager::GetInstance();
-    if (GridManager && CubesAmount > 0)
+    if (CellSize > 0)
     {
         if (GEditor)
         {
@@ -238,9 +231,7 @@ FReply FFireSimulationEditorModule::OnFillGridClicked()
                 GridActor = *It;
                 break;
             }
-            GridManager->InitializeGrid(GridActor, CubesAmount, Threads, FireSize);
-            GridManager->PopulateGridWithActors(World, GridActor);
-            ShowNotification("Grid was successfully filled with Actors!");
+            ShowNotification("Parameters was saved!");
 
         }
     }   
@@ -279,7 +270,6 @@ FReply FFireSimulationEditorModule::OnPickActorClassClicked()
     AssetPickerConfig.OnAssetSelected = FOnAssetSelected::CreateLambda([this](const FAssetData& AssetData)
         {
             UObject* SelectedObject = AssetData.GetAsset();
-            AFireGridManager::GetInstance()->SelectedParticleFire = SelectedObject;
             
             UParticleSystem* SelectedParticleSystem = Cast<UParticleSystem>(SelectedObject);
             GConfig->SetString(
@@ -319,6 +309,48 @@ void FFireSimulationEditorModule::ShowNotification(FString message) {
     FNotificationInfo Info(FText::FromString(message));
     Info.ExpireDuration = 5.0f;
     FSlateNotificationManager::Get().AddNotification(Info);
+}
+
+void FFireSimulationEditorModule::DrawGrid(bool bVisible, UWorld* World, AGridActor* GridActor, int32 CellSize)
+{
+    UBoxComponent* BoxComponent = Cast<UBoxComponent>(GridActor->GetComponentByClass(UBoxComponent::StaticClass()));
+    if (!BoxComponent) return;
+
+    FVector Origin = BoxComponent->GetComponentLocation();
+    FVector BoxExtent = BoxComponent->GetScaledBoxExtent();
+
+    // Получаем размеры границ сетки
+    FVector GridSize = GridActor->GridBounds->GetScaledBoxExtent() * 2; // GetScaledBoxExtent возвращает половину размеров, умножаем на 2 для получения полных размеров
+
+    // Вычисляем количество ячеек в каждом измерении
+    int32 CellsX = FMath::CeilToInt(GridSize.X / CellSize);
+    int32 CellsY = FMath::CeilToInt(GridSize.Y / CellSize);
+    int32 CellsZ = FMath::CeilToInt(GridSize.Z / CellSize);
+
+    // Рассчитываем размер ячейки для каждого измерения
+    float CellSizeX = (BoxExtent.X * 2) / CellsX;
+    float CellSizeY = (BoxExtent.Y * 2) / CellsY;
+    float CellSizeZ = (BoxExtent.Z * 2) / CellsZ;
+
+    FlushPersistentDebugLines(World);
+
+    // Рисование только внешних ячеек сетки
+    for (int x = 0; x < CellsX; ++x)
+    {
+        for (int y = 0; y < CellsY; ++y)
+        {
+            for (int z = 0; z < CellsZ; ++z)
+            {
+                // Проверяем, является ли ячейка внешней
+                if (x == 0 || x == CellsX - 1 || y == 0 || y == CellsY - 1 || z == 0 || z == CellsZ - 1)
+                {
+                    FVector CellOrigin = Origin + FVector(x * CellSizeX, y * CellSizeY, z * CellSizeZ) - BoxExtent + FVector(CellSizeX / 2, CellSizeY / 2, CellSizeZ / 2);
+                    DrawDebugBox(World, CellOrigin, FVector(CellSizeX / 2, CellSizeY / 2, CellSizeZ / 2), FColor::Blue, bVisible, -1.f, 0, 1);
+                }
+            }
+        }
+    }
+
 }
 
 #undef LOCTEXT_NAMESPACE

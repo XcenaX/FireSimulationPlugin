@@ -582,3 +582,36 @@ void UBuildingGraph::UpdateGraphConnectionsAfterMergeToSourceRoom(int32 TargetRo
 		IncomingConnections.FindOrAdd(Key.EndID).Edges.Add(NewEdgePtr);
 	}
 }
+
+void UBuildingGraph::ClearGraph() {
+	for (auto& RoomPair : Rooms) {
+		URoomNode* RoomNode = RoomPair.Value;
+		if (RoomNode) {
+			RoomNode = nullptr;
+		}
+	}
+	Rooms.Empty();
+
+	for (auto& OutPair : OutgoingConnections) {
+		FGraphEdgeSet& EdgeSet = OutPair.Value;
+		for (FGraphEdgePtr& EdgePtr : EdgeSet.Edges) {
+			if (EdgePtr.Edge) {
+				EdgePtr.Edge = nullptr;
+			}
+		}
+	}
+	OutgoingConnections.Empty();
+
+	for (auto& IncPair : IncomingConnections) {
+		FGraphEdgeSet& EdgeSet = IncPair.Value;
+		for (FGraphEdgePtr& EdgePtr : EdgeSet.Edges) {
+			if (EdgePtr.Edge) {
+				EdgePtr.Edge = nullptr;
+			}
+		}
+	}
+	IncomingConnections.Empty();
+
+	SourceRoomID = -1;
+}
+

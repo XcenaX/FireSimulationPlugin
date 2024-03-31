@@ -45,6 +45,9 @@ public:
 
     int32 TotalTime;
 
+    UFUNCTION(BlueprintCallable, Category = "Building Graph")
+    void Cleanup();
+
 private:
     TArray<ARoomMarker*> Rooms;
     TArray<UDoorComponent*> Doors;

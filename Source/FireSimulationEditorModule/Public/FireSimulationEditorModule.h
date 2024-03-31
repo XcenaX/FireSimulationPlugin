@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
+#include "GridActor.h"
 #include "Widgets/Docking/SDockTab.h"
 
 class FFireSimulationEditorModule : public IModuleInterface
@@ -12,6 +13,8 @@ public:
     virtual void ShutdownModule() override;
 
     void ShowNotification(FString message);
+
+    void DrawGrid(bool bVisible, UWorld* World, AGridActor* GridActor, int32 CellSize);
 
 private:
 

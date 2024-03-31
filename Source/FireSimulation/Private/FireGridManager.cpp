@@ -11,30 +11,27 @@
 #include <Misc/FileHelper.h>
 #include <MaterialDataManager.h>
 
-AFireGridManager* AFireGridManager::Instance = nullptr;
 
-AFireGridManager::AFireGridManager()
+UFireGridManager::UFireGridManager()
 {
 	// Инициализация переменных и состояний по умолчанию
 }
 
-AFireGridManager* AFireGridManager::GetInstance()
-{
-	if (!Instance)
-	{
-		Instance = NewObject<AFireGridManager>();
-		Instance->AddToRoot(); // Предотвратить уничтожение сборщиком мусора
-	}
-	return Instance;
-}
-
-void AFireGridManager::InitializeGrid(AGridActor* NewGridActor, int32 NewCellSize, int32 NewThreads, int32 FireSize)
+void UFireGridManager::InitializeGrid(UWorld* NewWorld, AGridActor* NewGridActor, int32 NewCellSize, int32 NewThreads, int32 FireSize, UObject* FireParticle)
 {
 	Threads = NewThreads;
 	FireParticleSize = FireSize;
 	CellSize = NewCellSize;
-
+	SelectedParticleFire = FireParticle;
 	GridActor = NewGridActor;
+	World = NewWorld;
+
+	if (!World) {
+		UE_LOG(LogTemp, Warning, TEXT("NO WORLD in InitializeGrid"));
+	}
+	if (!GridActor) {
+		UE_LOG(LogTemp, Warning, TEXT("NO GRID ACTOR in InitializeGrid"));
+	}
 
 	// Получаем размеры границ сетки
 	FVector GridSize = GridActor->GridBounds->GetScaledBoxExtent() * 2; // GetScaledBoxExtent возвращает половину размеров, умножаем на 2 для получения полных размеров
@@ -100,60 +97,20 @@ void AFireGridManager::InitializeGrid(AGridActor* NewGridActor, int32 NewCellSiz
 }
 
 
-void AFireGridManager::DrawGrid(bool bVisible, UWorld* NewWorld, AActor* NewGridActor)
-{
-	if (!NewGridActor || !NewWorld) return;
-
-	World = NewWorld;
-	GridActor = Cast<AGridActor>(NewGridActor);
-
-	UBoxComponent* BoxComponent = Cast<UBoxComponent>(GridActor->GetComponentByClass(UBoxComponent::StaticClass()));
-	if (!BoxComponent) return;
-
-	FVector Origin = BoxComponent->GetComponentLocation();
-	FVector BoxExtent = BoxComponent->GetScaledBoxExtent();
-
-	// Рассчитываем размер ячейки для каждого измерения
-	float CellSizeX = (BoxExtent.X * 2) / ElementsAmountX;
-	float CellSizeY = (BoxExtent.Y * 2) / ElementsAmountY;
-	float CellSizeZ = (BoxExtent.Z * 2) / ElementsAmountZ;
-
-	FlushPersistentDebugLines(World);
-
-	// Рисование только внешних ячеек сетки
-	for (int x = 0; x < ElementsAmountX; ++x)
-	{
-		for (int y = 0; y < ElementsAmountY; ++y)
-		{
-			for (int z = 0; z < ElementsAmountZ; ++z)
-			{
-				// Проверяем, является ли ячейка внешней
-				if (x == 0 || x == ElementsAmountX - 1 || y == 0 || y == ElementsAmountY - 1 || z == 0 || z == ElementsAmountZ - 1)
-				{
-					FVector CellOrigin = Origin + FVector(x * CellSizeX, y * CellSizeY, z * CellSizeZ) - BoxExtent + FVector(CellSizeX / 2, CellSizeY / 2, CellSizeZ / 2);
-					DrawDebugBox(World, CellOrigin, FVector(CellSizeX / 2, CellSizeY / 2, CellSizeZ / 2), FColor::Blue, bVisible, -1.f, 0, 1);
-				}
-			}
-		}
-	}
-}
-
-
-void AFireGridManager::ClearGrid() {
+void UFireGridManager::ClearGrid() {
 	Grid.Empty();
+	ActorToFireCompMap.Empty();
+	ActorCellsCount.Empty();
 }
 
-FGridCell& AFireGridManager::GetCell(int32 x, int32 y, int32 z) {
+FGridCell& UFireGridManager::GetCell(int32 x, int32 y, int32 z) {
 	int32 index = z + ElementsAmountZ * (y + ElementsAmountY * x);
 	return Grid[index];
 }
 
-void AFireGridManager::PopulateGridWithActors(UWorld* NewWorld, AActor* NewGridActor)
+void UFireGridManager::PopulateGridWithActors()
 {
-	if (!NewWorld || !NewGridActor || ElementsAmountX <= 0 || ElementsAmountY <= 0 || ElementsAmountZ <= 0) return;
-
-	World = NewWorld;
-	GridActor = Cast<AGridActor>(NewGridActor);
+	if (!World || !GridActor || ElementsAmountX <= 0 || ElementsAmountY <= 0 || ElementsAmountZ <= 0) return;
 
 	UBoxComponent* BoxComponent = GridActor->FindComponentByClass<UBoxComponent>();
 	if (!BoxComponent) return;
@@ -190,11 +147,14 @@ void AFireGridManager::PopulateGridWithActors(UWorld* NewWorld, AActor* NewGridA
 						if (UFireSimulationComponent* FireComp = HitActor->FindComponentByClass<UFireSimulationComponent>())
 						{
 							const FMaterialData* Material = FMaterialDataManager::Get().GetMaterialData(FireComp->SelectedMaterial);
-							if (Material && MaxLinearFlameSpeed < Material->LinearFlameSpeed) {
+							if (Material && MaxLinearFlameSpeed < Material->LinearFlameSpeed || FireComp->IsBurning) {
 								MaxLinearFlameSpeed = Material->LinearFlameSpeed;
 								PickedActor = HitActor;
 								PickedFireComp = FireComp;
-							}														
+							}
+							if (FireComp->IsBurning) {
+								break;
+							}
 						}
 					}
 				}
@@ -228,8 +188,6 @@ void AFireGridManager::PopulateGridWithActors(UWorld* NewWorld, AActor* NewGridA
 		{
 			for (int z = 0; z < ElementsAmountZ; z++)
 			{
-				if (z + ElementsAmountY * (y + ElementsAmountX * x) >= (ElementsAmountX * ElementsAmountY * ElementsAmountZ)) continue;
-
 				FGridCell& Cell = GetCell(x, y, z);
 				if (Cell.OccupyingActor) {
 					UFireSimulationComponent* FireComp = ActorToFireCompMap.FindRef(Cell.OccupyingActor);
@@ -240,7 +198,7 @@ void AFireGridManager::PopulateGridWithActors(UWorld* NewWorld, AActor* NewGridA
 	}
 }
 
-TArray<FGridCell*> AFireGridManager::GetBurningCells() {
+TArray<FGridCell*> UFireGridManager::GetBurningCells() {
 	TArray<FGridCell*> BurningCells;
 	for (int i = 0; i < ElementsAmountX; i++) {
 		for (int j = 0; j < ElementsAmountY; j++) {
@@ -256,15 +214,13 @@ TArray<FGridCell*> AFireGridManager::GetBurningCells() {
 }
 
 
-void AFireGridManager::CreateFireActor(FGridCell* Cell, UWorld* NewWorld)
+void UFireGridManager::CreateFireActor(FGridCell* Cell)
 {
-	if (!SelectedParticleFire || !NewWorld)
+	if (!SelectedParticleFire || !World)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("VLAD! NO WORLD!"));
 		return;
 	}
-
-	World = NewWorld;
 
 	// Вычисляем локацию ячейки
 	UBoxComponent* GridBoxComponent = GridActor->FindComponentByClass<UBoxComponent>();
@@ -333,23 +289,42 @@ void AFireGridManager::CreateFireActor(FGridCell* Cell, UWorld* NewWorld)
 	Cell->FireActor = SpawnedActor;
 }
 
+void UFireGridManager::RemoveBurntActor(FGridCell* StartCell) {
+	if (!StartCell || !StartCell->OccupyingActor) return;
 
-void AFireGridManager::RemoveBurntActor(FGridCell* Cell) {
-	for (int i = 0; i < ElementsAmountX; ++i) {
-		for (int j = 0; j < ElementsAmountY; ++j) {
-			for (int k = 0; k < ElementsAmountZ; ++k) {
-				if (GetCell(i, j, k).OccupyingActor == Cell->OccupyingActor && Cell->FireActor) {
-					Cell->FireActor->Destroy();
-					Cell->FireActor = nullptr;
+	// Используем очередь для BFS
+	TQueue<FGridCell*> Queue;
+	Queue.Enqueue(StartCell);
+
+	// Помечаем StartCell как обработанную, чтобы избежать повторного добавления в очередь
+	TSet<AActor*> Processed;
+	Processed.Add(StartCell->OccupyingActor);
+
+	while (!Queue.IsEmpty()) {
+		FGridCell* CurrentCell;
+		Queue.Dequeue(CurrentCell);
+
+		// Удаление FireActor и очистка ссылки, если они существуют
+		if (CurrentCell->FireActor) {
+			CurrentCell->FireActor->Destroy();
+			CurrentCell->FireActor = nullptr;
+		}
+
+		// Перебор всех соседей текущей ячейки
+		for (FGridCell* Neighbour : CurrentCell->Neighbours) {
+			// Проверка, не обрабатывали ли мы уже эту ячейку или её актора
+			if (Neighbour && Neighbour->OccupyingActor && !Processed.Contains(Neighbour->OccupyingActor)) {
+				if (Neighbour->OccupyingActor->GetActorGuid() == CurrentCell->OccupyingActor->GetActorGuid()) {
+					Queue.Enqueue(Neighbour); // Добавляем соседа в очередь для обработки
+					Processed.Add(Neighbour->OccupyingActor); // Помечаем актора соседа как обработанного
 				}
 			}
 		}
 	}
 
-    if (Cell->OccupyingActor) {
-		Cell->OccupyingActor->SetActorHiddenInGame(true);
-		Cell->OccupyingActor->SetActorEnableCollision(false);
-		Cell->OccupyingActor->SetActorTickEnabled(false);
-		Cell->OccupyingActor->MarkComponentsRenderStateDirty();
-	}
+	// Скрываем основного актора и отключаем его взаимодействие
+	StartCell->OccupyingActor->SetActorHiddenInGame(true);
+	StartCell->OccupyingActor->SetActorEnableCollision(false);
+	StartCell->OccupyingActor->SetActorTickEnabled(false);
+	StartCell->OccupyingActor->MarkComponentsRenderStateDirty();
 }

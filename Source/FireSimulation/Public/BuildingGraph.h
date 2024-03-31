@@ -267,6 +267,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Building Graph")
 	bool MergeToSourceRoom(int32 TargetRoomID);
 
+	UFUNCTION(BlueprintCallable, Category = "Building Graph")
+	void ClearGraph();
+
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Building Graph")
 	TMap<int32, URoomNode*> Rooms;

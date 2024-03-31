@@ -9,6 +9,14 @@ USmokeManager::USmokeManager()
 {
 }
 
+void USmokeManager::Cleanup() {
+	graph->ClearGraph();
+	Rooms.Empty();
+	Doors.Empty();
+	ActorsLocation.Empty();
+	RoomsStatus.Empty();
+}
+
 void USmokeManager::Initialize(UWorld* World) {
 	UE_LOG(LogTemp, Warning, TEXT("INITIALIZING GRAPH"));
 
