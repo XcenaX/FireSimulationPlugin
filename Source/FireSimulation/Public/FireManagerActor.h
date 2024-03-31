@@ -29,11 +29,11 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Fire Management")
     void UpdateFireSpread();
 
-    void InitializeGrid(int32 CellSize, int32 Threads, int32 FireDistance, UObject* FireParticle);
+    void InitializeGrid(int32 CellSize, int32 Threads, int32 FireDistance, UParticleSystem* FireParticle);
 
     // Функция запуска распространения огня, пожар распространяется каждую секунду
     UFUNCTION(BlueprintCallable, Category = "Fire Management")
-    void StartFireThread(int32 CellSize, int32 NewThreads, int32 FireDistance, UObject* FireParticle);
+    void StartFireThread(int32 CellSize, int32 NewThreads, int32 FireDistance, UParticleSystem* FireParticle);
 
     // Функция остановки распространения огня
     UFUNCTION(BlueprintCallable, Category = "Fire Management")

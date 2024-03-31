@@ -25,7 +25,7 @@ void AFireManagerActor::BeginPlay()
 		SmokeManager->Initialize(GetWorld());
 
     FString AssetPath;
-    UObject* Asset = nullptr;
+    UParticleSystem* Asset = nullptr;
     if (GConfig->GetString(
         TEXT("FireSimulationSettings"),
         TEXT("FireParticle"),
@@ -74,7 +74,7 @@ void AFireManagerActor::BeginPlay()
 	FEditorDelegates::EndPIE.AddUObject(this, &AFireManagerActor::OnEndPIE);
 }
 
-void AFireManagerActor::StartFireThread(int32 CellSize, int32 NewThreads, int32 FireDistance, UObject* FireParticle) {
+void AFireManagerActor::StartFireThread(int32 CellSize, int32 NewThreads, int32 FireDistance, UParticleSystem* FireParticle) {
 
 	Threads = GridManager->Threads;
 
@@ -221,7 +221,7 @@ void AFireManagerActor::UpdateFireSpread()
     JobDone = true;
 }
 
-void AFireManagerActor::InitializeGrid(int32 CellSize, int32 NewThreads, int32 FireDistance, UObject* FireParticle)
+void AFireManagerActor::InitializeGrid(int32 CellSize, int32 NewThreads, int32 FireDistance, UParticleSystem* FireParticle)
 {
     Threads = NewThreads;
     
@@ -321,7 +321,7 @@ void AFireManagerActor::processNewList(int32 StartIndex, int32 EndIndex, TArray<
 		CoordsToRemove.Add(FVector(cell->x, cell->y, cell->z));
 		if (cell->FireActor == nullptr) {
 			AsyncTask(ENamedThreads::GameThread, [this, cell]() {
-				GridManager->CreateFireActor(cell, GetWorld()); // Создает актор огня в этой ячейке
+				GridManager->CreateFireActor(cell); // Создает актор огня в этой ячейке
 				});
 		}
 
