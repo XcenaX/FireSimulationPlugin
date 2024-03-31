@@ -12,7 +12,7 @@ USmokeManager::USmokeManager()
 void USmokeManager::Initialize(UWorld* World) {
 	UE_LOG(LogTemp, Warning, TEXT("INITIALIZING GRAPH"));
 
-	graph = NewObject<UBuildingGraph>(this, "BuildingGraph");
+	graph = NewObject<UBuildingGraph>(this);
 	if (!graph)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Failed to create UBuildingGraph."));
@@ -93,6 +93,7 @@ void USmokeManager::Initialize(UWorld* World) {
 
 void USmokeManager::UpdateSmoke()
 {
+	UE_LOG(LogTemp, Warning, TEXT("UPDATE"));
 	graph->CalculateFireDynamicsForSecond(TotalTime, 1);
 }
 
@@ -175,4 +176,11 @@ void USmokeManager::OnDoorStateChanged(UDoorComponent* Door, bool bIsOpen)
 	}
 	URoomNode* Room = graph->GetRooms()[Room2->RoomID];
 	Room->MakeImprint(TotalTime);
+}
+
+void USmokeManager::BeginDestroy()
+{
+	Super::BeginDestroy();
+
+	UE_LOG(LogTemp, Warning, TEXT("USmokeManager is being destroyed"));
 }

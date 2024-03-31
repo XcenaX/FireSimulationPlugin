@@ -75,9 +75,9 @@ private:
     TArray<FVector> FireListRemovalIndices;
 
     AFireGridManager* GridManager;
+
+    UPROPERTY(meta = (Hidden))
     USmokeManager* SmokeManager;
 
     float TimeAccumulator;
-
-
 };
