@@ -23,7 +23,7 @@ public:
 
     FMaterialData CalculateAverageMaterialData();
 
-    float GetRoomVolume();
+    float GetRoomVolume(float UnitsPerMeter);
 
     bool IsGasSource(TArray<AActor*> Actors);
 

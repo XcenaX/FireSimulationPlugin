@@ -64,11 +64,12 @@ FMaterialData ARoomMarker::CalculateAverageMaterialData()
 	return AverageMaterialData;
 }
 
-float ARoomMarker::GetRoomVolume() {
+float ARoomMarker::GetRoomVolume(float UnitsPerMeter) {
 	if (RoomBounds)
 	{
 		FVector BoxSize = RoomBounds->GetScaledBoxExtent();
-		return (BoxSize.X * 2 / 100) * (BoxSize.Y * 2 / 100) * (BoxSize.Z * 2 / 100);
+		float ConversionFactor = 1.0f / UnitsPerMeter;
+		return (BoxSize.X * 2 * ConversionFactor) * (BoxSize.Y * 2 * ConversionFactor) * (BoxSize.Z * 2 * ConversionFactor);
 	}
 
 	return 0.0f;
@@ -116,7 +117,7 @@ TArray<AActor*> ARoomMarker::GetActors()
 	if (!World) return Actors;
 
 	FVector RoomCenter = RoomBounds->GetComponentLocation();
-	FVector RoomSize = RoomBounds->GetScaledBoxExtent(); // Размер границы в одну сторону от центра
+	FVector RoomSize = RoomBounds->GetScaledBoxExtent(); // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	FCollisionShape Box = FCollisionShape::MakeBox(RoomSize);
 
 	FCollisionQueryParams QueryParams;

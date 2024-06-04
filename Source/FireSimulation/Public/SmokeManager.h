@@ -51,5 +51,6 @@ public:
 private:
     TArray<ARoomMarker*> Rooms;
     TArray<UDoorComponent*> Doors;
+    float UnitsPerMeter;
     virtual void BeginDestroy() override;
 };

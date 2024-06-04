@@ -35,6 +35,16 @@ void USmokeManager::Initialize(UWorld* World) {
 	if (!graph || !World)
 		return;
 
+	FString LoadedUnitsPerMeter = "";
+	GConfig->GetString(
+		TEXT("FireSimulationSettings"),
+		TEXT("UnitsPerMeter"),
+		LoadedUnitsPerMeter,
+		GEditorPerProjectIni
+	);
+
+	UnitsPerMeter = FCString::Atoi(*LoadedUnitsPerMeter);
+
 	for (TActorIterator<ARoomMarker> It(World); It; ++It)
 	{
 		ARoomMarker* Room = *It;
@@ -66,10 +76,10 @@ void USmokeManager::Initialize(UWorld* World) {
 
 		RoomNode->Initialize(RoomCount, IsGasSource, Room->CombustionCompletenessCoefficient,
 			Room->HeatAbsorptionCoefficient, Room->StartTemperature, Room->InitialGasDensity,
-			Room->Cp, Room->GetRoomVolume(), AverageMaterialData.LowestHeatOfCombustion_kJ_per_kg, AverageMaterialData.LinearFlameSpeed,
+			Room->Cp, Room->GetRoomVolume(UnitsPerMeter), AverageMaterialData.LowestHeatOfCombustion_kJ_per_kg, AverageMaterialData.LinearFlameSpeed,
 			AverageMaterialData.BurningRate, AverageMaterialData.SmokeGeneration, GetWorld());
 
-		UE_LOG(LogTemp, Warning, TEXT("ROOM %d : CombustionCompletenessCoefficient: %f; HeatAbsorptionCoefficient: %f; StartTemperature: %f, InitialGasDensity: %f;  Cp: %f ; Volume: %f ; LowestHeatOfCombustion_kJ_per_kg: %f ; LinearFlameSpeed: %f ; BurningRate: %f ; Smoke: %f"), RoomCount, (double)Room->CombustionCompletenessCoefficient, (double)Room->HeatAbsorptionCoefficient, (double)Room->StartTemperature, (double)Room->InitialGasDensity, (double)Room->Cp, (double)Room->GetRoomVolume(), (double)AverageMaterialData.LowestHeatOfCombustion_kJ_per_kg, (double)AverageMaterialData.LinearFlameSpeed, (double)AverageMaterialData.BurningRate, (double)AverageMaterialData.SmokeGeneration)
+		UE_LOG(LogTemp, Warning, TEXT("ROOM %d : CombustionCompletenessCoefficient: %f; HeatAbsorptionCoefficient: %f; StartTemperature: %f, InitialGasDensity: %f;  Cp: %f ; Volume: %f ; LowestHeatOfCombustion_kJ_per_kg: %f ; LinearFlameSpeed: %f ; BurningRate: %f ; Smoke: %f"), RoomCount, (double)Room->CombustionCompletenessCoefficient, (double)Room->HeatAbsorptionCoefficient, (double)Room->StartTemperature, (double)Room->InitialGasDensity, (double)Room->Cp, (double)Room->GetRoomVolume(UnitsPerMeter), (double)AverageMaterialData.LowestHeatOfCombustion_kJ_per_kg, (double)AverageMaterialData.LinearFlameSpeed, (double)AverageMaterialData.BurningRate, (double)AverageMaterialData.SmokeGeneration)
 
 			RoomNode->RoomMarker = Room;
 

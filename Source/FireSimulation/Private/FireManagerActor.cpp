@@ -295,8 +295,8 @@ void AFireManagerActor::processCheckList(int32 StartIndex, int32 EndIndex, TArra
 
 		float SpreadFactor = GetSpreadFactor(LinearSpeed);
 
-		// 16 - кол-во соседей которое влияет на вероятность возгорания
-		float Probability = ((LinearSpeed * FP) / 16.0) * SpreadFactor;
+		// 26 - кол-во соседей которое влияет на вероятность возгорания
+		float Probability = ((LinearSpeed * FP) / 26.0) * SpreadFactor;
 
 		// UE_LOG(LogTemp, Warning, TEXT("LinearSpeed: %f; Probability: %f;"), LinearSpeed, Probability);
 
