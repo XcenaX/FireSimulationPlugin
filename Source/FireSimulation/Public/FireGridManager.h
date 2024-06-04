@@ -52,7 +52,7 @@ public:
 
     // Инициализация сетки на основе количества элементов в одном измерении.
     UFUNCTION(BlueprintCallable)
-    void InitializeGrid(UWorld* World, AGridActor* GridActor, int32 CubesPerDimension, int32 Threads, int32 FireSize, UParticleSystem* FireParticle);
+    void InitializeGrid(UWorld* World, AGridActor* GridActor, int32 CubesPerDimension, int32 Threads, int32 FireSize, UObject* FireParticle);
  
     // Заполнение сетки акторами с компонентом FireSimulationComponent. 
     UFUNCTION(BlueprintCallable)

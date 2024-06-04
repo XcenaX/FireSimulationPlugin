@@ -24,9 +24,9 @@ static const FName FireSimulationTabName("FireSimulation");
 
 void FFireSimulationEditorModule::StartupModule()
 {
-    /*FGlobalTabmanager::Get()->RegisterNomadTabSpawner(FireSimulationTabName, FOnSpawnTab::CreateRaw(this, &FFireSimulationEditorModule::OnSpawnPluginTab))
+    FGlobalTabmanager::Get()->RegisterNomadTabSpawner(FireSimulationTabName, FOnSpawnTab::CreateRaw(this, &FFireSimulationEditorModule::OnSpawnPluginTab))
         .SetDisplayName(LOCTEXT("FFireSimulationTabTitle", "Fire Simulation"))
-        .SetMenuType(ETabSpawnerMenuType::Enabled);*/
+        .SetMenuType(ETabSpawnerMenuType::Enabled);
 }
 
 void FFireSimulationEditorModule::ShutdownModule()
@@ -75,10 +75,18 @@ TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnT
         GEditorPerProjectIni
     );
 
+    FString LoadedUnitsPerMeter = "";
+    GConfig->GetString(
+        TEXT("FireSimulationSettings"),
+        TEXT("UnitsPerMeter"),
+        LoadedUnitsPerMeter,
+        GEditorPerProjectIni
+    );
+
     FText FireParticleText = LOCTEXT("PickActorClassButtonText", "Pick Fire Visualisation");
-    /*if (Asset){
+    if (Asset){
         FireParticleText = FText::FromName(Asset->GetFName());
-    }*/
+    }
 
     CubesAmountTextBox = SNew(SEditableTextBox)
         .Padding(FMargin(5.0f, 0.0f, 2.5f, 0.0f))
@@ -89,6 +97,9 @@ TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnT
     FireSizeTextBox = SNew(SEditableTextBox)
         .Padding(FMargin(5.0f, 0.0f, 2.5f, 0.0f))
         .HintText(LOCTEXT("FireSizeHint", "Enter size of your Fire Particle System for 1 dimension (example: 10 means Particle will have size of box 10 x 10 x 10 )..."));
+    UnitsPerMeterTextBox = SNew(SEditableTextBox)
+        .Padding(FMargin(5.0f, 0.0f, 2.5f, 0.0f))
+        .HintText(LOCTEXT("UnitsPerMeterHint", "Enter the number of Unreal Engine units that will be equal to 1 meter in real world..."));
     PickFireButton = SNew(SButton)
         .VAlign(VAlign_Center)
         .Text(FireParticleText)
@@ -98,6 +109,7 @@ TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnT
     CubesAmountTextBox->SetText(FText::FromString(LoadedCubesAmount));
     ThreadsTextBox->SetText(FText::FromString(LoadedThreads));
     FireSizeTextBox->SetText(FText::FromString(LoadedFireSize));
+    UnitsPerMeterTextBox->SetText(FText::FromString(LoadedUnitsPerMeter));
 
     return SNew(SDockTab)
         .TabRole(ETabRole::NomadTab)
@@ -123,6 +135,11 @@ TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnT
                 .Padding(5)
                 [
                     FireSizeTextBox.ToSharedRef()
+                ]
+                + SVerticalBox::Slot()
+                .Padding(5)
+                [
+                    UnitsPerMeterTextBox.ToSharedRef()
                 ]
                 + SVerticalBox::Slot()
                 .AutoHeight()
@@ -220,6 +237,9 @@ FReply FFireSimulationEditorModule::OnFillGridClicked()
     FString FireSizeText = FireSizeTextBox->GetText().ToString();
     int32 FireSize = FCString::Atoi(*FireSizeText);
 
+    FString UnitsPerMeterText = UnitsPerMeterTextBox->GetText().ToString();
+    float UnitsPerMeter = FCString::Atof(*UnitsPerMeterText);
+
     if (CellSize > 0)
     {
         if (GEditor)
@@ -257,6 +277,12 @@ FReply FFireSimulationEditorModule::OnFillGridClicked()
         GEditorPerProjectIni
     );
 
+    GConfig->SetString(
+        TEXT("FireSimulationSettings"),
+        TEXT("UnitsPerMeter"),
+        *UnitsPerMeterText,
+        GEditorPerProjectIni
+    );
     GConfig->Flush(false, GEditorPerProjectIni);
 
     return FReply::Handled();

@@ -25,7 +25,7 @@ void AFireManagerActor::BeginPlay()
 		SmokeManager->Initialize(GetWorld());
 
     FString AssetPath;
-    UParticleSystem* Asset = nullptr;
+    UObject* Asset = nullptr;
     if (GConfig->GetString(
         TEXT("FireSimulationSettings"),
         TEXT("FireParticle"),
@@ -35,6 +35,7 @@ void AFireManagerActor::BeginPlay()
     {
         Asset = LoadObject<UParticleSystem>(nullptr, *AssetPath);        
     }
+    
 
     FString LoadedCellSize = "";
     GConfig->GetString(
@@ -60,21 +61,34 @@ void AFireManagerActor::BeginPlay()
         GEditorPerProjectIni
     );
 
+	FString LoadedUnitsPerMeter = "";	
+	GConfig->GetString(
+        TEXT("FireSimulationSettings"),
+        TEXT("UnitsPerMeter"),
+        LoadedUnitsPerMeter,
+        GEditorPerProjectIni
+    );
+
     int32 CellSize = FCString::Atoi(*LoadedCellSize);
-    int32 NewThreads = FCString::Atoi(*LoadedThreads);
+	Threads = FCString::Atoi(*LoadedThreads);
     int32 FireSize = FCString::Atoi(*LoadedFireSize);
+    UnitsPerMeter = FCString::Atoi(*LoadedUnitsPerMeter);
 
     GridManager = NewObject<UFireGridManager>(this, FName(TEXT("GridManager")));
     InitializeGrid(CellSize, Threads, FireSize, Asset);
-
-    Threads = NewThreads;
-
 	InitializeFireSpread();
 
 	FEditorDelegates::EndPIE.AddUObject(this, &AFireManagerActor::OnEndPIE);
 }
 
-void AFireManagerActor::StartFireThread(int32 CellSize, int32 NewThreads, int32 FireDistance, UParticleSystem* FireParticle) {
+float AFireManagerActor::GetSpreadFactor(float LinearSpeed) const{
+	float SpreadSpeedInUnrealUnits = LinearSpeed *  UnitsPerMeter;
+	float SpreadFactor = SpreadSpeedInUnrealUnits / 100.0f;
+	return FMath::Clamp(SpreadFactor, 1.0f, 10.0f);
+};
+
+
+void AFireManagerActor::StartFireThread(int32 CellSize, int32 NewThreads, int32 FireDistance, UObject* FireParticle) {
 
 	Threads = GridManager->Threads;
 
@@ -130,33 +144,33 @@ void AFireManagerActor::Tick(float DeltaTime)
 	// Суммируем прошедшее время
 	TimeAccumulator += DeltaTime;
 
-	// Проверяем, прошла ли секунда
-	if (TimeAccumulator >= 1.0f)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("SecondPassed: %d; FireManagerActor: %s"), SmokeManager->TotalTime, this);
-		SmokeManager->UpdateSmoke();
-		SmokeManager->TotalTime++;
-
-		if (JobDone)
-		{
-			Async(EAsyncExecution::Thread, [this]()
-				{
-					UpdateFireSpread();
-				});
-		}
-
-		TimeAccumulator = 0.0f;
-	}
+    // Проверяем, прошла ли секунда
+    if (TimeAccumulator >= 1.0f)
+    {        
+        if (JobDone)
+        {
+            SmokeManager->UpdateSmoke();
+            SmokeManager->TotalTime++;
+            Async(EAsyncExecution::Thread, [this]()
+                {
+                    UpdateFireSpread();
+                });
+        }
+        
+        TimeAccumulator = 0.0f;
+    }    
 }
 
 void AFireManagerActor::InitializeFireSpread()
-{
-	// Переносим изначально горящие акторы в список для дальнейшей обработки    
-	TArray<FGridCell*> BurningCells = GridManager->GetBurningCells();
-	NewList.Empty(BurningCells.Num());
-	for (int i = 0; i < BurningCells.Num(); i++) {
-		NewList.Add(BurningCells[i]);
-	}
+{    
+    // Переносим изначально горящие акторы в список для дальнейшей обработки    
+    TArray<FGridCell*> BurningCells = GridManager->GetBurningCells();
+    UE_LOG(LogTemp, Warning, TEXT("BURNING LIST: %d"), BurningCells.Num());
+
+    NewList.Empty(BurningCells.Num());
+    for (int i = 0; i < BurningCells.Num(); i++) {
+        NewList.Add(BurningCells[i]);
+    }
 }
 
 void AFireManagerActor::UpdateFireSpread()
@@ -205,23 +219,18 @@ void AFireManagerActor::UpdateFireSpread()
 
 		Start = FPlatformTime::Seconds();
 
-		if (FireList.Num() > 500) {
-			//parallelProcessList(FireList, &AFireManagerActor::processFireList, FireListRemovalIndices);
-			parallelProcessList(FireList, [this](int32 Start, int32 End, TArray<FVector>& CoordsToRemove) {
-				this->processFireList(Start, End, CoordsToRemove);
-				}, FireListRemovalIndices);
-		}
-		else {
-			processFireList(0, FireList.Num(), FireListRemovalIndices);
-		}
-		RemoveCellsByCoords(FireList, FireListRemovalIndices);
+
+        End = FPlatformTime::Seconds();
+        ElapsedSeconds = End - Start;
+        //UE_LOG(LogTemp, Warning, TEXT("FireList: %f сек"), ElapsedSeconds);
+        TotalTime += ElapsedSeconds;
 
         UE_LOG(LogTemp, Warning, TEXT("Total Time: %f сек"), TotalTime);
     }
     JobDone = true;
 }
 
-void AFireManagerActor::InitializeGrid(int32 CellSize, int32 NewThreads, int32 FireDistance, UParticleSystem* FireParticle)
+void AFireManagerActor::InitializeGrid(int32 CellSize, int32 NewThreads, int32 FireDistance, UObject* FireParticle)
 {
     Threads = NewThreads;
     
@@ -284,7 +293,10 @@ void AFireManagerActor::processCheckList(int32 StartIndex, int32 EndIndex, TArra
 			LinearSpeed = Material->LinearFlameSpeed;
 		}
 
-		float Probability = (LinearSpeed * FP) / 4.0;
+		float SpreadFactor = GetSpreadFactor(LinearSpeed);
+
+		// 16 - кол-во соседей которое влияет на вероятность возгорания
+		float Probability = ((LinearSpeed * FP) / 16.0) * SpreadFactor;
 
 		// UE_LOG(LogTemp, Warning, TEXT("LinearSpeed: %f; Probability: %f;"), LinearSpeed, Probability);
 
@@ -311,31 +323,35 @@ void AFireManagerActor::processNewList(int32 StartIndex, int32 EndIndex, TArray<
 		for (int32 j = 0; j < cell->Neighbours.Num(); j++) {
 			FGridCell* Neighbour = cell->Neighbours[j];
 
-			if (Neighbour->Status == EMPTY && Neighbour->OccupyingActor && !Contains(CheckList, Neighbour)) {
-				CheckList.Add(Neighbour);
+			cell->Status = BURNING;
+			FireList.Add(cell);
+			CoordsToRemove.Add(FVector(cell->x, cell->y, cell->z));
+			if (cell->FireActor == nullptr) {
+				AsyncTask(ENamedThreads::GameThread, [this, cell]() {
+					GridManager->CreateFireActor(cell); // Создает актор огня в этой ячейке
+					});
 			}
-		}
 
-		cell->Status = BURNING;
-		FireList.Add(cell);
-		CoordsToRemove.Add(FVector(cell->x, cell->y, cell->z));
-		if (cell->FireActor == nullptr) {
-			AsyncTask(ENamedThreads::GameThread, [this, cell]() {
-				GridManager->CreateFireActor(cell); // Создает актор огня в этой ячейке
-				});
-		}
+			cell->Status = BURNING;
+			FireList.Add(cell);
+			CoordsToRemove.Add(FVector(cell->x, cell->y, cell->z));
+			if (cell->FireActor == nullptr) {
+				AsyncTask(ENamedThreads::GameThread, [this, cell]() {
+					GridManager->CreateFireActor(cell); // Создает актор огня в этой ячейке
+					});
+			}
 
-		// Если Комната этого актора еще не загорелась то сделать Merge            
-		if (FireComp && !SmokeManager->GetRoomStatusForActor(cell->OccupyingActor->GetName()) && !FireComp->IsWall) {
-			int32 RoomID = SmokeManager->GetRoomIdForActor(cell->OccupyingActor->GetName());
-			if (RoomID >= 0) {
-				UE_LOG(LogTemp, Warning, TEXT("MERGE ROOM : %d ; Actor: %s"), RoomID, *cell->OccupyingActor->GetName());
-				SmokeManager->SetRoomStatus(RoomID, true);
-				SmokeManager->graph->MergeToSourceRoom(RoomID);
+			// Если Комната этого актора еще не загорелась то сделать Merge            
+			if (FireComp && !SmokeManager->GetRoomStatusForActor(cell->OccupyingActor->GetName()) && !FireComp->IsWall) {
+				int32 RoomID = SmokeManager->GetRoomIdForActor(cell->OccupyingActor->GetName());
+				if (RoomID >= 0) {
+					UE_LOG(LogTemp, Warning, TEXT("MERGE ROOM : %d ; Actor: %s"), RoomID, *cell->OccupyingActor->GetName());
+					SmokeManager->SetRoomStatus(RoomID, true);
+					SmokeManager->graph->MergeToSourceRoom(RoomID);
+				}
 			}
 		}
 	}
-
 }
 
 void AFireManagerActor::processFireList(int32 StartIndex, int32 EndIndex, TArray<FVector>& CoordsToRemove) {

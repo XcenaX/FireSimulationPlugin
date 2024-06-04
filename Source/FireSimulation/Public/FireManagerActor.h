@@ -29,11 +29,11 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Fire Management")
     void UpdateFireSpread();
 
-    void InitializeGrid(int32 CellSize, int32 Threads, int32 FireDistance, UParticleSystem* FireParticle);
+    void InitializeGrid(int32 CellSize, int32 Threads, int32 FireDistance, UObject* FireParticle);
 
     // Функция запуска распространения огня, пожар распространяется каждую секунду
     UFUNCTION(BlueprintCallable, Category = "Fire Management")
-    void StartFireThread(int32 CellSize, int32 NewThreads, int32 FireDistance, UParticleSystem* FireParticle);
+    void StartFireThread(int32 CellSize, int32 NewThreads, int32 FireDistance, UObject* FireParticle);
 
     // Функция остановки распространения огня
     UFUNCTION(BlueprintCallable, Category = "Fire Management")
@@ -50,6 +50,7 @@ public:
     bool Contains(TArray<FGridCell*> List, FGridCell* Cell);
 
     int CalculateFP(FGridCell* Cell);
+    float GetSpreadFactor(float LinearSpeed) const;
     
     // Показывает скрытые акторы; Тушит весь огонь
     UFUNCTION(BlueprintCallable)
@@ -78,4 +79,5 @@ private:
     USmokeManager* SmokeManager;
 
     float TimeAccumulator;
+    float UnitsPerMeter;
 };

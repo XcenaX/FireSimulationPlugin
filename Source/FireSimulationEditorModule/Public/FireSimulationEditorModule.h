@@ -23,6 +23,7 @@ private:
     TSharedPtr<SEditableTextBox> CubesAmountTextBox;
     TSharedPtr<SEditableTextBox> ThreadsTextBox;
     TSharedPtr<SEditableTextBox> FireSizeTextBox;
+    TSharedPtr<SEditableTextBox> UnitsPerMeterTextBox;
     
     TSharedPtr<SButton> PickFireButton;
     

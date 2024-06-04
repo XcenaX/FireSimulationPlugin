@@ -17,7 +17,7 @@ UFireGridManager::UFireGridManager()
 	// Инициализация переменных и состояний по умолчанию
 }
 
-void UFireGridManager::InitializeGrid(UWorld* NewWorld, AGridActor* NewGridActor, int32 NewCellSize, int32 NewThreads, int32 FireSize, UParticleSystem* FireParticle)
+void UFireGridManager::InitializeGrid(UWorld* NewWorld, AGridActor* NewGridActor, int32 NewCellSize, int32 NewThreads, int32 FireSize, UObject* FireParticle)
 {
 	Threads = NewThreads;
 	FireParticleSize = FireSize;
