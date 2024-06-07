@@ -51,7 +51,7 @@ Follow these steps to integrate the Fire Simulation Plugin into your Unreal Engi
   ![FireSimulation tab](https://github.com/XcenaX/FireSimulationPlugin/assets/40425017/a84d17e1-06b8-4e0d-a5d1-bf8a41e97420)
 
 - **Example of Scene:**
-  ![Example of Scene](https://github.com/XcenaX/FireSimulationPlugin/assets/40425017/e6a49cdf-c6b0-4633-aec6-19c7f9ebd0f2)
+  ![Example of Scene](https://github.com/XcenaX/FireSimulationPlugin/assets/40425017/66ccd0fd-bbc3-4e86-a0ee-847144423674)
 
 - **Draw Grid Example:**
   ![Draw Grid](https://github.com/XcenaX/FireSimulationPlugin/assets/40425017/b4b00d21-40c7-4790-af71-35aa599f64bc)
