@@ -22,7 +22,7 @@ Follow these steps to integrate the Fire Simulation Plugin into your Unreal Engi
      - `Mass`: The mass of the actor in kilograms.
      - `IsWall`: Indicates whether the actor is a wall, which cannot burn completely.
      - `IsBurning`: If `true`, the actor is a starting point for the fire to spread.
-     - `Selected material`: Еhe name of a material that has a set of combustion parameters such as Linear flame speed, Lowest Heat Of Combustion, Burning Rate, etc.
+     - `Selected material`: The name of a material that has a set of combustion parameters such as Linear flame speed, Lowest Heat Of Combustion, Burning Rate, etc.
 
 4. **Mark Room Boundaries:**
    - Place `RoomMarker` actors in the scene to define the boundaries of rooms. Smoke will be generated within these boundaries.
