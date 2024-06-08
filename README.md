@@ -8,7 +8,7 @@ Follow these steps to integrate the Fire Simulation Plugin into your Unreal Engi
 
 ### Setting Up the Environment
 
-1. **Initialize Simulation Managers:** Place the `FireGridManager`, `FireManagerActor`, and `SmokeManager` in your scene to manage the fire and smoke simulation.
+1. **Initialize Simulation Managers:** Place the `FireGridManager` and `FireManagerActor` in your scene to manage the fire and smoke simulation.
    
 2. **Configure the Fire Grid:**
    - Create a `GridActor` in your scene.
