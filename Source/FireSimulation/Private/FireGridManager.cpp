@@ -62,7 +62,7 @@ void UFireGridManager::InitializeGrid(UWorld* NewWorld, AGridActor* NewGridActor
 		}
 	}
 
-	for (int32 i = 0; i < CellsX; i++)
+	/*for (int32 i = 0; i < CellsX; i++)
 	{
 		for (int32 j = 0; j < CellsY; j++)
 		{
@@ -91,7 +91,7 @@ void UFireGridManager::InitializeGrid(UWorld* NewWorld, AGridActor* NewGridActor
 
 			}
 		}
-	}
+	}*/
 
 	ActorCellsCount.Empty();
 }
@@ -276,17 +276,22 @@ void UFireGridManager::CreateFireActor(FGridCell* Cell)
 		}
 	}
 
-	UParticleSystem* SelectedParticleSystem = Cast<UParticleSystem>(SelectedParticleFire);
-	UParticleSystemComponent* ParticleSystemComponent = NewObject<UParticleSystemComponent>(SpawnedActor, UParticleSystemComponent::StaticClass());
-	SpawnedActor->AddInstanceComponent(ParticleSystemComponent);
-	ParticleSystemComponent->SetTemplate(SelectedParticleSystem);
-	ParticleSystemComponent->RegisterComponent();
-	ParticleSystemComponent->SetWorldLocation(CellCenter);
-	ParticleSystemComponent->SetVisibility(true);
-	ParticleSystemComponent->Activate();
-	SpawnedActor->RegisterAllComponents();
+	try {
+		UParticleSystem* SelectedParticleSystem = Cast<UParticleSystem>(SelectedParticleFire);
+		UParticleSystemComponent* ParticleSystemComponent = NewObject<UParticleSystemComponent>(SpawnedActor, UParticleSystemComponent::StaticClass());
+		SpawnedActor->AddInstanceComponent(ParticleSystemComponent);
+		ParticleSystemComponent->SetTemplate(SelectedParticleSystem);
+		ParticleSystemComponent->RegisterComponent();
+		ParticleSystemComponent->SetWorldLocation(CellCenter);
+		ParticleSystemComponent->SetVisibility(true);
+		ParticleSystemComponent->Activate();
+		SpawnedActor->RegisterAllComponents();
 
-	Cell->FireActor = SpawnedActor;
+		Cell->FireActor = SpawnedActor;
+	}
+	catch(...){
+		UE_LOG(LogTemp, Warning, TEXT("ERROR CREATING FIRE ACTOR"));
+	}
 }
 
 void UFireGridManager::RemoveBurntActor(FGridCell* StartCell) {
@@ -305,10 +310,24 @@ void UFireGridManager::RemoveBurntActor(FGridCell* StartCell) {
 		Queue.Dequeue(CurrentCell);
 
 		// Удаление FireActor и очистка ссылки, если они существуют
-		if (CurrentCell->FireActor) {
+		/*if (CurrentCell->FireActor) {
 			CurrentCell->FireActor->Destroy();
 			CurrentCell->FireActor = nullptr;
+		}*/
+
+		// Удаляем текущую клетку из соседей всех соседних клеток
+		for (FGridCell* Neighbour : CurrentCell->Neighbours) {
+			if (Neighbour) {
+				Neighbour->RemoveNeighbour(CurrentCell);
+			}
 		}
+
+		UParticleSystemComponent* ParticleSystemComponent = CurrentCell->FireActor->FindComponentByClass<UParticleSystemComponent>();
+		if (ParticleSystemComponent) {
+			ParticleSystemComponent->Deactivate();
+			ParticleSystemComponent->SetVisibility(false);
+		}
+
 
 		// Перебор всех соседей текущей ячейки
 		for (FGridCell* Neighbour : CurrentCell->Neighbours) {
@@ -320,6 +339,8 @@ void UFireGridManager::RemoveBurntActor(FGridCell* StartCell) {
 				}
 			}
 		}
+
+		CurrentCell->Neighbours.Empty();
 	}
 
 	// Скрываем основного актора и отключаем его взаимодействие
@@ -327,4 +348,11 @@ void UFireGridManager::RemoveBurntActor(FGridCell* StartCell) {
 	StartCell->OccupyingActor->SetActorEnableCollision(false);
 	StartCell->OccupyingActor->SetActorTickEnabled(false);
 	StartCell->OccupyingActor->MarkComponentsRenderStateDirty();
+}
+
+void UFireGridManager::BeginDestroy()
+{
+	Super::BeginDestroy();
+
+	UE_LOG(LogTemp, Warning, TEXT("UFireGridManager being destroyed"));
 }

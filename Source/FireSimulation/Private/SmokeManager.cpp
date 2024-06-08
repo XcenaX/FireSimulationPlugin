@@ -109,6 +109,10 @@ void USmokeManager::Initialize(UWorld* World) {
 
 }
 
+bool USmokeManager::CorrectlySetuped() {
+	return graph->CorrectlySetuped;
+}
+
 void USmokeManager::UpdateSmoke()
 {
 	UE_LOG(LogTemp, Warning, TEXT("UPDATE"));

@@ -75,9 +75,12 @@ private:
     TArray<FVector> NewListRemovalIndices;
     TArray<FVector> FireListRemovalIndices;
 
+    UPROPERTY()
     UFireGridManager* GridManager;
+    UPROPERTY()
     USmokeManager* SmokeManager;
 
     float TimeAccumulator;
     float UnitsPerMeter;
+    int TotalSimulationTime;
 };

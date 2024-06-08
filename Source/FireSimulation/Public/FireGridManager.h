@@ -37,6 +37,13 @@ public:
     {
         return HashCombine(HashCombine(GetTypeHash(Cell.x), GetTypeHash(Cell.y)), GetTypeHash(Cell.z));
     }
+
+    void RemoveNeighbour(FGridCell* Neighbour) {
+        int32 Index = Neighbours.Find(Neighbour);
+        if (Index != INDEX_NONE) {
+            Neighbours.RemoveAt(Index);
+        }
+    }
 };
 
 /**
@@ -93,4 +100,5 @@ private:
     AGridActor* GridActor;
     // Трехмерный массив ячеек.
     TArray<FGridCell> Grid;
+    virtual void BeginDestroy() override;
 };

@@ -261,6 +261,8 @@ void UBuildingGraph::FindSourceRoomId()
 		UE_LOG(LogTemp, Warning, TEXT("No fire sources detected. There should be only one source of fire."));
 		SourceRoomID = -1;
 	}
+	
+	if (SourceRoomID > -1) CorrectlySetuped = true;
 }
 
 FFireDynamicsParameters UBuildingGraph::CalculateFireDynamicsForRoom(URoomNode* Room, float CurrentTime)

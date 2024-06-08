@@ -270,6 +270,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Building Graph")
 	void ClearGraph();
 
+	bool CorrectlySetuped = false;
+
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Building Graph")
 	TMap<int32, URoomNode*> Rooms;
@@ -294,4 +296,5 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = "Building Graph")
 	void UpdateGraphConnectionsAfterMergeToSourceRoom(int32 TargetRoomID);
+
 };

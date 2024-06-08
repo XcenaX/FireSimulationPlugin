@@ -48,6 +48,8 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Building Graph")
     void Cleanup();
 
+    bool CorrectlySetuped();
+
 private:
     TArray<ARoomMarker*> Rooms;
     TArray<UDoorComponent*> Doors;
