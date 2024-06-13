@@ -20,8 +20,8 @@ Follow these steps to integrate the Fire Simulation Plugin into your Unreal Engi
    - Add a `FireSimulationComponent` to each actor you want to include in the fire simulation.
    - Specify the following properties for each actor:
      - `Mass`: The mass of the actor in kilograms.
-     - `IsWall`: Indicates whether the actor is a wall, which cannot burn completely.
-     - `IsBurning`: If `true`, the actor is a starting point for the fire to spread.
+     - `IsWall`: Walls cannot burn.
+     - `IsBurning`: If `true`, the actor is a starting point for the fire to spread. There MUST be only 1 starting point.
      - `Selected material`: The name of a material that has a set of combustion parameters such as Linear flame speed, Lowest Heat Of Combustion, Burning Rate, etc.
 
 4. **Mark Room Boundaries:**
@@ -42,8 +42,8 @@ Follow these steps to integrate the Fire Simulation Plugin into your Unreal Engi
    - `Measure`. The number of Unreal Engine untis that will be equal to 1 meter.
    - `Fire distance`. Visualisation parameter. Distance between fire actors. The greater the distance, the fewer Actors will be required to represent the fire zone and fewer resources will be required.
    - Select a `Fire Particle System`. Visualisation of fire.
-   - Use `Draw Grid` to visualize your grid in the scene and `Clear Grid` to hide it.
-   - Click `Fill Grid with Actors` to search for actors with `FireSimulationComponent` and initialize the grid for fire simulation.
+   - Use `Draw Grid` to visualize your grid in the scene and `Clear Grid` to clear it.
+   - Click `Confirm Changes` to save plugin settings.
 
 ### Example Images
 
