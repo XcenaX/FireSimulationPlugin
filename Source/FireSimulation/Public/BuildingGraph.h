@@ -73,6 +73,18 @@ public:
 		SmokeExtinctionCoefficient(0.f), Visibility(0.f) {}
 };
 
+USTRUCT(BlueprintType)
+struct FDoorStateImprint
+{
+	GENERATED_BODY()
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Door")
+	int32 FromRoomID;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Door")
+	EConnectionStatus Status;
+};
+
 UCLASS(BlueprintType)
 class FIRESIMULATION_API URoomNode : public UObject
 {
@@ -130,6 +142,9 @@ public:
 	int32 GetTimeImprint() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Room")
+	FDoorStateImprint GetDoorStateImprint() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Room")
 	FCalculatedParameters InitializeCalculatedParams();
 
 	// Спавнит в комнате туман с заданной начальной видимостью в метрах
@@ -145,17 +160,18 @@ public:
 	void RemoveFog();
 
 	UFUNCTION(BlueprintCallable, Category = "Room")
-	void MakeImprint(int32 Time);
+	void MakeImprint(int32 Time, int32 ChangedDoorRoomID, EConnectionStatus NewDoorStatus);
 
-protected:
 	float heat_of_combustion_;
 	float linear_flame_speed_rate_;
 	float specific_fuel_burn_rate_;
 	float smoke_forming_ability_;
 	FCalculatedParameters calculated_params_;
 	FFireDynamicsParameters fire_dynamics_;
+protected:
 	int32 time_imprint_;
 	FFireDynamicsParameters fire_dynamics_imprint_;
+	FDoorStateImprint door_state_imprint_;
 };
 
 UCLASS(BlueprintType)
@@ -183,14 +199,30 @@ public:
 		switch (ConnectionStatus)
 		{
 		case EConnectionStatus::DoorClosed:
-			ConnectionStrength = 0.15f;
-			return 0.15f;
-		case EConnectionStatus::DoorOpen:
-			ConnectionStrength = 0.3f;
-			return 0.3f;
-		case EConnectionStatus::NoDoor:
 			ConnectionStrength = 0;
 			return 0;
+		case EConnectionStatus::DoorOpen:
+			ConnectionStrength = 0.63f;
+			return 0.63f;
+		case EConnectionStatus::NoDoor:
+			ConnectionStrength = 1;
+			return 1;
+		default:
+			return 0;
+		}
+	}
+
+	UFUNCTION(BlueprintCallable, Category = "GraphEdge")
+	static float GetConnectionStrengthFromStatus(EConnectionStatus ConnectionStatus)
+	{
+		switch (ConnectionStatus)
+		{
+		case EConnectionStatus::DoorClosed:
+			return 0;
+		case EConnectionStatus::DoorOpen:
+			return 0.63f;
+		case EConnectionStatus::NoDoor:
+			return 1;
 		default:
 			return 0;
 		}
@@ -289,7 +321,7 @@ protected:
 	void FindSourceRoomId();
 
 	UFUNCTION(BlueprintCallable, Category = "Building Graph")
-	FFireDynamicsParameters CalculateFireDynamicsForRoom(URoomNode* Room, float CurrentTime);
+	FFireDynamicsParameters CalculateFireDynamicsForRoom(URoomNode* Room, float CurrentTime, bool IsImprint);
 
 	UFUNCTION(BlueprintCallable, Category = "Building Graph")
 	bool TopologicalSort();

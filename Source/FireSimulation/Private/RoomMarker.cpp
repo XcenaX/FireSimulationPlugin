@@ -59,6 +59,7 @@ FMaterialData ARoomMarker::CalculateAverageMaterialData()
 		AverageMaterialData.HydrogenChloride_kg_per_kg /= TotalMass;
 		AverageMaterialData.LinearFlameSpeed /= TotalActors;
 		AverageMaterialData.OxygenConsumption_kg_per_kg /= TotalMass;
+		AverageMaterialData.SmokeGeneration /= TotalActors;
 	}
 
 	return AverageMaterialData;

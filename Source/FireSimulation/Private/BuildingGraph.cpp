@@ -56,6 +56,10 @@ int32 URoomNode::GetTimeImprint() const {
 	return time_imprint_;
 }
 
+FDoorStateImprint URoomNode::GetDoorStateImprint() const {
+	return door_state_imprint_;
+}
+
 FCalculatedParameters URoomNode::InitializeCalculatedParams()
 {
 	FCalculatedParameters Params;
@@ -157,10 +161,12 @@ void URoomNode::RemoveFog()
 	}
 }
 
-void URoomNode::MakeImprint(int32 Time)
+void URoomNode::MakeImprint(int32 Time, int32 ChangedDoorFromRoomID, EConnectionStatus NewDoorStatus)
 {
 	fire_dynamics_imprint_ = fire_dynamics_;
 	time_imprint_ = Time;
+	door_state_imprint_.FromRoomID = ChangedDoorFromRoomID;
+	door_state_imprint_.Status = NewDoorStatus;
 }
 
 void UBuildingGraph::PrepareGraphToWork()
@@ -265,7 +271,7 @@ void UBuildingGraph::FindSourceRoomId()
 	if (SourceRoomID > -1) CorrectlySetuped = true;
 }
 
-FFireDynamicsParameters UBuildingGraph::CalculateFireDynamicsForRoom(URoomNode* Room, float CurrentTime)
+FFireDynamicsParameters UBuildingGraph::CalculateFireDynamicsForRoom(URoomNode* Room, float CurrentTime, bool IsImprint)
 {
 	if (!Room)
 	{
@@ -275,11 +281,11 @@ FFireDynamicsParameters UBuildingGraph::CalculateFireDynamicsForRoom(URoomNode* 
 	FCalculatedParameters CalcParams = Room->GetCalculatedParameters();
 
 	FFireDynamicsParameters FireDynamicsParams;
-	FireDynamicsParams.BurnedMass = CalcParams.A * FMath::Pow(CurrentTime, CalcParams.N);
 
 	bool bHasConnections = IncomingConnections.Contains(Room->RoomID) && IncomingConnections[Room->RoomID].Edges.Num() > 0;
 	if (!bHasConnections)
 	{
+		FireDynamicsParams.BurnedMass = CalcParams.A * FMath::Pow(CurrentTime, CalcParams.N);
 		FireDynamicsParams.GasDensity = CalcParams.LimitGasDensity + (Room->InitialGasDensity - CalcParams.LimitGasDensity) * FMath::Exp(-CalcParams.GasReleasePerMeterBurn * FireDynamicsParams.BurnedMass / Room->RoomVolume);
 		FireDynamicsParams.SmokeExtinctionCoefficient = CalcParams.LimitSmokeExtinctionCoefficient + (0 - CalcParams.LimitSmokeExtinctionCoefficient) * FMath::Exp(-CalcParams.GasReleasePerMeterBurn * FireDynamicsParams.BurnedMass / Room->RoomVolume);
 	}
@@ -292,14 +298,27 @@ FFireDynamicsParameters UBuildingGraph::CalculateFireDynamicsForRoom(URoomNode* 
 			int32 adjacentRoomId = Connection->RoomStartID;
 			URoomNode* AdjacentRoom = Rooms[adjacentRoomId];
 			FFireDynamicsParameters AdjacentRoomFireDynamicsParams = AdjacentRoom->GetFireDynamics();
-			float ConnectionStrength = Connection->ConnectionStrength;
+			FCalculatedParameters AdjacentRoomCalcParams = AdjacentRoom->GetCalculatedParameters();
+			
+			float ConnectionStrength;
+			if (IsImprint && Room->GetDoorStateImprint().FromRoomID == adjacentRoomId) {
+				ConnectionStrength = UGraphEdge::GetConnectionStrengthFromStatus(Room->GetDoorStateImprint().Status);
+			}
+			else {
+				ConnectionStrength = Connection->ConnectionStrength;
+			}
 
+			//UE_LOG(LogTemp, Warning, TEXT("Second: %f; adjusted_ROOM %d : adjusted_GasDensity: %f, Adjacent_SmEx: %f"), CurrentTime, adjacentRoomId, AdjacentRoomFireDynamicsParams.GasDensity, AdjacentRoomFireDynamicsParams.SmokeExtinctionCoefficient)
+
+			FireDynamicsParams.BurnedMass += AdjacentRoomFireDynamicsParams.BurnedMass;
 			FireDynamicsParams.GasDensity += AdjacentRoomFireDynamicsParams.GasDensity + (Room->InitialGasDensity - AdjacentRoomFireDynamicsParams.GasDensity) * FMath::Exp(-ConnectionStrength * CalcParams.GasReleasePerMeterBurn * FireDynamicsParams.BurnedMass / Room->RoomVolume);
 			FireDynamicsParams.SmokeExtinctionCoefficient += AdjacentRoomFireDynamicsParams.SmokeExtinctionCoefficient + (0 - AdjacentRoomFireDynamicsParams.SmokeExtinctionCoefficient) * FMath::Exp(-ConnectionStrength * CalcParams.GasReleasePerMeterBurn * FireDynamicsParams.BurnedMass / Room->RoomVolume);
+			Count++;
 		}
 
 		if (Count > 0)
 		{
+			FireDynamicsParams.BurnedMass /= Count;
 			FireDynamicsParams.GasDensity /= Count;
 			FireDynamicsParams.SmokeExtinctionCoefficient /= Count;
 		}
@@ -307,7 +326,18 @@ FFireDynamicsParameters UBuildingGraph::CalculateFireDynamicsForRoom(URoomNode* 
 
 	FireDynamicsParams.GasTemperature += Room->StartTemperature * Room->InitialGasDensity / FireDynamicsParams.GasDensity;
 	FireDynamicsParams.Visibility += FMath::Min(30.0f, CalcParams.LimitVisibility / FireDynamicsParams.SmokeExtinctionCoefficient);
-
+/*	if (Room->IsGasSource)
+	{
+		if (Room->GetDoorStateImprint().FromRoomID == 1)
+		{
+			FFireDynamicsParameters FireDynamicsParamsImprint = Room->GetFireDynamicsImprint();
+			if (FireDynamicsParamsImprint.GasTemperature > FireDynamicsParams.GasTemperature) {
+				FireDynamicsParams.GasTemperature = FireDynamicsParamsImprint.GasTemperature;
+				FireDynamicsParams.Visibility = FireDynamicsParamsImprint.Visibility;
+			}
+		}
+	}*/
+	//UE_LOG(LogTemp, Warning, TEXT("Second: %f; ROOM %d : temp: %f, vis: %f"), CurrentTime, Room->RoomID, FireDynamicsParams.GasTemperature, FireDynamicsParams.Visibility)
 	return FireDynamicsParams;
 }
 
@@ -322,21 +352,26 @@ void UBuildingGraph::CalculateFireDynamicsForSecond(int32 Second, float TimeStep
 	for (auto& R : Rooms)
 	{
 		URoomNode* Room = R.Value;
-		FFireDynamicsParameters CurrentParams = CalculateFireDynamicsForRoom(Room, Second);
+		FFireDynamicsParameters CurrentParams = CalculateFireDynamicsForRoom(Room, Second, false);
+		//UE_LOG(LogTemp, Warning, TEXT("Current Second: %d; ROOM %d : visibility: %f, temp: %f"), Room->GetTimeImprint(), Room->RoomID, (double)CurrentParams.Visibility, (double)CurrentParams.GasTemperature);
 
-		if (Room->GetTimeImprint() != -1)
+		if (Room->GetTimeImprint() != -1 && !Room->IsGasSource)
 		{
-			FFireDynamicsParameters CurrentParamsImprintTime = CalculateFireDynamicsForRoom(Room, Room->GetTimeImprint());
+			FFireDynamicsParameters CurrentParamsImprintTime = CalculateFireDynamicsForRoom(Room, Room->GetTimeImprint(), true);
 			FFireDynamicsParameters ImprintParams = Room->GetFireDynamicsImprint();
 
-			CurrentParams.GasDensity = ImprintParams.GasDensity + (CurrentParams.GasDensity - CurrentParamsImprintTime.GasDensity);
-			CurrentParams.GasTemperature = ImprintParams.GasTemperature + (CurrentParams.GasTemperature - CurrentParamsImprintTime.GasTemperature);
-			CurrentParams.SmokeExtinctionCoefficient = ImprintParams.SmokeExtinctionCoefficient + (CurrentParams.SmokeExtinctionCoefficient - CurrentParamsImprintTime.SmokeExtinctionCoefficient);
-			CurrentParams.Visibility = ImprintParams.Visibility + (CurrentParams.Visibility - CurrentParamsImprintTime.Visibility);
+			//UE_LOG(LogTemp, Warning, TEXT("Current Second: %d; ROOM %d : visibility_1: %f, visibility_2: %f"), Room->GetTimeImprint(), Room->RoomID, (double)ImprintParams.Visibility, (double)(ImprintParams.Visibility + (CurrentParams.Visibility - CurrentParamsImprintTime.Visibility)));
+			CurrentParams.GasDensity = FMath::Min(ImprintParams.GasDensity, ImprintParams.GasDensity + (CurrentParams.GasDensity - ImprintParams.GasDensity));
+			CurrentParams.GasTemperature = FMath::Max(ImprintParams.GasTemperature, ImprintParams.GasTemperature + (CurrentParams.GasTemperature - ImprintParams.GasTemperature));
+			CurrentParams.SmokeExtinctionCoefficient = FMath::Max(ImprintParams.SmokeExtinctionCoefficient, ImprintParams.SmokeExtinctionCoefficient + (CurrentParams.SmokeExtinctionCoefficient - ImprintParams.SmokeExtinctionCoefficient));
+			CurrentParams.Visibility = FMath::Min(ImprintParams.Visibility, ImprintParams.Visibility + (CurrentParams.Visibility - ImprintParams.Visibility));
+			UE_LOG(LogTemp, Warning, TEXT("Imprint Second: %d; ROOM %d : visibility: %f, temp: %f"), Second, Room->RoomID, (double)ImprintParams.Visibility, (double)ImprintParams.GasTemperature);
+			UE_LOG(LogTemp, Warning, TEXT("Current Imprint: %d; ROOM %d : visibility: %f, temp: %f"), Second, Room->RoomID, (double)CurrentParamsImprintTime.Visibility, (double)CurrentParamsImprintTime.GasTemperature);
+			//UE_LOG(LogTemp, Warning, TEXT("Imprint"));
 		}
 		Room->UpdateFireDynamics(CurrentParams);
 
-		UE_LOG(LogTemp, Warning, TEXT("Second: %d; ROOM %d : visibility: %f; volume: %f; other: %f, %f, %f, %f"), Second, Room->RoomID, (double)CurrentParams.Visibility, (double)Room->RoomVolume, (double)CurrentParams.BurnedMass, (double)CurrentParams.GasDensity, (double)CurrentParams.GasTemperature, (double)CurrentParams.SmokeExtinctionCoefficient);
+		UE_LOG(LogTemp, Warning, TEXT("Second: %d; ROOM %d : visibility: %f, burned mass: %f"), Second, Room->RoomID, (double)CurrentParams.Visibility, (double)CurrentParams.BurnedMass);
 
 		//// Если в комнате есть дым надо проверить есть ли в ней Particle Sytem, если нет - создать, если да - обновить видимость
 		if (CurrentParams.Visibility != 30.0) {
@@ -440,12 +475,19 @@ bool UBuildingGraph::MergeToSourceRoom(int32 TargetRoomID)
 	{
 		SourceRoom->InitialGasDensity = (SourceRoom->InitialGasDensity * SourceRoom->RoomVolume + TargetRoom->InitialGasDensity * TargetRoom->RoomVolume) / TotalVolume;
 		SourceRoom->StartTemperature = (SourceRoom->StartTemperature * SourceRoom->RoomVolume + TargetRoom->StartTemperature * TargetRoom->RoomVolume) / TotalVolume;
+		SourceRoom->CombustionCompletenessCoefficient = (SourceRoom->CombustionCompletenessCoefficient * SourceRoom->RoomVolume + TargetRoom->CombustionCompletenessCoefficient * TargetRoom->RoomVolume) / TotalVolume;
+		SourceRoom->HeatAbsorptionCoefficient = (SourceRoom->HeatAbsorptionCoefficient * SourceRoom->RoomVolume + TargetRoom->HeatAbsorptionCoefficient * TargetRoom->RoomVolume) / TotalVolume;
+		SourceRoom->Cp = (SourceRoom->Cp * SourceRoom->RoomVolume + TargetRoom->Cp * TargetRoom->RoomVolume) / TotalVolume;
+		SourceRoom->heat_of_combustion_ = (SourceRoom->heat_of_combustion_ * SourceRoom->RoomVolume + TargetRoom->heat_of_combustion_ * TargetRoom->RoomVolume) / TotalVolume;
+		SourceRoom->linear_flame_speed_rate_ = (SourceRoom->linear_flame_speed_rate_ * SourceRoom->RoomVolume + TargetRoom->linear_flame_speed_rate_ * TargetRoom->RoomVolume) / TotalVolume;
+		SourceRoom->specific_fuel_burn_rate_ = (SourceRoom->specific_fuel_burn_rate_ * SourceRoom->RoomVolume + TargetRoom->specific_fuel_burn_rate_ * TargetRoom->RoomVolume) / TotalVolume;
+		SourceRoom->smoke_forming_ability_ = (SourceRoom->smoke_forming_ability_ * SourceRoom->RoomVolume + TargetRoom->smoke_forming_ability_ * TargetRoom->RoomVolume) / TotalVolume;
 
 		SourceRoom->RoomVolume = TotalVolume;
 	}
-
-	SourceRoom->UpdateFireDynamics(TargetRoom->GetFireDynamics());
+	SourceRoom->calculated_params_ = SourceRoom->InitializeCalculatedParams();
 	Rooms.Remove(TargetRoomID);
+	SourceRoom->MakeImprint(0, 1, EConnectionStatus::NoDoor);
 
 	UpdateGraphConnectionsAfterMergeToSourceRoom(TargetRoomID);
 
