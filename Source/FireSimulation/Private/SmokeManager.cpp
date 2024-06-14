@@ -185,19 +185,21 @@ void USmokeManager::OnDoorStateChanged(UDoorComponent* Door, bool bIsOpen)
 			IncomingEdge = Edge;
 	}
 	if (!IncomingEdge) return;
+	
+	URoomNode* Room = graph->GetRooms()[Room2->RoomID];
 
 	if (bIsOpen)
 	{
+		Room->MakeImprint(TotalTime, Room1->RoomID, EConnectionStatus::DoorClosed);
 		OutgoingEdge->SetConnectionStrengthFromStatus(EConnectionStatus::DoorOpen);
 		IncomingEdge->SetConnectionStrengthFromStatus(EConnectionStatus::DoorOpen);
 	}
 	else
 	{
+		Room->MakeImprint(TotalTime, Room1->RoomID, EConnectionStatus::DoorOpen);
 		OutgoingEdge->SetConnectionStrengthFromStatus(EConnectionStatus::DoorClosed);
 		IncomingEdge->SetConnectionStrengthFromStatus(EConnectionStatus::DoorClosed);
 	}
-	URoomNode* Room = graph->GetRooms()[Room2->RoomID];
-	Room->MakeImprint(TotalTime);
 }
 
 void USmokeManager::BeginDestroy()
