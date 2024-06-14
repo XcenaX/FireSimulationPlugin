@@ -349,6 +349,8 @@ void UBuildingGraph::CalculateFireDynamicsForSecond(int32 Second, float TimeStep
 			}
 		}
 	}
+	UE_LOG(LogTemp, Warning, TEXT("\n"));
+
 }
 
 bool UBuildingGraph::TopologicalSort()

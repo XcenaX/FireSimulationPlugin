@@ -69,7 +69,9 @@ float ARoomMarker::GetRoomVolume(float UnitsPerMeter) {
 	{
 		FVector BoxSize = RoomBounds->GetScaledBoxExtent();
 		float ConversionFactor = 1.0f / UnitsPerMeter;
-		return (BoxSize.X * 2 * ConversionFactor) * (BoxSize.Y * 2 * ConversionFactor) * (BoxSize.Z * 2 * ConversionFactor);
+		return (BoxSize.X * 2 * ConversionFactor) * 
+			   (BoxSize.Y * 2 * ConversionFactor) * 
+			   (BoxSize.Z * 2 * ConversionFactor);
 	}
 
 	return 0.0f;

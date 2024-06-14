@@ -255,9 +255,13 @@ bool FFireSimulationTest::RunTest(const FString& Parameters)
 	UBuildingGraphTestHelper* BuildingGraph = NewObject<UBuildingGraphTestHelper>();
 
 	// Инициализация комнат
-	URoomNode* FireSourceRoom = NewObject<URoomNode>(); // 1
-	FireSourceRoom->Initialize(1, true, 0.8f, 0.6f, 293.15f, 1.2f, 1000.0f, 50.0f, 50000.0f, 0.5f, 0.01f, 0.5f, nullptr);
+	URoomNode* FireSourceRoom = NewObject<URoomNode>(); // 4
+	FireSourceRoom->Initialize(4, true, 0.8f, 0.6f, 293.15f, 1.2f, 1000.0f, 50.0f, 50000.0f, 0.5f, 0.01f, 0.5f, nullptr);
 	BuildingGraph->AddRoom(FireSourceRoom);
+
+	URoomNode* FireRoom1 = NewObject<URoomNode>(); // 1
+	FireRoom1->Initialize(1, false, 0.8f, 0.6f, 293.15f, 1.2f, 1000.0f, 50.0f, 50000.0f, 0.5f, 0.01f, 0.5f, nullptr);
+	BuildingGraph->AddRoom(FireRoom1);
 
 	URoomNode* FireRoom2 = NewObject<URoomNode>(); // 2
 	FireRoom2->Initialize(2, false, 0.8f, 0.6f, 293.15f, 1.2f, 1000.0f, 50.0f, 50000.0f, 0.5f, 0.01f, 0.5f, nullptr);
@@ -267,8 +271,14 @@ bool FFireSimulationTest::RunTest(const FString& Parameters)
 	FireRoom3->Initialize(3, false, 0.8f, 0.6f, 293.15f, 1.2f, 1000.0f, 50.0f, 50000.0f, 0.5f, 0.01f, 0.5f, nullptr);
 	BuildingGraph->AddRoom(FireRoom3);
 
-	BuildingGraph->AddConnection(FireSourceRoom, FireRoom2, EConnectionStatus::DoorOpen);
-	BuildingGraph->AddConnection(FireSourceRoom, FireRoom3, EConnectionStatus::DoorOpen);
+	URoomNode* FireRoom5 = NewObject<URoomNode>(); // 5
+	FireRoom5->Initialize(5, false, 0.8f, 0.6f, 293.15f, 1.2f, 1000.0f, 50.0f, 50000.0f, 0.5f, 0.01f, 0.5f, nullptr);
+	BuildingGraph->AddRoom(FireRoom5);
+
+	BuildingGraph->AddConnection(FireRoom5, FireRoom2, EConnectionStatus::DoorOpen);
+	BuildingGraph->AddConnection(FireRoom5, FireRoom1, EConnectionStatus::DoorOpen);
+	BuildingGraph->AddConnection(FireSourceRoom, FireRoom5, EConnectionStatus::DoorOpen);
+	BuildingGraph->AddConnection(FireRoom5, FireRoom3, EConnectionStatus::DoorClosed);
 
 	BuildingGraph->PrepareGraphToWork();
 

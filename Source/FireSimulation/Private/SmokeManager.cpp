@@ -100,7 +100,7 @@ void USmokeManager::Initialize(UWorld* World) {
 
 			UE_LOG(LogTemp, Warning, TEXT("START_ROOM_ID: %d ; END_ROOM_ID: %d ; Status: %s"), StartRoomID, EndRoomID, *EnumToString(ConnectionStatus));
 
-			graph->AddConnection(graph->GetRooms()[Door->ConnectedRoom1->RoomID], graph->GetRooms()[Door->ConnectedRoom2->RoomID], ConnectionStatus);
+			graph->AddConnection(graph->GetRooms()[StartRoomID], graph->GetRooms()[EndRoomID], ConnectionStatus);
 		}
 	}
 	graph->PrepareGraphToWork();

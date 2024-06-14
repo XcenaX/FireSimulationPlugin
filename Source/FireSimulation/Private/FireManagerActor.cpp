@@ -390,7 +390,7 @@ void AFireManagerActor::processNewList(int32 StartIndex, int32 EndIndex, TArray<
 
 						FGridCell& Cell = GridManager->GetCell(newX, newY, newZ);
 
-						if (Cell.Status == EMPTY && Cell.OccupyingActor && !Contains(CheckList, Cell)) {
+						if (Cell.Status == EMPTY && !FireComp->IsWall && Cell.OccupyingActor && !Contains(CheckList, Cell)) {
 							CheckList.Add(&Cell);
 						}
 					}
@@ -535,7 +535,7 @@ int AFireManagerActor::CalculateFP(FGridCell* Cell) {
 		}
 	}
 
-	return (4 * directNeighborCount) + (2 * diagonalNeighborCount) + (16 * bottomNeighborCount);
+	return (2 * directNeighborCount) + diagonalNeighborCount + (8 * bottomNeighborCount);
 }
 
 

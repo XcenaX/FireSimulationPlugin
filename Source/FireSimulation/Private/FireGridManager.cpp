@@ -147,13 +147,16 @@ void UFireGridManager::PopulateGridWithActors()
 						if (UFireSimulationComponent* FireComp = HitActor->FindComponentByClass<UFireSimulationComponent>())
 						{
 							const FMaterialData* Material = FMaterialDataManager::Get().GetMaterialData(FireComp->SelectedMaterial);
-							if (Material && MaxLinearFlameSpeed < Material->LinearFlameSpeed || FireComp->IsBurning) {
+							if (Material && MaxLinearFlameSpeed < Material->LinearFlameSpeed || FireComp->IsBurning || FireComp->IsWall) {
 								MaxLinearFlameSpeed = Material->LinearFlameSpeed;
 								PickedActor = HitActor;
 								PickedFireComp = FireComp;
 							}
-							if (FireComp->IsBurning) {
+							if (FireComp->IsBurning || FireComp->IsWall) {
 								break;
+							}
+							if (FireComp->IsBurning) {
+								UE_LOG(LogTemp, Warning, TEXT("BURNING!"))
 							}
 						}
 					}
@@ -316,11 +319,11 @@ void UFireGridManager::RemoveBurntActor(FGridCell* StartCell) {
 		}*/
 
 		// Удаляем текущую клетку из соседей всех соседних клеток
-		for (FGridCell* Neighbour : CurrentCell->Neighbours) {
+		/*for (FGridCell* Neighbour : CurrentCell->Neighbours) {
 			if (Neighbour) {
 				Neighbour->RemoveNeighbour(CurrentCell);
 			}
-		}
+		}*/
 
 		UParticleSystemComponent* ParticleSystemComponent = CurrentCell->FireActor->FindComponentByClass<UParticleSystemComponent>();
 		if (ParticleSystemComponent) {
@@ -330,17 +333,17 @@ void UFireGridManager::RemoveBurntActor(FGridCell* StartCell) {
 
 
 		// Перебор всех соседей текущей ячейки
-		for (FGridCell* Neighbour : CurrentCell->Neighbours) {
-			// Проверка, не обрабатывали ли мы уже эту ячейку или её актора
-			if (Neighbour && Neighbour->OccupyingActor && !Processed.Contains(Neighbour->OccupyingActor)) {
-				if (Neighbour->OccupyingActor->GetActorGuid() == CurrentCell->OccupyingActor->GetActorGuid()) {
-					Queue.Enqueue(Neighbour); // Добавляем соседа в очередь для обработки
-					Processed.Add(Neighbour->OccupyingActor); // Помечаем актора соседа как обработанного
-				}
-			}
-		}
+		//for (FGridCell* Neighbour : CurrentCell->Neighbours) {
+		//	// Проверка, не обрабатывали ли мы уже эту ячейку или её актора
+		//	if (Neighbour && Neighbour->OccupyingActor && !Processed.Contains(Neighbour->OccupyingActor)) {
+		//		if (Neighbour->OccupyingActor->GetActorGuid() == CurrentCell->OccupyingActor->GetActorGuid()) {
+		//			Queue.Enqueue(Neighbour); // Добавляем соседа в очередь для обработки
+		//			Processed.Add(Neighbour->OccupyingActor); // Помечаем актора соседа как обработанного
+		//		}
+		//	}
+		//}
 
-		CurrentCell->Neighbours.Empty();
+		//CurrentCell->Neighbours.Empty();
 	}
 
 	// Скрываем основного актора и отключаем его взаимодействие
