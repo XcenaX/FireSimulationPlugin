@@ -5,6 +5,7 @@
 #include <RoomMarker.h>
 #include "BuildingGraph.generated.h"
 
+// Enumeration for door connection status
 UENUM(BlueprintType)
 enum class EConnectionStatus : uint8
 {
@@ -13,12 +14,14 @@ enum class EConnectionStatus : uint8
 	NoDoor      UMETA(DisplayName = "No Door")
 };
 
+// Struct to hold calculated fire dynamics parameters
 USTRUCT(BlueprintType)
 struct FCalculatedParameters
 {
 public:
 	GENERATED_BODY()
 
+	// Various fire dynamics parameters
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Fire Dynamics")
 	float A;
 
@@ -40,6 +43,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Fire Dynamics")
 	float LimitVisibility;
 
+	// Constructor initializing parameters to zero
 	FCalculatedParameters()
 		: A(0.f), N(0.f), GasReleasePerMeterBurn(0.f), LimitGasDensity(0.f),
 		LimitGasTemperature(0.f), LimitSmokeExtinctionCoefficient(0.f), LimitVisibility(0.f)
@@ -47,12 +51,14 @@ public:
 	}
 };
 
+// Struct to hold dynamic fire parameters
 USTRUCT(BlueprintType)
 struct FFireDynamicsParameters
 {
 public:
 	GENERATED_BODY()
 
+	// Various fire dynamics parameters
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Fire Dynamics")
 	float BurnedMass;
 
@@ -68,23 +74,28 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Fire Dynamics")
 	float Visibility;
 
+	// Constructor initializing parameters to zero
 	FFireDynamicsParameters()
 		: BurnedMass(0.f), GasDensity(0.f), GasTemperature(0.f),
 		SmokeExtinctionCoefficient(0.f), Visibility(0.f) {}
 };
 
+// Struct to store the state of a door
 USTRUCT(BlueprintType)
 struct FDoorStateImprint
 {
 	GENERATED_BODY()
 
+	// ID of the room from which the door state is recorded
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Door")
 	int32 FromRoomID;
 
+	// Status of the door
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Door")
 	EConnectionStatus Status;
 };
 
+// Class representing a room node in the building graph
 UCLASS(BlueprintType)
 class FIRESIMULATION_API URoomNode : public UObject
 {
@@ -115,8 +126,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Room")
 	float RoomVolume;
 
+	// Pointer to the room marker actor
 	ARoomMarker* RoomMarker;
 
+	// Pointer to the world
 	UWorld* World;
 
 	URoomNode();
@@ -147,18 +160,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Room")
 	FCalculatedParameters InitializeCalculatedParams();
 
-	// Спавнит в комнате туман с заданной начальной видимостью в метрах
+	// Spawn fog in the room with a given visibility
 	UFUNCTION(BlueprintCallable, Category = "Room")
 	void SpawnFog(float visibility);
 
-	// Обновляет видимость в метрах для тумана в комнате
 	UFUNCTION(BlueprintCallable, Category = "Room")
 	void UpdateFogVisibility(float visibility);
 
-	// Удаляет весь дым
 	UFUNCTION(BlueprintCallable, Category = "Room")
 	void RemoveFog();
 
+	// Make an imprint of the room state
 	UFUNCTION(BlueprintCallable, Category = "Room")
 	void MakeImprint(int32 Time, int32 ChangedDoorRoomID, EConnectionStatus NewDoorStatus);
 
@@ -174,6 +186,7 @@ protected:
 	FDoorStateImprint door_state_imprint_;
 };
 
+// Class representing a graph edge in the building graph
 UCLASS(BlueprintType)
 class UGraphEdge : public UObject
 {
@@ -193,6 +206,7 @@ public:
 
 	void Initialize(int32 InRoomStartID, int32 InRoomEndID, float InConnectionStrength);
 
+	// Set connection strength based on door status
 	UFUNCTION(BlueprintCallable, Category = "GraphEdge")
 	float SetConnectionStrengthFromStatus(EConnectionStatus ConnectionStatus)
 	{
@@ -212,6 +226,7 @@ public:
 		}
 	}
 
+	// Static function to get connection strength from door status
 	UFUNCTION(BlueprintCallable, Category = "GraphEdge")
 	static float GetConnectionStrengthFromStatus(EConnectionStatus ConnectionStatus)
 	{
@@ -229,6 +244,7 @@ public:
 	}
 };
 
+// Struct representing a pointer to a graph edge
 USTRUCT(BlueprintType)
 struct FGraphEdgePtr
 {
@@ -236,29 +252,35 @@ struct FGraphEdgePtr
 
 	UGraphEdge* Edge;
 
+	// Operator overloading to allow usage of UGraphEdge* directly
 	operator UGraphEdge* () const { return Edge; }
 };
 
+// Function to get hash of a graph edge
 FORCEINLINE uint32 GetTypeHash(const UGraphEdge& Edge)
 {
 	return HashCombine(::GetTypeHash(Edge.RoomStartID), ::GetTypeHash(Edge.RoomEndID));
 }
 
+// Overload equality operator for graph edges
 FORCEINLINE bool operator==(const UGraphEdge& A, const UGraphEdge& B)
 {
 	return A.RoomStartID == B.RoomStartID && A.RoomEndID == B.RoomEndID;
 }
 
+// Overload equality operator for graph edge pointers
 FORCEINLINE bool operator==(const FGraphEdgePtr& A, const FGraphEdgePtr& B)
 {
 	return *A.Edge == *B.Edge;
 }
 
+// Function to get hash of a graph edge pointer
 FORCEINLINE uint32 GetTypeHash(const FGraphEdgePtr& A)
 {
 	return ::GetTypeHash(*A.Edge);
 }
 
+// Struct representing a set of graph edges
 USTRUCT(BlueprintType)
 struct FGraphEdgeSet
 {
@@ -269,12 +291,14 @@ public:
 	TSet<FGraphEdgePtr> Edges;
 };
 
+// Class representing the building graph
 UCLASS(BlueprintType)
 class FIRESIMULATION_API UBuildingGraph : public UObject
 {
 public:
 	GENERATED_BODY()
 
+	// Prepare the graph for use
 	UFUNCTION(BlueprintCallable, Category = "Building Graph")
 	void PrepareGraphToWork();
 
@@ -293,24 +317,29 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Building Graph")
 	const TMap<int32, FGraphEdgeSet>& GetIncomingConnections() const;
 
+	// Calculate fire dynamics for a given time
 	UFUNCTION(BlueprintCallable, Category = "Building Graph")
 	void CalculateFireDynamicsForSecond(int32 TimeInSeconds, float TimeStep = 1.0f);
 
 	UFUNCTION(BlueprintCallable, Category = "Building Graph")
 	bool MergeToSourceRoom(int32 TargetRoomID);
 
+	// Merge a room to the source room
 	UFUNCTION(BlueprintCallable, Category = "Building Graph")
 	void ClearGraph();
 
 	bool CorrectlySetuped = false;
 
 protected:
+	// Map of room IDs to room nodes
 	UPROPERTY(VisibleAnywhere, Category = "Building Graph")
 	TMap<int32, URoomNode*> Rooms;
 
+	// Map of room IDs to outgoing connections
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Building Graph")
 	TMap<int32, FGraphEdgeSet> OutgoingConnections;
 
+	// Map of room IDs to incoming connections
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Building Graph")
 	TMap<int32, FGraphEdgeSet> IncomingConnections;
 
@@ -320,12 +349,15 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Building Graph")
 	void FindSourceRoomId();
 
+	// Calculate fire dynamics for a room at a given time
 	UFUNCTION(BlueprintCallable, Category = "Building Graph")
 	FFireDynamicsParameters CalculateFireDynamicsForRoom(URoomNode* Room, float CurrentTime, bool IsImprint);
 
+	// Perform topological sort on the graph
 	UFUNCTION(BlueprintCallable, Category = "Building Graph")
 	bool TopologicalSort();
 
+	// Update graph connections after merging a room to the source room
 	UFUNCTION(BlueprintCallable, Category = "Building Graph")
 	void UpdateGraphConnectionsAfterMergeToSourceRoom(int32 TargetRoomID);
 

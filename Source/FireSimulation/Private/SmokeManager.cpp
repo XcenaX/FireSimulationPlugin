@@ -131,7 +131,6 @@ bool USmokeManager::GetRoomStatusForActor(FString Name)
 	const bool* StatusPtr = RoomsStatus.Find(RoomMarker->RoomID);
 	if (StatusPtr == nullptr)
 	{
-		// Статус комнаты неизвестен
 		return false;
 	}
 

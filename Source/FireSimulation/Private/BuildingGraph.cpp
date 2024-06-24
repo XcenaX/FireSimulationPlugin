@@ -87,9 +87,9 @@ void URoomNode::SpawnFog(float visibility)
 	FVector RoomCenter = RoomMarker->RoomBounds->GetComponentLocation();
 	FVector RoomExtent = RoomMarker->RoomBounds->GetScaledBoxExtent();
 
-	float EmitterHeight = 20.0f; // Высота между эмиттерами
+	float EmitterHeight = 20.0f; // Height between emitters
 	float Offset = 30.0f;
-	int32 NumEmittersZ = FMath::FloorToInt((RoomExtent.Z * 2) / (EmitterHeight + Offset)); // Расчет количества эмиттеров по Z
+	int32 NumEmittersZ = FMath::FloorToInt((RoomExtent.Z * 2) / (EmitterHeight + Offset)); // Number of emitters in Z axis
 	int32 NumEmittersX = FMath::CeilToInt(RoomMarker->RoomBounds->GetScaledBoxExtent().X * 2 / 150);
 	int32 NumEmittersY = FMath::CeilToInt(RoomMarker->RoomBounds->GetScaledBoxExtent().Y * 2 / 150);
 
@@ -100,7 +100,7 @@ void URoomNode::SpawnFog(float visibility)
 			for (int32 z = 0; z < NumEmittersZ; ++z)
 			{
 				FVector EmitterLocation(
-					RoomCenter.X - RoomExtent.X + (x * 150) + 75, // +75 чтобы центрировать в своей ячейке
+					RoomCenter.X - RoomExtent.X + (x * 150) + 75, // +75 for centering
 					RoomCenter.Y - RoomExtent.Y + (y * 150) + 75,
 					RoomCenter.Z - RoomExtent.Z + (z * (EmitterHeight + Offset)) + EmitterHeight / 2
 				);
@@ -115,7 +115,7 @@ void URoomNode::SpawnFog(float visibility)
 
 				SpawnedActor->AddInstanceComponent(ParticleSystemComponent);
 				ParticleSystemComponent->SetTemplate(ParticleSystemAsset);
-				ParticleSystemComponent->RegisterComponent(); // Регистрация компонента 
+				ParticleSystemComponent->RegisterComponent(); // Register the component to make it valid
 				ParticleSystemComponent->SetRelativeLocation(EmitterLocation);
 
 				ParticleSystemComponent->SetVisibility(true);
@@ -133,11 +133,10 @@ void URoomNode::SpawnFog(float visibility)
 
 void URoomNode::UpdateFogVisibility(float Visibility)
 {
-	// Значения параметров (примеры, требуется настройка)
 	float BaseExtinction = 0.01f;
-	float k = 0.1f; // Коэффициент влияния видимости (надо эмпирический потестить это)
+	float k = 0.1f;
 
-	Visibility = FMath::Max(Visibility, 3.0f); // Видимость не может быть меньше 1 метра (можно изменить если надо)
+	Visibility = FMath::Max(Visibility, 3.0f);
 
 	float NewExtinction = BaseExtinction + k * (1 / Visibility);
 
@@ -326,17 +325,6 @@ FFireDynamicsParameters UBuildingGraph::CalculateFireDynamicsForRoom(URoomNode* 
 
 	FireDynamicsParams.GasTemperature += Room->StartTemperature * Room->InitialGasDensity / FireDynamicsParams.GasDensity;
 	FireDynamicsParams.Visibility += FMath::Min(30.0f, CalcParams.LimitVisibility / FireDynamicsParams.SmokeExtinctionCoefficient);
-/*	if (Room->IsGasSource)
-	{
-		if (Room->GetDoorStateImprint().FromRoomID == 1)
-		{
-			FFireDynamicsParameters FireDynamicsParamsImprint = Room->GetFireDynamicsImprint();
-			if (FireDynamicsParamsImprint.GasTemperature > FireDynamicsParams.GasTemperature) {
-				FireDynamicsParams.GasTemperature = FireDynamicsParamsImprint.GasTemperature;
-				FireDynamicsParams.Visibility = FireDynamicsParamsImprint.Visibility;
-			}
-		}
-	}*/
 	//UE_LOG(LogTemp, Warning, TEXT("Second: %f; ROOM %d : temp: %f, vis: %f"), CurrentTime, Room->RoomID, FireDynamicsParams.GasTemperature, FireDynamicsParams.Visibility)
 	return FireDynamicsParams;
 }
@@ -353,27 +341,24 @@ void UBuildingGraph::CalculateFireDynamicsForSecond(int32 Second, float TimeStep
 	{
 		URoomNode* Room = R.Value;
 		FFireDynamicsParameters CurrentParams = CalculateFireDynamicsForRoom(Room, Second, false);
-		//UE_LOG(LogTemp, Warning, TEXT("Current Second: %d; ROOM %d : visibility: %f, temp: %f"), Room->GetTimeImprint(), Room->RoomID, (double)CurrentParams.Visibility, (double)CurrentParams.GasTemperature);
 
 		if (Room->GetTimeImprint() != -1 && !Room->IsGasSource)
 		{
 			FFireDynamicsParameters CurrentParamsImprintTime = CalculateFireDynamicsForRoom(Room, Room->GetTimeImprint(), true);
 			FFireDynamicsParameters ImprintParams = Room->GetFireDynamicsImprint();
 
-			//UE_LOG(LogTemp, Warning, TEXT("Current Second: %d; ROOM %d : visibility_1: %f, visibility_2: %f"), Room->GetTimeImprint(), Room->RoomID, (double)ImprintParams.Visibility, (double)(ImprintParams.Visibility + (CurrentParams.Visibility - CurrentParamsImprintTime.Visibility)));
 			CurrentParams.GasDensity = FMath::Min(ImprintParams.GasDensity, ImprintParams.GasDensity + (CurrentParams.GasDensity - ImprintParams.GasDensity));
 			CurrentParams.GasTemperature = FMath::Max(ImprintParams.GasTemperature, ImprintParams.GasTemperature + (CurrentParams.GasTemperature - ImprintParams.GasTemperature));
 			CurrentParams.SmokeExtinctionCoefficient = FMath::Max(ImprintParams.SmokeExtinctionCoefficient, ImprintParams.SmokeExtinctionCoefficient + (CurrentParams.SmokeExtinctionCoefficient - ImprintParams.SmokeExtinctionCoefficient));
 			CurrentParams.Visibility = FMath::Min(ImprintParams.Visibility, ImprintParams.Visibility + (CurrentParams.Visibility - ImprintParams.Visibility));
 			UE_LOG(LogTemp, Warning, TEXT("Imprint Second: %d; ROOM %d : visibility: %f, temp: %f"), Second, Room->RoomID, (double)ImprintParams.Visibility, (double)ImprintParams.GasTemperature);
 			UE_LOG(LogTemp, Warning, TEXT("Current Imprint: %d; ROOM %d : visibility: %f, temp: %f"), Second, Room->RoomID, (double)CurrentParamsImprintTime.Visibility, (double)CurrentParamsImprintTime.GasTemperature);
-			//UE_LOG(LogTemp, Warning, TEXT("Imprint"));
 		}
 		Room->UpdateFireDynamics(CurrentParams);
 
 		UE_LOG(LogTemp, Warning, TEXT("Second: %d; ROOM %d : visibility: %f, burned mass: %f"), Second, Room->RoomID, (double)CurrentParams.Visibility, (double)CurrentParams.BurnedMass);
 
-		//// Если в комнате есть дым надо проверить есть ли в ней Particle Sytem, если нет - создать, если да - обновить видимость
+		// If there is smoke in the room, it is necessary to check if there is a Particle System, if not - create one, if yes - update visibility
 		if (CurrentParams.Visibility != 30.0) {
 			if (!Room->RoomMarker) continue;
 			if (Room->RoomMarker->FogEmitters.Num() == 0) {

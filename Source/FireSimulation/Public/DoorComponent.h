@@ -6,8 +6,10 @@
 #include "Components/BoxComponent.h"
 #include "DoorComponent.generated.h"
 
+// Delegate to notify when the door state changes
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDoorStateChangedSignature, UDoorComponent*, Door, bool, bIsOpen);
 
+// UDoorComponent class, which represents a door component in the fire simulation
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class FIRESIMULATION_API UDoorComponent : public USceneComponent
 {
@@ -17,9 +19,11 @@ public:
     UDoorComponent();
 
 protected:
+    // TickComponent function called every frame
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
+    // Box component representing the bounds of the door
     UPROPERTY(VisibleAnywhere, Category="Door")
     UBoxComponent* DoorBounds;
 
@@ -32,6 +36,7 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Door")
     bool bIsOpen;
 
+    // Delegate to notify when the door state changes
     UPROPERTY(BlueprintAssignable)
     FOnDoorStateChangedSignature OnDoorStateChangedDelegate;
 
