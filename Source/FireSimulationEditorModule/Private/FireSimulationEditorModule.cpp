@@ -37,7 +37,7 @@ void FFireSimulationEditorModule::ShutdownModule()
 TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnTabArgs& SpawnTabArgs)
 {
  
-    // Загрузка введенных пользоваталем данных
+    // Loading user-entered data
     FString AssetPath;
     UObject* Asset = nullptr;
     if (GConfig->GetString(
@@ -48,7 +48,6 @@ TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnT
     ))
     {
         Asset = LoadObject<UParticleSystem>(nullptr, *AssetPath);
-               
     }
 
     FString LoadedCubesAmount;
@@ -105,7 +104,7 @@ TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnT
         .Text(FireParticleText)
         .ContentPadding(FMargin(10.0f))
         .OnClicked(FOnClicked::CreateRaw(this, &FFireSimulationEditorModule::OnPickActorClassClicked));
-    
+
     CubesAmountTextBox->SetText(FText::FromString(LoadedCubesAmount));
     ThreadsTextBox->SetText(FText::FromString(LoadedThreads));
     FireSizeTextBox->SetText(FText::FromString(LoadedFireSize));
@@ -181,9 +180,6 @@ TSharedRef<SDockTab> FFireSimulationEditorModule::OnSpawnPluginTab(const FSpawnT
                         ]
                 ]
         ];
-
-
-
 }
 
 FReply FFireSimulationEditorModule::OnInitializeGridClicked()
@@ -195,7 +191,6 @@ FReply FFireSimulationEditorModule::OnInitializeGridClicked()
 
         if (CellSize > 0)
         {
-            // Поиск актора GridActor в мире
             if (GEditor)
             {
                 UWorld* World = GEditor->GetEditorWorldContext().World();
@@ -227,7 +222,7 @@ FReply FFireSimulationEditorModule::OnClearGridClicked()
 }
 
 FReply FFireSimulationEditorModule::OnFillGridClicked()
-{    
+{
     FString CubesAmountText = CubesAmountTextBox->GetText().ToString();
     int32 CellSize = FCString::Atoi(*CubesAmountText);
 
@@ -290,7 +285,6 @@ FReply FFireSimulationEditorModule::OnFillGridClicked()
 
 FReply FFireSimulationEditorModule::OnPickActorClassClicked()
 {
-    // Настройка конфигурации пикера ассетов
     FAssetPickerConfig AssetPickerConfig;
     AssetPickerConfig.Filter.ClassNames.Add(UParticleSystem::StaticClass()->GetFName());
     AssetPickerConfig.OnAssetSelected = FOnAssetSelected::CreateLambda([this](const FAssetData& AssetData)
@@ -308,7 +302,6 @@ FReply FFireSimulationEditorModule::OnPickActorClassClicked()
             ShowNotification("Fire Visualisation was picked!");
         });
 
-    // Создание виджета для пикера ассетов
     FContentBrowserModule& ContentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
     TSharedRef<SWidget> AssetPicker = SNew(SBox)
         .WidthOverride(500.f)
@@ -317,7 +310,6 @@ FReply FFireSimulationEditorModule::OnPickActorClassClicked()
             ContentBrowserModule.Get().CreateAssetPicker(AssetPickerConfig)
         ];
 
-    // Создание и отображение диалогового окна
     TSharedRef<SWindow> PickerWindow = SNew(SWindow)
         .Title(FText::FromString("Pick Fire visualisation"))
         .ClientSize(FVector2D(600, 500))
@@ -326,8 +318,6 @@ FReply FFireSimulationEditorModule::OnPickActorClassClicked()
         ];
 
     FSlateApplication::Get().AddModalWindow(PickerWindow, nullptr, false);
-
-
     return FReply::Handled();
 }
 
@@ -345,29 +335,24 @@ void FFireSimulationEditorModule::DrawGrid(bool bVisible, UWorld* World, AGridAc
     FVector Origin = BoxComponent->GetComponentLocation();
     FVector BoxExtent = BoxComponent->GetScaledBoxExtent();
 
-    // Получаем размеры границ сетки
-    FVector GridSize = GridActor->GridBounds->GetScaledBoxExtent() * 2; // GetScaledBoxExtent возвращает половину размеров, умножаем на 2 для получения полных размеров
+    FVector GridSize = GridActor->GridBounds->GetScaledBoxExtent() * 2;
 
-    // Вычисляем количество ячеек в каждом измерении
     int32 CellsX = FMath::CeilToInt(GridSize.X / CellSize);
     int32 CellsY = FMath::CeilToInt(GridSize.Y / CellSize);
     int32 CellsZ = FMath::CeilToInt(GridSize.Z / CellSize);
 
-    // Рассчитываем размер ячейки для каждого измерения
     float CellSizeX = (BoxExtent.X * 2) / CellsX;
     float CellSizeY = (BoxExtent.Y * 2) / CellsY;
     float CellSizeZ = (BoxExtent.Z * 2) / CellsZ;
 
     FlushPersistentDebugLines(World);
 
-    // Рисование только внешних ячеек сетки
     for (int x = 0; x < CellsX; ++x)
     {
         for (int y = 0; y < CellsY; ++y)
         {
             for (int z = 0; z < CellsZ; ++z)
             {
-                // Проверяем, является ли ячейка внешней
                 if (x == 0 || x == CellsX - 1 || y == 0 || y == CellsY - 1 || z == 0 || z == CellsZ - 1)
                 {
                     FVector CellOrigin = Origin + FVector(x * CellSizeX, y * CellSizeY, z * CellSizeZ) - BoxExtent + FVector(CellSizeX / 2, CellSizeY / 2, CellSizeZ / 2);

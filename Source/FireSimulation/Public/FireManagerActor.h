@@ -6,12 +6,13 @@
 #include <SmokeManager.h>
 #include "FireManagerActor.generated.h"
 
+// FireManagerActor class that manages the fire simulation in the game
 UCLASS()
 class FIRESIMULATION_API AFireManagerActor : public AActor
 {
     GENERATED_BODY()
 
-public:    
+public:
     // Sets default values for this actor's properties
     AFireManagerActor();
 
@@ -25,24 +26,30 @@ public:
 
     void InitializeFireSpread();
 
-    // Функция обновления распространения огня вручную. Эта функция высчитывает распространение один раз. Может пригодится если нужно быстро проверить пожар
+    // Manually updates the fire spread calculation. Useful for quickly checking the fire spread.
     UFUNCTION(BlueprintCallable, Category = "Fire Management")
     void UpdateFireSpread();
 
     void InitializeGrid(int32 CellSize, int32 Threads, int32 FireDistance, UObject* FireParticle);
 
-    // Функция запуска распространения огня, пожар распространяется каждую секунду
+    // Starts the fire spread thread, causing the fire to spread every second
     UFUNCTION(BlueprintCallable, Category = "Fire Management")
     void StartFireThread(int32 CellSize, int32 NewThreads, int32 FireDistance, UObject* FireParticle);
 
-    // Функция остановки распространения огня
+    // Stops the fire spread thread
     UFUNCTION(BlueprintCallable, Category = "Fire Management")
     void StopFireThread();
 
+    // Processes the checklist of cells to be checked for fire spread
     void processCheckList(int32 StartIndex, int32 EndIndex, TArray<FVector>& CoordsToRemove);
+
+    // Processes the new list of cells that have caught fire
     void processNewList(int32 StartIndex, int32 EndIndex, TArray<FVector>& CoordsToRemove);
+
+    // Processes the fire list of cells that are currently burning
     void processFireList(int32 StartIndex, int32 EndIndex, TArray<FVector>& CoordsToRemove);
 
+    // Parallel processing of a list of cells
     void parallelProcessList(TArray<FGridCell*>& List, TFunction<void(int32, int32, TArray<FVector>&)> ProcessFunction, TArray<FVector>& GlobalCoordsToRemove);
     void RemoveCellsByCoords(TArray<FGridCell*>& List, TArray<FVector>& CoordsToRemove);
 
@@ -51,8 +58,8 @@ public:
 
     int CalculateFP(FGridCell* Cell);
     float GetSpreadFactor(float LinearSpeed) const;
-    
-    // Показывает скрытые акторы; Тушит весь огонь
+
+    // Restores the scene by showing hidden actors and extinguishing all fire
     UFUNCTION(BlueprintCallable)
     void RestoreScene();
 
@@ -65,22 +72,33 @@ private:
     TArray<FGridCell*> NewList;
     TArray<FGridCell*> BurntList;
     int32 Threads;
-    bool JobDone = true; // Завершены ли расчеты распространения огня для текущей секунды
 
+    // Flag indicating whether the job for the current second is done
+    bool JobDone = true;
+
+    // Flag to stop the fire spread thread
     bool Stop = false;
 
+    // Mutex for thread-safe access to the lists
     FCriticalSection ListMutex;
 
+    // Indices of cells to be removed from the lists
     TArray<FVector> CheckListRemovalIndices;
     TArray<FVector> NewListRemovalIndices;
     TArray<FVector> FireListRemovalIndices;
 
+    // Grid manager for handling the fire grid
     UPROPERTY()
     UFireGridManager* GridManager;
+
+    // Smoke manager for handling smoke effects
     UPROPERTY()
     USmokeManager* SmokeManager;
 
+    // Accumulator for tracking time
     float TimeAccumulator;
+
+    // Units per meter conversion factor
     float UnitsPerMeter;
     int TotalSimulationTime;
 };

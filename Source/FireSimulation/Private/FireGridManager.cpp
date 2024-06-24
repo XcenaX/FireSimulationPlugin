@@ -14,7 +14,6 @@
 
 UFireGridManager::UFireGridManager()
 {
-	// Инициализация переменных и состояний по умолчанию
 }
 
 void UFireGridManager::InitializeGrid(UWorld* NewWorld, AGridActor* NewGridActor, int32 NewCellSize, int32 NewThreads, int32 FireSize, UObject* FireParticle)
@@ -33,10 +32,9 @@ void UFireGridManager::InitializeGrid(UWorld* NewWorld, AGridActor* NewGridActor
 		UE_LOG(LogTemp, Warning, TEXT("NO GRID ACTOR in InitializeGrid"));
 	}
 
-	// Получаем размеры границ сетки
-	FVector GridSize = GridActor->GridBounds->GetScaledBoxExtent() * 2; // GetScaledBoxExtent возвращает половину размеров, умножаем на 2 для получения полных размеров
+	FVector GridSize = GridActor->GridBounds->GetScaledBoxExtent() * 2; // GetScaledBoxExtent returns half size so we multiply by 2
 
-	// Вычисляем количество ячеек в каждом измерении
+	// Calculate the number of cells in each dimension
 	int32 CellsX = FMath::CeilToInt(GridSize.X / CellSize);
 	int32 CellsY = FMath::CeilToInt(GridSize.Y / CellSize);
 	int32 CellsZ = FMath::CeilToInt(GridSize.Z / CellSize);
@@ -61,38 +59,6 @@ void UFireGridManager::InitializeGrid(UWorld* NewWorld, AGridActor* NewGridActor
 			}
 		}
 	}
-
-	/*for (int32 i = 0; i < CellsX; i++)
-	{
-		for (int32 j = 0; j < CellsY; j++)
-		{
-			for (int32 k = 0; k < CellsZ; k++) {
-				FGridCell& CurrentCell = GetCell(i, j, k);
-
-				for (int32 dx = -1; dx <= 1; dx++) {
-					for (int32 dy = -1; dy <= 1; dy++) {
-						for (int32 dz = -1; dz <= 1; dz++) {
-							if (dx == 0 && dy == 0 && dz == 0) continue;
-
-							int32 newX = i + dx;
-							int32 newY = j + dy;
-							int32 newZ = k + dz;
-
-							if (newX >= 0 && newX < CellsX &&
-								newY >= 0 && newY < CellsY &&
-								newZ >= 0 && newZ < CellsZ) {
-
-								FGridCell& NeighbourCell = GetCell(newX, newY, newZ);
-								CurrentCell.Neighbours.Add(&NeighbourCell);
-							}
-						}
-					}
-				}
-
-			}
-		}
-	}*/
-
 	ActorCellsCount.Empty();
 }
 
@@ -115,11 +81,10 @@ void UFireGridManager::PopulateGridWithActors()
 	UBoxComponent* BoxComponent = GridActor->FindComponentByClass<UBoxComponent>();
 	if (!BoxComponent) return;
 
-    FVector GridSize = BoxComponent->GetScaledBoxExtent() * 2; // Получаем полные размеры 
+    FVector GridSize = BoxComponent->GetScaledBoxExtent() * 2; // Get full size of the box
     FVector CellSizeVector(GridSize.X / ElementsAmountX, GridSize.Y / ElementsAmountY, GridSize.Z / ElementsAmountZ);
 
-	// Заполняем сетку акторами
-	FVector GridOrigin = BoxComponent->GetComponentLocation() - GridSize / 2; // Начальная точка сетки	
+	FVector GridOrigin = BoxComponent->GetComponentLocation() - GridSize / 2; // Start point of the grid
 
 	FCollisionQueryParams QueryParams;
 	QueryParams.bReturnPhysicalMaterial = false;
@@ -205,7 +170,7 @@ TArray<FGridCell*> UFireGridManager::GetBurningCells() {
 	TArray<FGridCell*> BurningCells;
 	for (int i = 0; i < ElementsAmountX; i++) {
 		for (int j = 0; j < ElementsAmountY; j++) {
-			for (int k = 0; k < ElementsAmountZ; k++) {				
+			for (int k = 0; k < ElementsAmountZ; k++) {
 				FGridCell& Cell = GetCell(i, j, k);
 				if (Cell.Status == BURNING) {
 					BurningCells.Add(&Cell);
@@ -225,7 +190,7 @@ void UFireGridManager::CreateFireActor(FGridCell* Cell)
 		return;
 	}
 
-	// Вычисляем локацию ячейки
+	// Calculate cell's location
 	UBoxComponent* GridBoxComponent = GridActor->FindComponentByClass<UBoxComponent>();
 
 	FVector GridSize = GridBoxComponent->GetScaledBoxExtent() * 2;
@@ -252,13 +217,13 @@ void UFireGridManager::CreateFireActor(FGridCell* Cell)
 				UParticleSystemComponent* ParticleSystemComponent = OverlappedActor->FindComponentByClass<UParticleSystemComponent>();
 				if (ParticleSystemComponent && ParticleSystemComponent->Template == SelectedParticleFire)
 				{
-					// Найден актор с нужной системой частиц, не создаем нового
+					// Actor already has a fire particle system
 					return;
 				}
 			}
 		}
 	}
-	// Создаем актор огня
+	// Create fire actor
 	FActorSpawnParameters SpawnParams;
 	FRotator Rotation(0);
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
@@ -272,7 +237,7 @@ void UFireGridManager::CreateFireActor(FGridCell* Cell)
 			ActorBoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 			ActorBoxComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
 			ActorBoxComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
-			ActorBoxComponent->InitBoxExtent(FVector(FireParticleSize, FireParticleSize, FireParticleSize)); // Можно настроить под себя
+			ActorBoxComponent->InitBoxExtent(FVector(FireParticleSize, FireParticleSize, FireParticleSize));
 			ActorBoxComponent->SetWorldLocation(CellCenter);
 			ActorBoxComponent->RegisterComponent();
 			SpawnedActor->AddInstanceComponent(ActorBoxComponent);
@@ -300,11 +265,11 @@ void UFireGridManager::CreateFireActor(FGridCell* Cell)
 void UFireGridManager::RemoveBurntActor(FGridCell* StartCell) {
 	if (!StartCell || !StartCell->OccupyingActor) return;
 
-	// Используем очередь для BFS
+	// Use BFS to find all connected cells with the same actor
 	TQueue<FGridCell*> Queue;
 	Queue.Enqueue(StartCell);
 
-	// Помечаем StartCell как обработанную, чтобы избежать повторного добавления в очередь
+	// Mark all processed actors to avoid processing them again
 	TSet<AActor*> Processed;
 	Processed.Add(StartCell->OccupyingActor);
 
@@ -312,14 +277,8 @@ void UFireGridManager::RemoveBurntActor(FGridCell* StartCell) {
 		FGridCell* CurrentCell;
 		Queue.Dequeue(CurrentCell);
 
-		// Удаление FireActor и очистка ссылки, если они существуют
-		/*if (CurrentCell->FireActor) {
-			CurrentCell->FireActor->Destroy();
-			CurrentCell->FireActor = nullptr;
-		}*/
-
-		// Удаляем текущую клетку из соседей всех соседних клеток
-		/*for (FGridCell* Neighbour : CurrentCell->Neighbours) {
+		// Delete all neighbours of the current cell's neighbours
+		for (FGridCell* Neighbour : CurrentCell->Neighbours) {
 			if (Neighbour) {
 				Neighbour->RemoveNeighbour(CurrentCell);
 			}
@@ -332,21 +291,21 @@ void UFireGridManager::RemoveBurntActor(FGridCell* StartCell) {
 		}
 
 
-		// Перебор всех соседей текущей ячейки
-		//for (FGridCell* Neighbour : CurrentCell->Neighbours) {
-		//	// Проверка, не обрабатывали ли мы уже эту ячейку или её актора
-		//	if (Neighbour && Neighbour->OccupyingActor && !Processed.Contains(Neighbour->OccupyingActor)) {
-		//		if (Neighbour->OccupyingActor->GetActorGuid() == CurrentCell->OccupyingActor->GetActorGuid()) {
-		//			Queue.Enqueue(Neighbour); // Добавляем соседа в очередь для обработки
-		//			Processed.Add(Neighbour->OccupyingActor); // Помечаем актора соседа как обработанного
-		//		}
-		//	}
-		//}
+		// Iterating over all neighbors of the current cell
+		for (FGridCell* Neighbour : CurrentCell->Neighbours) {
+			// Check if we have already processed this cell or its actor
+			if (Neighbour && Neighbour->OccupyingActor && !Processed.Contains(Neighbour->OccupyingActor)) {
+				if (Neighbour->OccupyingActor->GetActorGuid() == CurrentCell->OccupyingActor->GetActorGuid()) {
+					Queue.Enqueue(Neighbour);
+					Processed.Add(Neighbour->OccupyingActor);
+				}
+			}
+		}
 
 		//CurrentCell->Neighbours.Empty();
 	}
 
-	// Скрываем основного актора и отключаем его взаимодействие
+	// Hide the main actor and disable its interaction
 	StartCell->OccupyingActor->SetActorHiddenInGame(true);
 	StartCell->OccupyingActor->SetActorEnableCollision(false);
 	StartCell->OccupyingActor->SetActorTickEnabled(false);

@@ -11,9 +11,8 @@ public class FireSimulationTests : ModuleRules
             {
                 "Core",
                 "FireSimulation"
-                // Другие зависимости модулей...
             }
-            );
+        );
 
         PrivateDependencyModuleNames.AddRange(
             new string[]
@@ -23,11 +22,7 @@ public class FireSimulationTests : ModuleRules
                 "Slate",
                 "SlateCore",
                 "UnrealEd"
-                // Важно для модулей редактора
-                // Другие зависимости модулей...
             }
-            );
-
-        // Если вы используете сторонние библиотеки, добавьте их здесь...
+        );
     }
 }

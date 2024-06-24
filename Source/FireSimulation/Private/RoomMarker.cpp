@@ -120,7 +120,7 @@ TArray<AActor*> ARoomMarker::GetActors()
 	if (!World) return Actors;
 
 	FVector RoomCenter = RoomBounds->GetComponentLocation();
-	FVector RoomSize = RoomBounds->GetScaledBoxExtent(); // ������ ������� � ���� ������� �� ������
+	FVector RoomSize = RoomBounds->GetScaledBoxExtent();
 	FCollisionShape Box = FCollisionShape::MakeBox(RoomSize);
 
 	FCollisionQueryParams QueryParams;

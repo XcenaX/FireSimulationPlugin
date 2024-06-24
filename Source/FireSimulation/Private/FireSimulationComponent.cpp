@@ -24,18 +24,14 @@ void UFireSimulationComponent::BeginPlay()
 void UFireSimulationComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// Обновление симуляции огня здесь
 }
 
 void UFireSimulationComponent::StartFireAtLocation(const FVector& Location)
 {
-	// Логика для начала симуляции огня в заданной точке
 }
 
 void UFireSimulationComponent::SetFireTexture(UTexture2D* Texture)
 {
-	// Установка текстуры огня
 }
 
 void UFireSimulationComponent::UpdateSelectedMaterial(FString NewMaterial)
@@ -57,7 +53,7 @@ void UFireSimulationComponent::UpdateSelectedMaterial(FString NewMaterial)
 }
 
 
-// функция которая не позволяет одновременно установить IsWall = true и IsBurning = true
+// A function that prevents setting IsWall = true and IsBurning = true at the same time
 void UFireSimulationComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
     Super::PostEditChangeProperty(PropertyChangedEvent);

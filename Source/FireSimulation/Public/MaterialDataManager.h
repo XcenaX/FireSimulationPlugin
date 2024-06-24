@@ -6,27 +6,29 @@
 class FIRESIMULATION_API FMaterialDataManager
 {
 public:
-    // Получение экземпляра синглтона
+    // Provides access to the singleton instance of the manager
     static FMaterialDataManager& Get()
     {
         static FMaterialDataManager Instance;
         return Instance;
     }
 
-    // Загрузка данных о материалах из JSON файла
+    // Loads material data from a source (e.g., file or database)
     bool LoadMaterialData();
 
-    // Получение данных о материале по имени
+    // Retrieves material data by material name
     const FMaterialData* GetMaterialData(const FString& MaterialName) const;
 
+    // Retrieves a list of material names
     const TArray<TSharedPtr<FString>>& GetMaterialNames() const;
 
 private:
-    // Приватный конструктор для синглтона
+    // Private constructor to enforce singleton pattern
     FMaterialDataManager() {}
 
-    // Кэш данных о материалах
+    // Map storing material data, keyed by material name
     TMap<FString, FMaterialData> MaterialDataMap;
 
+    // Cache of material names for quick access
     TArray<TSharedPtr<FString>> MaterialNamesCache;
 };
