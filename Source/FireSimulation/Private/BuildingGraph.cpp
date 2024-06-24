@@ -314,6 +314,8 @@ FFireDynamicsParameters UBuildingGraph::CalculateFireDynamicsForRoom(URoomNode* 
 			FireDynamicsParams.GasDensity += AdjacentRoomFireDynamicsParams.GasDensity + (Room->InitialGasDensity - AdjacentRoomFireDynamicsParams.GasDensity) * FMath::Exp(-ConnectionStrength * CalcParams.GasReleasePerMeterBurn * FireDynamicsParams.BurnedMass / Room->RoomVolume);
 			FireDynamicsParams.SmokeExtinctionCoefficient += AdjacentRoomFireDynamicsParams.SmokeExtinctionCoefficient + (0 - AdjacentRoomFireDynamicsParams.SmokeExtinctionCoefficient) * FMath::Exp(-ConnectionStrength * CalcParams.GasReleasePerMeterBurn * FireDynamicsParams.BurnedMass / Room->RoomVolume);
 			Count++;
+
+			UE_LOG(LogTemp, Warning, TEXT("Second: %f; ROOM 1: %d : Room 2: %d, status: %f"), CurrentTime, Room->RoomID, adjacentRoomId, ConnectionStrength);
 		}
 
 		if (Count > 0)
@@ -384,6 +386,7 @@ void UBuildingGraph::CalculateFireDynamicsForSecond(int32 Second, float TimeStep
 			}
 		}
 	}
+
 	UE_LOG(LogTemp, Warning, TEXT("\n"));
 
 }

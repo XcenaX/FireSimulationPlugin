@@ -30,8 +30,7 @@ void AFireManagerActor::BeginPlay()
 	if (!SmokeManager->CorrectlySetuped()) {
 		SmokeManager->ConditionalBeginDestroy();
 		SmokeManager = nullptr;
-	}
-
+	
 
     FString AssetPath;
     UObject* Asset = nullptr;
