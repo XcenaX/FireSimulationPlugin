@@ -7,12 +7,99 @@
 #include <MaterialDataManager.h>
 #include "Misc/DateTime.h"
 #include "HAL/PlatformTime.h"
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "Engine/Engine.h"
+#include "Widgets/Input/SButton.h"
+#include "Widgets/SWindow.h"
+#include "Widgets/DeclarativeSyntaxSupport.h"
+#include "Widgets/Text/STextBlock.h"
+#include "Framework/Application/SlateApplication.h"
+#include "Widgets/Layout/SBorder.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AFireManagerActor::AFireManagerActor()
 {
     // Set this actor to call Tick() every frame. You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = true;
+}
+
+void AFireManagerActor::ShowWarningDialog(FString Message)
+{
+	TSharedPtr<SWindow> DialogWindow = SNew(SWindow)
+		.Title(FText::FromString("Warning"))
+		.ClientSize(FVector2D(400, 200))
+		.SupportsMinimize(false)
+		.SupportsMaximize(false)
+		.IsTopmostWindow(true)
+		.SizingRule(ESizingRule::FixedSize);
+
+	TSharedPtr<SBorder> DialogContent = SNew(SBorder)
+		.Padding(10)
+		.Content()
+		[
+			SNew(SVerticalBox)
+
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				.Padding(5, 20) // Увеличиваем вертикальные отступы
+				[
+					SNew(STextBlock)
+						.Text(FText::FromString(Message))
+						.AutoWrapText(true) // Включаем автоматический перенос текста
+				]
+
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				.HAlign(HAlign_Right)
+				.Padding(5)
+				[
+					SNew(SHorizontalBox)
+
+						+ SHorizontalBox::Slot()
+						.AutoWidth()
+						.Padding(5)
+						[
+							SNew(SButton)
+								.Text(FText::FromString("OK"))
+								.OnClicked_Lambda([DialogWindow]()
+									{
+										DialogWindow->RequestDestroyWindow();
+										return FReply::Handled();
+									})
+						]
+
+						+ SHorizontalBox::Slot()
+						.AutoWidth()
+						.Padding(5)
+						[
+							SNew(SButton)
+								.Text(FText::FromString("Cancel"))
+								.OnClicked_Lambda([this, DialogWindow]()
+									{
+										DialogWindow->RequestDestroyWindow();
+										if (GEngine && GEngine->GameViewport)
+										{
+											UGameplayStatics::OpenLevel(GetWorld(), FName("MainMenu"));
+										}
+										return FReply::Handled();
+									})
+						]
+				]
+		];
+
+	DialogWindow->SetContent(DialogContent.ToSharedRef());
+
+	if (GEngine && GEngine->GameViewport)
+	{
+		TSharedPtr<SWindow> ParentWindow = GEngine->GameViewport->GetWindow();
+		if (ParentWindow.IsValid())
+		{
+			FSlateApplication::Get().AddModalWindow(DialogWindow.ToSharedRef(), ParentWindow, false);
+		}
+	}
+	
 }
 
 // Called when the game starts or when spawned
@@ -27,67 +114,80 @@ void AFireManagerActor::BeginPlay()
 	if (SmokeManager)
 		SmokeManager->Initialize(GetWorld());
 
+	if (SmokeManager->BadRooms.Num() > 0)
+	{
+		FString RoomNames;
+		for (const FString& RoomName : SmokeManager->BadRooms)
+		{
+			RoomNames += RoomName + TEXT(", ");
+		}
+		RoomNames = RoomNames.LeftChop(2);
+
+		FString Message = FString::Printf(TEXT("Rooms: %s probably don't correctly setuped because they have no actors with FireSimulationComponent in their borders. The Smoke will not be generated in those rooms. Is That OK?"), *RoomNames);
+		ShowWarningDialog(Message);
+	}
+
 	if (!SmokeManager->CorrectlySetuped()) {
 		SmokeManager->ConditionalBeginDestroy();
 		SmokeManager = nullptr;
-	
+	}
 
-    FString AssetPath;
-    UObject* Asset = nullptr;
-    if (GConfig->GetString(
-        TEXT("FireSimulationSettings"),
-        TEXT("FireParticle"),
-        AssetPath,
-        GEditorPerProjectIni
-    ))
-    {
-        Asset = LoadObject<UParticleSystem>(nullptr, *AssetPath);        
-    }
-    
+	FString AssetPath;
+	UObject* Asset = nullptr;
+	if (GConfig->GetString(
+		TEXT("FireSimulationSettings"),
+		TEXT("FireParticle"),
+		AssetPath,
+		GEditorPerProjectIni
+	))
+	{
+		Asset = LoadObject<UParticleSystem>(nullptr, *AssetPath);
+	}
 
-    FString LoadedCellSize = "";
-    GConfig->GetString(
-        TEXT("FireSimulationSettings"),
-        TEXT("CubesAmount"),
-        LoadedCellSize,
-        GEditorPerProjectIni
-    );
-
-    FString LoadedThreads = "";
-    GConfig->GetString(
-        TEXT("FireSimulationSettings"),
-        TEXT("Threads"),
-        LoadedThreads,
-        GEditorPerProjectIni
-    );
-
-    FString LoadedFireSize = "";
-    GConfig->GetString(
-        TEXT("FireSimulationSettings"),
-        TEXT("FireSize"),
-        LoadedFireSize,
-        GEditorPerProjectIni
-    );
-
-	FString LoadedUnitsPerMeter = "";	
+	FString LoadedCellSize = "";
 	GConfig->GetString(
-        TEXT("FireSimulationSettings"),
-        TEXT("UnitsPerMeter"),
-        LoadedUnitsPerMeter,
-        GEditorPerProjectIni
-    );
+		TEXT("FireSimulationSettings"),
+		TEXT("CubesAmount"),
+		LoadedCellSize,
+		GEditorPerProjectIni
+	);
 
-    int32 CellSize = FCString::Atoi(*LoadedCellSize);
+	FString LoadedThreads = "";
+	GConfig->GetString(
+		TEXT("FireSimulationSettings"),
+		TEXT("Threads"),
+		LoadedThreads,
+		GEditorPerProjectIni
+	);
+
+	FString LoadedFireSize = "";
+	GConfig->GetString(
+		TEXT("FireSimulationSettings"),
+		TEXT("FireSize"),
+		LoadedFireSize,
+		GEditorPerProjectIni
+	);
+
+	FString LoadedUnitsPerMeter = "";
+	GConfig->GetString(
+		TEXT("FireSimulationSettings"),
+		TEXT("UnitsPerMeter"),
+		LoadedUnitsPerMeter,
+		GEditorPerProjectIni
+	);
+
+	int32 CellSize = FCString::Atoi(*LoadedCellSize);
 	Threads = FCString::Atoi(*LoadedThreads);
-    int32 FireSize = FCString::Atoi(*LoadedFireSize);
-    UnitsPerMeter = FCString::Atoi(*LoadedUnitsPerMeter);
+	int32 FireSize = FCString::Atoi(*LoadedFireSize);
+	UnitsPerMeter = FCString::Atoi(*LoadedUnitsPerMeter);
 
-    GridManager = NewObject<UFireGridManager>(this, FName(TEXT("GridManager")));
+	GridManager = NewObject<UFireGridManager>(this, FName(TEXT("GridManager")));
 	GridManager->AddToRoot();
-    InitializeGrid(CellSize, Threads, FireSize, Asset);
+	InitializeGrid(CellSize, Threads, FireSize, Asset);
 	InitializeFireSpread();
 
 	FEditorDelegates::EndPIE.AddUObject(this, &AFireManagerActor::OnEndPIE);
+	
 }
 
 float AFireManagerActor::GetSpreadFactor(float LinearSpeed) const{
@@ -129,22 +229,22 @@ void AFireManagerActor::OnEndPIE(const bool bIsSimulating)
 {
     UE_LOG(LogTemp, Warning, TEXT("GAME ENDED"));
     
-    RestoreScene();
+    //RestoreScene();
 
-    CheckList.Empty();
-    NewList.Empty();
-    FireList.Empty();
+    //CheckList.Empty();
+    //NewList.Empty();
+    //FireList.Empty();
 
-    if (GridManager) {
-        GridManager->ClearGrid();
-    }
+    //if (GridManager) {
+    //    GridManager->ClearGrid();
+    //}
 
-    if (SmokeManager && SmokeManager->graph) {
-        SmokeManager->graph->ClearGraph();
-        SmokeManager->Cleanup();
-        SmokeManager->graph = nullptr;
-        SmokeManager = nullptr;
-    }
+    //if (SmokeManager && SmokeManager->graph) {
+    //    SmokeManager->graph->ClearGraph();
+    //    SmokeManager->Cleanup();
+    //    SmokeManager->graph = nullptr;
+    //    SmokeManager = nullptr;
+    //}
 }
 
 // Called every frame
@@ -532,4 +632,23 @@ void AFireManagerActor::RestoreScene() {
         }
     }
 
+}
+
+void AFireManagerActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	if (GridManager)
+	{
+		GridManager->RemoveFromRoot();
+		GridManager->ConditionalBeginDestroy();
+		GridManager = nullptr;
+	}
+
+	if (SmokeManager)
+	{
+		SmokeManager->RemoveFromRoot();
+		SmokeManager->ConditionalBeginDestroy();
+		SmokeManager = nullptr;
+	}
 }

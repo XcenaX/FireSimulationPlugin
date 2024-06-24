@@ -60,6 +60,11 @@ void USmokeManager::Initialize(UWorld* World) {
 	int32 RoomCount = 1;
 	for (ARoomMarker* Room : Rooms) {
 		FMaterialData AverageMaterialData = Room->CalculateAverageMaterialData();
+
+		if (AverageMaterialData.BurningRate == 0 || AverageMaterialData.CarbonDioxide_kg_per_kg == 0 || AverageMaterialData.LinearFlameSpeed == 0) {
+			BadRooms.Add(Room->GetName());
+		}
+
 		Room->RoomID = RoomCount;
 
 		TArray<AActor*> Actors = Room->GetActors();

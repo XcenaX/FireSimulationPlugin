@@ -282,7 +282,7 @@ void UFireGridManager::RemoveBurntActor(FGridCell* StartCell) {
 			if (Neighbour) {
 				Neighbour->RemoveNeighbour(CurrentCell);
 			}
-		}*/
+		}
 
 		UParticleSystemComponent* ParticleSystemComponent = CurrentCell->FireActor->FindComponentByClass<UParticleSystemComponent>();
 		if (ParticleSystemComponent) {

@@ -50,6 +50,8 @@ public:
 
     bool CorrectlySetuped();
 
+    TArray<FString> BadRooms; // rooms with no actors that have FireSimulationComponent
+
 private:
     TArray<ARoomMarker*> Rooms;
     TArray<UDoorComponent*> Doors;
