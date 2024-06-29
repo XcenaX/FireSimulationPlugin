@@ -42,7 +42,7 @@ Follow these steps to integrate the Fire Simulation Plugin into your Unreal Engi
    - `Number of threads` for simulation calculations
    - `Measure`. The number of Unreal Engine untis that will be equal to 1 meter.
    - `Fire distance`. Visualisation parameter. Distance between fire actors. The greater the distance, the fewer Actors will be required to represent the fire zone and fewer resources will be required.
-   - Select a `Fire Particle System`. Visualisation of fire.
+   - Select a `Fire Particle System`. Visualisation of fire. If you dont have Fire ParticlleSytem you can pick default visualisation located in `Project/Plugins/FireSimulation/Content/P_Fire.uasset`
    - Use `Draw Grid` to visualize your grid in the scene and `Clear Grid` to clear it. Be CAREFULL. If element size is too low this will crash UE.
    - Click `Confirm Changes` to confirm and save plugin settings.
 
