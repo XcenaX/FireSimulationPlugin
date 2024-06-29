@@ -14,6 +14,7 @@ Follow these steps to integrate the Fire Simulation Plugin into your Unreal Engi
    - Create a `GridActor` in your scene.
    - Assign the desired size to this actor to define the Fire Grid. The simulation will only occur within the bounds of this actor.
 
+3. You also must to place ExponentialHeightFog on scene to make smoke work.
 ### Preparing Actors for Simulation
 
 3. **Enable Fire Simulation for Actors:**
@@ -42,8 +43,8 @@ Follow these steps to integrate the Fire Simulation Plugin into your Unreal Engi
    - `Measure`. The number of Unreal Engine untis that will be equal to 1 meter.
    - `Fire distance`. Visualisation parameter. Distance between fire actors. The greater the distance, the fewer Actors will be required to represent the fire zone and fewer resources will be required.
    - Select a `Fire Particle System`. Visualisation of fire.
-   - Use `Draw Grid` to visualize your grid in the scene and `Clear Grid` to clear it.
-   - Click `Confirm Changes` to save plugin settings.
+   - Use `Draw Grid` to visualize your grid in the scene and `Clear Grid` to clear it. Be CAREFULL. If element size is too low this will crash UE.
+   - Click `Confirm Changes` to confirm and save plugin settings.
 
 ### Example Images
 
@@ -63,5 +64,23 @@ Follow these steps to integrate the Fire Simulation Plugin into your Unreal Engi
   ![Draw Grid](https://github.com/XcenaX/FireSimulationPlugin/assets/40425017/a83eef18-da6c-4835-a63b-7486c9c71cce)
 
 
-7. **Testing the Program:**
-   Now you're ready to test your setup and see the fire and smoke simulation in action.
+- **PLUGIN EXAMPLE OF WORK**
+
+## 1
+  ![image](https://github.com/XcenaX/FireSimulationPlugin/assets/40425017/91f50753-e2db-4cde-b79e-d0390bb4e4e9)
+
+
+## 2
+![image](https://github.com/XcenaX/FireSimulationPlugin/assets/40425017/0d46e556-4eb0-41be-aecb-eaa66170c370)
+
+
+## 3
+![image](https://github.com/XcenaX/FireSimulationPlugin/assets/40425017/06e7f0df-8622-4790-91df-7190916d284a)
+
+
+## 4
+![image](https://github.com/XcenaX/FireSimulationPlugin/assets/40425017/a297dde3-7e49-4547-94b4-0fc3e86e1222)
+
+
+## 5
+![image](https://github.com/XcenaX/FireSimulationPlugin/assets/40425017/b7ea8923-8c18-41db-b14f-ae3ecedaaf77)
