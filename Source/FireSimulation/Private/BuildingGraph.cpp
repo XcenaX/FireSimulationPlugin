@@ -84,48 +84,50 @@ void UGraphEdge::Initialize(int32 InRoomStartID = -1, int32 InRoomEndID = -1, fl
 void URoomNode::SpawnFog(float visibility)
 {
 	if (!World) return;
-	FVector RoomCenter = RoomMarker->RoomBounds->GetComponentLocation();
-	FVector RoomExtent = RoomMarker->RoomBounds->GetScaledBoxExtent();
+	for (auto RoomMarker : RoomMarkers) {
+		FVector RoomCenter = RoomMarker->RoomBounds->GetComponentLocation();
+		FVector RoomExtent = RoomMarker->RoomBounds->GetScaledBoxExtent();
 
-	float EmitterHeight = 20.0f; // Height between emitters
-	float Offset = 30.0f;
-	int32 NumEmittersZ = FMath::FloorToInt((RoomExtent.Z * 2) / (EmitterHeight + Offset)); // Number of emitters in Z axis
-	int32 NumEmittersX = FMath::CeilToInt(RoomMarker->RoomBounds->GetScaledBoxExtent().X * 2 / 150);
-	int32 NumEmittersY = FMath::CeilToInt(RoomMarker->RoomBounds->GetScaledBoxExtent().Y * 2 / 150);
+		float EmitterHeight = 20.0f; // Height between emitters
+		float Offset = 30.0f;
+		int32 NumEmittersZ = FMath::FloorToInt((RoomExtent.Z * 2) / (EmitterHeight + Offset)); // Number of emitters in Z axis
+		int32 NumEmittersX = FMath::CeilToInt(RoomMarker->RoomBounds->GetScaledBoxExtent().X * 2 / 150);
+		int32 NumEmittersY = FMath::CeilToInt(RoomMarker->RoomBounds->GetScaledBoxExtent().Y * 2 / 150);
 
-	for (int32 x = 0; x < NumEmittersX; ++x)
-	{
-		for (int32 y = 0; y < NumEmittersY; ++y)
+		for (int32 x = 0; x < NumEmittersX; ++x)
 		{
-			for (int32 z = 0; z < NumEmittersZ; ++z)
+			for (int32 y = 0; y < NumEmittersY; ++y)
 			{
-				FVector EmitterLocation(
-					RoomCenter.X - RoomExtent.X + (x * 150) + 75, // +75 for centering
-					RoomCenter.Y - RoomExtent.Y + (y * 150) + 75,
-					RoomCenter.Z - RoomExtent.Z + (z * (EmitterHeight + Offset)) + EmitterHeight / 2
-				);
+				for (int32 z = 0; z < NumEmittersZ; ++z)
+				{
+					FVector EmitterLocation(
+						RoomCenter.X - RoomExtent.X + (x * 150) + 75, // +75 for centering
+						RoomCenter.Y - RoomExtent.Y + (y * 150) + 75,
+						RoomCenter.Z - RoomExtent.Z + (z * (EmitterHeight + Offset)) + EmitterHeight / 2
+					);
 
-				FActorSpawnParameters SpawnParams;
-				FRotator Rotation(0);
-				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-				AActor* SpawnedActor = World->SpawnActor<AActor>(AActor::StaticClass(), EmitterLocation, Rotation, SpawnParams);
+					FActorSpawnParameters SpawnParams;
+					FRotator Rotation(0);
+					SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+					AActor* SpawnedActor = World->SpawnActor<AActor>(AActor::StaticClass(), EmitterLocation, Rotation, SpawnParams);
 
-				UParticleSystemComponent* ParticleSystemComponent = NewObject<UParticleSystemComponent>(SpawnedActor, UParticleSystemComponent::StaticClass());
-				UParticleSystem* ParticleSystemAsset = LoadObject<UParticleSystem>(nullptr, TEXT("/FireSimulation/Fog_PS"));
+					UParticleSystemComponent* ParticleSystemComponent = NewObject<UParticleSystemComponent>(SpawnedActor, UParticleSystemComponent::StaticClass());
+					UParticleSystem* ParticleSystemAsset = LoadObject<UParticleSystem>(nullptr, TEXT("/FireSimulation/Fog_PS"));
 
-				SpawnedActor->AddInstanceComponent(ParticleSystemComponent);
-				ParticleSystemComponent->SetTemplate(ParticleSystemAsset);
-				ParticleSystemComponent->RegisterComponent(); // Register the component to make it valid
-				ParticleSystemComponent->SetRelativeLocation(EmitterLocation);
+					SpawnedActor->AddInstanceComponent(ParticleSystemComponent);
+					ParticleSystemComponent->SetTemplate(ParticleSystemAsset);
+					ParticleSystemComponent->RegisterComponent(); // Register the component to make it valid
+					ParticleSystemComponent->SetRelativeLocation(EmitterLocation);
 
-				ParticleSystemComponent->SetVisibility(true);
-				ParticleSystemComponent->Activate();
-				SpawnedActor->RegisterAllComponents();
+					ParticleSystemComponent->SetVisibility(true);
+					ParticleSystemComponent->Activate();
+					SpawnedActor->RegisterAllComponents();
 
-				UpdateFogVisibility(visibility);
-				RoomMarker->FogEmitters.Add(ParticleSystemComponent);
-				UMaterialInstanceDynamic* DynMaterial = ParticleSystemComponent->CreateDynamicMaterialInstance(0);
-				RoomMarker->DynamicMaterials.Add(DynMaterial);
+					UpdateFogVisibility(visibility);
+					RoomMarker->FogEmitters.Add(ParticleSystemComponent);
+					UMaterialInstanceDynamic* DynMaterial = ParticleSystemComponent->CreateDynamicMaterialInstance(0);
+					RoomMarker->DynamicMaterials.Add(DynMaterial);
+				}
 			}
 		}
 	}
@@ -134,28 +136,36 @@ void URoomNode::SpawnFog(float visibility)
 void URoomNode::UpdateFogVisibility(float Visibility)
 {
 	float BaseExtinction = 0.01f;
-	float k = 0.1f;
+	float k = 0.4f;
 
 	Visibility = FMath::Max(Visibility, 3.0f);
-
-	float NewExtinction = BaseExtinction + k * (1 / Visibility);
-
-	for (UMaterialInstanceDynamic* Material : RoomMarker->DynamicMaterials)
-	{
-		if (Material)
+	// 0.01 + 0.03 * (1/3)
+	// 0.015
+	float NewExtinction = BaseExtinction + (k * (1.5 / Visibility));
+	for (auto RoomMarker : RoomMarkers) {
+		for (UMaterialInstanceDynamic* Material : RoomMarker->DynamicMaterials)
 		{
-			Material->SetScalarParameterValue(FName("Extincion"), NewExtinction);
+			if (Material)
+			{
+				float CurrentExtinction;
+				Material->GetScalarParameterValue(FName("Extincion"), CurrentExtinction);
+				if (NewExtinction < CurrentExtinction) {
+					Material->SetScalarParameterValue(FName("Extincion"), NewExtinction);
+				}
+			}
 		}
 	}
 }
 
 void URoomNode::RemoveFog()
 {
-	for (UParticleSystemComponent* Emitter : RoomMarker->FogEmitters)
-	{
-		if (Emitter)
+	for (auto RoomMarker : RoomMarkers) {
+		for (UParticleSystemComponent* Emitter : RoomMarker->FogEmitters)
 		{
-			Emitter->DestroyComponent();
+			if (Emitter)
+			{
+				Emitter->DestroyComponent();
+			}
 		}
 	}
 }
@@ -362,18 +372,17 @@ void UBuildingGraph::CalculateFireDynamicsForSecond(int32 Second, float TimeStep
 
 		// If there is smoke in the room, it is necessary to check if there is a Particle System, if not - create one, if yes - update visibility
 		if (CurrentParams.Visibility != 30.0) {
-			if (!Room->RoomMarker) continue;
-			if (Room->RoomMarker->FogEmitters.Num() == 0) {
-				Room->SpawnFog(CurrentParams.Visibility);
-			}
-			else {
-				Room->UpdateFogVisibility(CurrentParams.Visibility);
+			for (auto RoomMarker : Room->RoomMarkers) {
+				if (RoomMarker->FogEmitters.Num() == 0) {
+					Room->SpawnFog(CurrentParams.Visibility);
+				}
+				else {
+					Room->UpdateFogVisibility(CurrentParams.Visibility);
+				}
 			}
 		}
-	}
-
+	}	
 	UE_LOG(LogTemp, Warning, TEXT("\n"));
-
 }
 
 bool UBuildingGraph::TopologicalSort()
@@ -460,6 +469,8 @@ bool UBuildingGraph::MergeToSourceRoom(int32 TargetRoomID)
 	URoomNode* SourceRoom = Rooms[SourceRoomID];
 	URoomNode* TargetRoom = Rooms[TargetRoomID];
 
+	SourceRoom->RoomMarkers.Add(TargetRoom->RoomMarkers[0]);
+	
 	float TotalVolume = SourceRoom->RoomVolume + TargetRoom->RoomVolume;
 	if (TotalVolume > 0)
 	{
@@ -478,10 +489,10 @@ bool UBuildingGraph::MergeToSourceRoom(int32 TargetRoomID)
 	SourceRoom->calculated_params_ = SourceRoom->InitializeCalculatedParams();
 	Rooms.Remove(TargetRoomID);
 	SourceRoom->MakeImprint(0, 1, EConnectionStatus::NoDoor);
-
+	
 	UpdateGraphConnectionsAfterMergeToSourceRoom(TargetRoomID);
 
-	UE_LOG(LogTemp, Log, TEXT("Rooms merged: SourceRoomID: %d, TargetRoomID: %d"), SourceRoomID, TargetRoomID);
+	// UE_LOG(LogTemp, Log, TEXT("Rooms merged: SourceRoomID: %d, TargetRoomID: %d"), SourceRoomID, TargetRoomID);
 
 	return true;
 }
@@ -528,9 +539,13 @@ void UBuildingGraph::UpdateGraphConnectionsAfterMergeToSourceRoom(int32 TargetRo
 
 	if (OutgoingConnections.Contains(TargetRoomID)) {
 		FGraphEdgeSet& TargetEdges = OutgoingConnections[TargetRoomID];
-		for (UGraphEdge* Edge : TargetEdges.Edges) {
-			UGraphEdge* NewEdge = DuplicateObject(Edge, this);
+		for (UGraphEdge* Edge : TargetEdges.Edges) {					
+			//UGraphEdge* NewEdge = DuplicateObject(Edge, this);			
+			UGraphEdge* NewEdge = NewObject<UGraphEdge>(this);
+
 			NewEdge->RoomStartID = SourceRoomID;
+			NewEdge->RoomEndID = Edge->RoomEndID;
+			NewEdge->ConnectionStrength = Edge->ConnectionStrength;
 
 			FEdgeKey Key(SourceRoomID, NewEdge->RoomEndID);
 			EdgeStrengths.FindOrAdd(Key).Add(NewEdge->ConnectionStrength);

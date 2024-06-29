@@ -86,7 +86,7 @@ void USmokeManager::Initialize(UWorld* World) {
 
 		UE_LOG(LogTemp, Warning, TEXT("ROOM %d : CombustionCompletenessCoefficient: %f; HeatAbsorptionCoefficient: %f; StartTemperature: %f, InitialGasDensity: %f;  Cp: %f ; Volume: %f ; LowestHeatOfCombustion_kJ_per_kg: %f ; LinearFlameSpeed: %f ; BurningRate: %f ; Smoke: %f"), RoomCount, (double)Room->CombustionCompletenessCoefficient, (double)Room->HeatAbsorptionCoefficient, (double)Room->StartTemperature, (double)Room->InitialGasDensity, (double)Room->Cp, (double)Room->GetRoomVolume(UnitsPerMeter), (double)AverageMaterialData.LowestHeatOfCombustion_kJ_per_kg, (double)AverageMaterialData.LinearFlameSpeed, (double)AverageMaterialData.BurningRate, (double)AverageMaterialData.SmokeGeneration)
 
-			RoomNode->RoomMarker = Room;
+		RoomNode->RoomMarkers.Add(Room);
 
 		graph->AddRoom(RoomNode);
 		RoomCount++;

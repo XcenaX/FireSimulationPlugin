@@ -81,10 +81,20 @@ void UFireGridManager::PopulateGridWithActors()
 	UBoxComponent* BoxComponent = GridActor->FindComponentByClass<UBoxComponent>();
 	if (!BoxComponent) return;
 
-    FVector GridSize = BoxComponent->GetScaledBoxExtent() * 2; // Get full size of the box
-    FVector CellSizeVector(GridSize.X / ElementsAmountX, GridSize.Y / ElementsAmountY, GridSize.Z / ElementsAmountZ);
+	FVector GridSize = BoxComponent->GetScaledBoxExtent() * 2; // Get full size of the box
+	FVector CellSizeVector(GridSize.X / ElementsAmountX, GridSize.Y / ElementsAmountY, GridSize.Z / ElementsAmountZ);
 
-	FVector GridOrigin = BoxComponent->GetComponentLocation() - GridSize / 2; // Start point of the grid
+	// Вычисление дополнительного количества ячеек, выходящих за границы
+	float TotalCellSizeX = ElementsAmountX * CellSizeVector.X;
+	float TotalCellSizeY = ElementsAmountY * CellSizeVector.Y;
+	float TotalCellSizeZ = ElementsAmountZ * CellSizeVector.Z;
+
+	float ExtraCellsX = (TotalCellSizeX - GridSize.X) / 2;
+	float ExtraCellsY = (TotalCellSizeY - GridSize.Y) / 2;
+	float ExtraCellsZ = (TotalCellSizeZ - GridSize.Z) / 2;
+
+	// Корректируем начальную точку, чтобы сетка была симметричной
+	FVector AdjustedOrigin = BoxComponent->GetComponentLocation() - FVector(TotalCellSizeX / 2, TotalCellSizeY / 2, TotalCellSizeZ / 2);
 
 	FCollisionQueryParams QueryParams;
 	QueryParams.bReturnPhysicalMaterial = false;
@@ -94,13 +104,13 @@ void UFireGridManager::PopulateGridWithActors()
 		for (int32 y = 0; y < ElementsAmountY; y++)
 		{
 			for (int32 z = 0; z < ElementsAmountZ; z++)
-			{				
+			{
 				FGridCell& Cell = GetCell(x, y, z);
-				FVector CellCenter = GridOrigin + FVector(x * CellSizeVector.X, y * CellSizeVector.Y, z * CellSizeVector.Z) + CellSizeVector / 2;
+				FVector CellCenter = AdjustedOrigin + FVector(x * CellSizeVector.X, y * CellSizeVector.Y, z * CellSizeVector.Z) + CellSizeVector / 2;
 				FCollisionShape Box = FCollisionShape::MakeBox(CellSizeVector / 2);
 				TArray<FOverlapResult> OverlapResults;
 				World->OverlapMultiByChannel(OverlapResults, CellCenter, FQuat::Identity, ECC_WorldStatic, Box, QueryParams);
-				
+
 				AActor* PickedActor = nullptr;
 				float MaxLinearFlameSpeed = 0;
 				UFireSimulationComponent* PickedFireComp = nullptr;
@@ -145,8 +155,8 @@ void UFireGridManager::PopulateGridWithActors()
 					{
 						ActorCellsCount.Add(PickedActor, 1);
 					}
-				}					
-			}	
+				}
+			}
 		}
 	}
 
@@ -159,12 +169,15 @@ void UFireGridManager::PopulateGridWithActors()
 				FGridCell& Cell = GetCell(x, y, z);
 				if (Cell.OccupyingActor) {
 					UFireSimulationComponent* FireComp = ActorToFireCompMap.FindRef(Cell.OccupyingActor);
-					Cell.mass = FireComp->Mass / ActorCellsCount[Cell.OccupyingActor];
+					if (FireComp) {
+						Cell.mass = FireComp->Mass / ActorCellsCount[Cell.OccupyingActor];
+					}
 				}
 			}
 		}
 	}
 }
+
 
 TArray<FGridCell*> UFireGridManager::GetBurningCells() {
 	TArray<FGridCell*> BurningCells;
@@ -278,11 +291,11 @@ void UFireGridManager::RemoveBurntActor(FGridCell* StartCell) {
 		Queue.Dequeue(CurrentCell);
 
 		// Delete all neighbours of the current cell's neighbours
-		for (FGridCell* Neighbour : CurrentCell->Neighbours) {
+		/*for (FGridCell* Neighbour : CurrentCell->Neighbours) {
 			if (Neighbour) {
 				Neighbour->RemoveNeighbour(CurrentCell);
 			}
-		}
+		}*/
 
 		UParticleSystemComponent* ParticleSystemComponent = CurrentCell->FireActor->FindComponentByClass<UParticleSystemComponent>();
 		if (ParticleSystemComponent) {
@@ -292,15 +305,15 @@ void UFireGridManager::RemoveBurntActor(FGridCell* StartCell) {
 
 
 		// Iterating over all neighbors of the current cell
-		for (FGridCell* Neighbour : CurrentCell->Neighbours) {
-			// Check if we have already processed this cell or its actor
-			if (Neighbour && Neighbour->OccupyingActor && !Processed.Contains(Neighbour->OccupyingActor)) {
-				if (Neighbour->OccupyingActor->GetActorGuid() == CurrentCell->OccupyingActor->GetActorGuid()) {
-					Queue.Enqueue(Neighbour);
-					Processed.Add(Neighbour->OccupyingActor);
-				}
-			}
-		}
+		//for (FGridCell* Neighbour : CurrentCell->Neighbours) {
+		//	// Check if we have already processed this cell or its actor
+		//	if (Neighbour && Neighbour->OccupyingActor && !Processed.Contains(Neighbour->OccupyingActor)) {
+		//		if (Neighbour->OccupyingActor->GetActorGuid() == CurrentCell->OccupyingActor->GetActorGuid()) {
+		//			Queue.Enqueue(Neighbour);
+		//			Processed.Add(Neighbour->OccupyingActor);
+		//		}
+		//	}
+		//}
 
 		//CurrentCell->Neighbours.Empty();
 	}

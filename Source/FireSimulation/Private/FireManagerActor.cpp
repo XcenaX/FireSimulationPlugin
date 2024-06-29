@@ -407,7 +407,7 @@ void AFireManagerActor::processCheckList(int32 StartIndex, int32 EndIndex, TArra
 		// 26 - Empirically determined maximum flame speed
 		float Probability = ((LinearSpeed * FP) / 26) * SpreadFactor;
 
-		if (i == StartIndex + 1) {
+		if (i == StartIndex + 10) {
 			UE_LOG(LogTemp, Warning, TEXT("FP: %d; Probability: %f"), FP, Probability);
 		}
 
@@ -446,9 +446,12 @@ void AFireManagerActor::processNewList(int32 StartIndex, int32 EndIndex, TArray<
 			if (FireComp && !SmokeManager->GetRoomStatusForActor(cell->OccupyingActor->GetName()) && !FireComp->IsWall) {
 				int32 RoomID = SmokeManager->GetRoomIdForActor(cell->OccupyingActor->GetName());
 				if (RoomID >= 0) {
-					UE_LOG(LogTemp, Warning, TEXT("MERGE ROOM : %d ; Actor: %s"), RoomID, *cell->OccupyingActor->GetName());
-					SmokeManager->SetRoomStatus(RoomID, true);
-					SmokeManager->graph->MergeToSourceRoom(RoomID);
+					UE_LOG(LogTemp, Warning, TEXT("MERGE ROOM : %d ; Actor: %s"), RoomID, *cell->OccupyingActor->GetName());					
+					AsyncTask(ENamedThreads::GameThread, [this, RoomID]() {
+						SmokeManager->SetRoomStatus(RoomID, true);
+						SmokeManager->graph->MergeToSourceRoom(RoomID);
+					});
+					//SmokeManager->graph->MergeToSourceRoom(RoomID);
 				}
 			}
 		}

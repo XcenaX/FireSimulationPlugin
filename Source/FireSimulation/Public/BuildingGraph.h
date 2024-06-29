@@ -126,8 +126,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Room")
 	float RoomVolume;
 
-	// Pointer to the room marker actor
-	ARoomMarker* RoomMarker;
+	// Pointer to the room marker actors
+	TArray<ARoomMarker*> RoomMarkers;
 
 	// Pointer to the world
 	UWorld* World;

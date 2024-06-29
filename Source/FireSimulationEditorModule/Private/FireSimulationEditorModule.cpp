@@ -329,40 +329,52 @@ void FFireSimulationEditorModule::ShowNotification(FString message) {
 
 void FFireSimulationEditorModule::DrawGrid(bool bVisible, UWorld* World, AGridActor* GridActor, int32 CellSize)
 {
+    if (!GridActor || !World || CellSize <= 0) return;
+
     UBoxComponent* BoxComponent = Cast<UBoxComponent>(GridActor->GetComponentByClass(UBoxComponent::StaticClass()));
     if (!BoxComponent) return;
 
     FVector Origin = BoxComponent->GetComponentLocation();
     FVector BoxExtent = BoxComponent->GetScaledBoxExtent();
 
-    FVector GridSize = GridActor->GridBounds->GetScaledBoxExtent() * 2;
+    FVector GridSize = BoxExtent * 2;
 
+    // Вычисляем количество ячеек по каждой оси
     int32 CellsX = FMath::CeilToInt(GridSize.X / CellSize);
     int32 CellsY = FMath::CeilToInt(GridSize.Y / CellSize);
     int32 CellsZ = FMath::CeilToInt(GridSize.Z / CellSize);
 
-    float CellSizeX = (BoxExtent.X * 2) / CellsX;
-    float CellSizeY = (BoxExtent.Y * 2) / CellsY;
-    float CellSizeZ = (BoxExtent.Z * 2) / CellsZ;
+    // Все ячейки должны быть одинакового размера
+    FVector CellSizeVector(CellSize, CellSize, CellSize);
+
+    // Вычисление дополнительного количества ячеек, выходящих за границы
+    float TotalCellSizeX = CellsX * CellSize;
+    float TotalCellSizeY = CellsY * CellSize;
+    float TotalCellSizeZ = CellsZ * CellSize;
+
+    float ExtraCellsX = (TotalCellSizeX - GridSize.X) / 2;
+    float ExtraCellsY = (TotalCellSizeY - GridSize.Y) / 2;
+    float ExtraCellsZ = (TotalCellSizeZ - GridSize.Z) / 2;
+
+    // Корректируем начальную точку, чтобы сетка была симметричной
+    FVector AdjustedOrigin = Origin - FVector(ExtraCellsX, ExtraCellsY, ExtraCellsZ);
 
     FlushPersistentDebugLines(World);
 
-    for (int x = 0; x < CellsX; ++x)
+    for (int32 x = 0; x < CellsX; ++x)
     {
-        for (int y = 0; y < CellsY; ++y)
+        for (int32 y = 0; y < CellsY; ++y)
         {
-            for (int z = 0; z < CellsZ; ++z)
+            for (int32 z = 0; z < CellsZ; ++z)
             {
-                if (x == 0 || x == CellsX - 1 || y == 0 || y == CellsY - 1 || z == 0 || z == CellsZ - 1)
-                {
-                    FVector CellOrigin = Origin + FVector(x * CellSizeX, y * CellSizeY, z * CellSizeZ) - BoxExtent + FVector(CellSizeX / 2, CellSizeY / 2, CellSizeZ / 2);
-                    DrawDebugBox(World, CellOrigin, FVector(CellSizeX / 2, CellSizeY / 2, CellSizeZ / 2), FColor::Blue, bVisible, -1.f, 0, 1);
-                }
+                FVector CellOrigin = AdjustedOrigin + FVector(x * CellSize, y * CellSize, z * CellSize) - BoxExtent + FVector(CellSize / 2, CellSize / 2, CellSize / 2);
+                DrawDebugBox(World, CellOrigin, FVector(CellSize / 2, CellSize / 2, CellSize / 2), FColor::Blue, bVisible, -1.f, 0, 1);
             }
         }
     }
-
 }
+
+
 
 #undef LOCTEXT_NAMESPACE
 
