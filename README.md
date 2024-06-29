@@ -64,7 +64,7 @@ Follow these steps to integrate the Fire Simulation Plugin into your Unreal Engi
   ![Draw Grid](https://github.com/XcenaX/FireSimulationPlugin/assets/40425017/a83eef18-da6c-4835-a63b-7486c9c71cce)
 
 
-- **PLUGIN EXAMPLE OF WORK**
+# EXAMPLE OF PLUGINS WORK
 
 ## Scene setup
 <img width="910" alt="image" src="https://github.com/XcenaX/FireSimulationPlugin/assets/40425017/06dcb48c-58ff-42b8-92e1-7d9d118ee0e4">
