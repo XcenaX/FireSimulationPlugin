@@ -1,5 +1,5 @@
 # FireSimulationPlugin
-```Plugin can contain bugs. If you found some, please inform. I will be very grateful```  
+```This is our first UE4 plugin. Plugin can contain bugs. If you found some, please inform. We will be very grateful```  
 This plugin for Unreal Engine 4 enables the simulation of fire and smoke propagation within your scenes. 
 
 ## How to Use
