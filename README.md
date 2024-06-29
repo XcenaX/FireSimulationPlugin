@@ -24,6 +24,7 @@ Follow these steps to integrate the Fire Simulation Plugin into your Unreal Engi
      - `IsWall`: Walls cannot burn.
      - `IsBurning`: If `true`, the actor is a starting point for the fire to spread. There MUST be only 1 starting point.
      - `Selected material`: The name of a material that has a set of combustion parameters such as Linear flame speed, Lowest Heat Of Combustion, Burning Rate, etc.
+     You can explore JSON file in `YourProject\Plugins\FireSimulation\Content\Data\materials.json`
 
 4. **Mark Room Boundaries:**
    - Place `RoomMarker` actors in the scene to define the boundaries of rooms. Smoke will be generated within these boundaries.
