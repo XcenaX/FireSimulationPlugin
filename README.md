@@ -14,7 +14,7 @@ Follow these steps to integrate the Fire Simulation Plugin into your Unreal Engi
    - Create a `GridActor` in your scene.
    - Assign the desired size to this actor to define the Fire Grid. The simulation will only occur within the bounds of this actor.
 
-3. You also must to place ExponentialHeightFog on scene to make smoke work.
+3. You also must to place `ExponentialHeightFog` on scene to make smoke work.
 ### Preparing Actors for Simulation
 
 3. **Enable Fire Simulation for Actors:**
