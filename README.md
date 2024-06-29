@@ -66,21 +66,25 @@ Follow these steps to integrate the Fire Simulation Plugin into your Unreal Engi
 
 - **PLUGIN EXAMPLE OF WORK**
 
-## 1
+## Scene setup
+<img width="910" alt="image" src="https://github.com/XcenaX/FireSimulationPlugin/assets/40425017/06dcb48c-58ff-42b8-92e1-7d9d118ee0e4">
+
+
+## 10 seconds
   ![image](https://github.com/XcenaX/FireSimulationPlugin/assets/40425017/91f50753-e2db-4cde-b79e-d0390bb4e4e9)
 
 
-## 2
+## 40 seconds
 ![image](https://github.com/XcenaX/FireSimulationPlugin/assets/40425017/0d46e556-4eb0-41be-aecb-eaa66170c370)
 
 
-## 3
+## 150 seconds
 ![image](https://github.com/XcenaX/FireSimulationPlugin/assets/40425017/06e7f0df-8622-4790-91df-7190916d284a)
 
 
-## 4
+## 185 seconds
 ![image](https://github.com/XcenaX/FireSimulationPlugin/assets/40425017/a297dde3-7e49-4547-94b4-0fc3e86e1222)
 
 
-## 5
+## 240 seconds
 ![image](https://github.com/XcenaX/FireSimulationPlugin/assets/40425017/b7ea8923-8c18-41db-b14f-ae3ecedaaf77)
